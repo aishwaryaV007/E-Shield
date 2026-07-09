@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: FastAPI routing/schema layer for Ingestion.
+# 1. FILE PURPOSE: API routes for ingesting scanned answer scripts.
 # 2. RESPONSIBILITIES:
-#    - Expose API contracts for the frontend.
-#    - Ensure strict type validation.
-# 3. PLANNED CONTENTS: Code block defining Ingestion functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - POST /ingest — accept uploaded PDFs/images for a batch and start preprocessing.
+#    - POST /blankcheck — run page-count + ink-presence check on a script.
+# 3. PLANNED CONTENTS: FastAPI endpoint functions delegating to services/batch_service + app/ingestion/*.
+# 4. INPUTS / OUTPUTS: Inputs: multipart uploads, batch id. Outputs: JSON ingest status / blankcheck results.
+# 5. DEPENDS ON / USED BY: fastapi, api/schemas.py, services/batch_service.py, app/ingestion/*.
