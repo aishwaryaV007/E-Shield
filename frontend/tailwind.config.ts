@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Tailwind to present evidence for human review.
+ 1. FILE PURPOSE: Tailwind CSS configuration (content paths, theme tokens).
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Tailwind functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Set content globs to src/app + src/components.
+    - Extend the theme (flag-severity colours, spacing) and register plugins.
+ 3. PLANNED CONTENTS: `export default { content, theme:{extend}, plugins } satisfies Config`.
+ 4. INPUTS / OUTPUTS: Inputs: class usage in TSX. Outputs: generated utility CSS.
+ 5. DEPENDS ON / USED BY: tailwindcss; consumed via globals.css.
 */
