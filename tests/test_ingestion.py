@@ -1,7 +1,8 @@
-# 1. FILE PURPOSE: Test suite for Test Ingestion.
+# 1. FILE PURPOSE: Test suite for the ingestion pipeline in backend/app/ingestion/.
 # 2. RESPONSIBILITIES:
-#    - Verify logic.
-#    - Prevent regressions.
-# 3. PLANNED CONTENTS: Code block defining Test Ingestion functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Mock data. Outputs: Pass/fail results.
-# 5. DEPENDS ON / USED BY: pytest
+#    - Test backend/app/ingestion/pdf_loader.py — PDF to image rasterization.
+#    - Test backend/app/ingestion/preprocess.py — deskew, denoise, binarize.
+#    - Test backend/app/ingestion/blankcheck.py — page count and ink-presence detection.
+# 3. PLANNED CONTENTS: One test function per ingestion module; uses sample image fixtures.
+# 4. INPUTS / OUTPUTS: Inputs: Sample PDFs and images from data/raw. Outputs: pytest pass/fail.
+# 5. DEPENDS ON / USED BY: pytest, backend/app/ingestion/* (resolved via pyproject.toml pythonpath).
