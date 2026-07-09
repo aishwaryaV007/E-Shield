@@ -231,15 +231,18 @@ E-Shield/
 │   ├── requirements.txt / requirements-dev.txt / pyproject.toml
 │   ├── config.py            # typed settings from .env
 │   ├── main.py              # FastAPI app factory
-│   └── app/
-│       ├── ingestion/       # pdf_loader, preprocess, blankcheck
-│       ├── calibration/     # zone template save/load
-│       ├── ocr/             # digit_ocr, prose_ocr, ambiguity fallback
-│       ├── engines/         # marksafe, copycatch, scriptid, reeval_guard, rubriclens
-│       ├── models/          # embedder (MiniLM), nli (deberta)
-│       ├── storage/         # db (SQLite), json_store, schema.sql
-│       ├── api/             # routes/ (ingestion, calibration, pipeline, results), schemas, deps
-│       └── utils/           # logging, image_ops (evidence crops)
+│   ├── app/
+│   │   ├── ingestion/       # pdf_loader, preprocess, blankcheck
+│   │   ├── calibration/     # zone template save/load
+│   │   ├── ocr/             # digit_ocr, prose_ocr, ambiguity fallback
+│   │   ├── engines/         # marksafe, copycatch, scriptid, reeval_guard, rubriclens
+│   │   ├── models/          # embedder (MiniLM), nli (deberta)
+│   │   ├── storage/         # db (SQLite), json_store, schema.sql
+│   │   ├── api/             # routes/ (ingestion, calibration, pipeline, results), schemas, deps
+│   │   ├── services/        # batch_service (routes ↔ pipeline/engines)
+│   │   ├── pipeline/        # orchestrator (end-to-end batch run)
+│   │   └── utils/           # logging, image_ops (evidence crops)
+│   └── tests/               # pytest suites (target app/*) — run: cd backend && pytest
 │
 ├── frontend/                # Next.js 14 + React 18 + TS dashboard
 │   ├── package.json / tsconfig.json / tailwind.config.ts / next.config.js
@@ -250,7 +253,6 @@ E-Shield/
 │       ├── hooks/           # useFlags, usePipeline (TanStack Query)
 │       ├── store/           # batchStore (Zustand)
 │       └── types/           # TS types mirroring backend schemas
-│   └── (backend/tests/)     # pytest suites (target backend/app/*) — run from backend/
 │
 ├── data/                    # gitignored inputs/outputs (raw, processed, templates, registers, results)
 ├── models_cache/            # local model weights
