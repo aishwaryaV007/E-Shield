@@ -1,9 +1,10 @@
 /*
- 1. FILE PURPOSE: React component for Collusiongraph feature.
+ 1. FILE PURPOSE: Renders the CopyCatch collusion graph from backend JSON using react-force-graph; nodes = scripts, edges = suspicious pairs.
  2. RESPONSIBILITIES:
-    - Manage collusiongraph logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: React component `Collusiongraph` managing local state and rendering.
- 4. INPUTS / OUTPUTS: Inputs: Props and Global State. Outputs: JSX.
- 5. DEPENDS ON / USED BY: React, Zustand, UI components.
+    - Fetch graph JSON from API.
+    - Render interactive PyVis-style force graph.
+    - Handle node click events to open side-by-side evidence.
+ 3. PLANNED CONTENTS: CollusionGraph React component. Takes JSON graph data. Returns ForceGraph2D/3D JSX.
+ 4. INPUTS / OUTPUTS: Inputs: CopyCatch graph JSON. Outputs: Interactive React component.
+ 5. DEPENDS ON / USED BY: react-force-graph, vis-network, backend API.
 */
