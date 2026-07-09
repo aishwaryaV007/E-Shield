@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Nli.
+# 1. FILE PURPOSE: Model loader for Nli (offline, local).
 # 2. RESPONSIBILITIES:
-#    - Manage nli logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Nli features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Nli.
-# 5. DEPENDS ON / USED BY: Dependencies for Nli module.
+#    - Load weights.
+#    - Run inference locally without APIs.
+# 3. PLANNED CONTENTS: Code block defining Nli functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: sentence-transformers, PaddleOCR
