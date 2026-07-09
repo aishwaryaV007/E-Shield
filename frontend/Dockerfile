@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Dockerfile.
+# 1. FILE PURPOSE: Frontend UI layer for Dockerfile to present evidence for human review.
 # 2. RESPONSIBILITIES:
-#    - Manage dockerfile logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Dockerfile features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Dockerfile.
-# 5. DEPENDS ON / USED BY: Dependencies for Dockerfile module.
+#    - Render UI elements.
+#    - Fetch/Manage state.
+# 3. PLANNED CONTENTS: Code block defining Dockerfile functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
