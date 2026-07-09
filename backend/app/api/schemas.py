@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: FastAPI routing/schema layer for Schemas.
+# 1. FILE PURPOSE: Pydantic request/response models — the API contract shared with the frontend.
 # 2. RESPONSIBILITIES:
-#    - Expose API contracts for the frontend.
-#    - Ensure strict type validation.
-# 3. PLANNED CONTENTS: Code block defining Schemas functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Define models for batches, scripts, flags, templates, and pipeline status.
+#    - Keep field names/types in sync with frontend/src/types/index.ts.
+# 3. PLANNED CONTENTS: BaseModel classes: BatchCreate, ScriptOut, FlagOut, TemplateIn/Out, PipelineStatus, CollusionGraph.
+# 4. INPUTS / OUTPUTS: Inputs: request bodies. Outputs: serialised JSON responses.
+# 5. DEPENDS ON / USED BY: pydantic; used by all api/routes/*; mirrored by frontend types/index.ts.
