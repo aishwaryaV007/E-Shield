@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Ambiguity.
+# 1. FILE PURPOSE: Supports the Ambiguity process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 # 2. RESPONSIBILITIES:
-#    - Manage ambiguity logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Ambiguity features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Ambiguity.
-# 5. DEPENDS ON / USED BY: Dependencies for Ambiguity module.
+#    - Handle ambiguity operations.
+#    - Integrate with the shared ingestion pipeline.
+# 3. PLANNED CONTENTS: Code block defining Ambiguity functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
