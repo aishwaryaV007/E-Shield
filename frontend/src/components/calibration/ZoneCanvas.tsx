@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: React component for Zonecanvas feature.
+ 1. FILE PURPOSE: Frontend UI layer for Zonecanvas to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage zonecanvas logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: React component `Zonecanvas` managing local state and rendering.
- 4. INPUTS / OUTPUTS: Inputs: Props and Global State. Outputs: JSX.
- 5. DEPENDS ON / USED BY: React, Zustand, UI components.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Zonecanvas functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
