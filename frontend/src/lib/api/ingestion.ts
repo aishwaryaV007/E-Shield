@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Ingestion.
+ 1. FILE PURPOSE: FastAPI routing/schema layer for Ingestion.
  2. RESPONSIBILITIES:
-    - Manage ingestion logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Ingestion features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Ingestion.
- 5. DEPENDS ON / USED BY: Dependencies for Ingestion module.
+    - Expose API contracts for the frontend.
+    - Ensure strict type validation.
+ 3. PLANNED CONTENTS: Code block defining Ingestion functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
