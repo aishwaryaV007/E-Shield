@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Pipeline.
+ 1. FILE PURPOSE: FastAPI routing/schema layer for Pipeline.
  2. RESPONSIBILITIES:
-    - Manage pipeline logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Pipeline features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Pipeline.
- 5. DEPENDS ON / USED BY: Dependencies for Pipeline module.
+    - Expose API contracts for the frontend.
+    - Ensure strict type validation.
+ 3. PLANNED CONTENTS: Code block defining Pipeline functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
