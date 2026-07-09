@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Spinner to present evidence for human review.
+ 1. FILE PURPOSE: Loading spinner indicator.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Spinner functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Show an animated spinner during async loads.
+ 3. PLANNED CONTENTS: Spinner({ size }) component.
+ 4. INPUTS / OUTPUTS: Inputs: size. Outputs: an animated SVG/div.
+ 5. DEPENDS ON / USED BY: Tailwind; used by loading states in pages/hooks.
 */
