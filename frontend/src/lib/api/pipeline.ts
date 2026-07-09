@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: FastAPI routing/schema layer for Pipeline.
+ 1. FILE PURPOSE: API calls to run the evaluation pipeline and poll status.
  2. RESPONSIBILITIES:
-    - Expose API contracts for the frontend.
-    - Ensure strict type validation.
- 3. PLANNED CONTENTS: Code block defining Pipeline functionality.
- 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - runPipeline(batchId); getStatus(batchId).
+ 3. PLANNED CONTENTS: async functions using the shared axios client.
+ 4. INPUTS / OUTPUTS: Inputs: batch id. Outputs: run ack + status payloads.
+ 5. DEPENDS ON / USED BY: lib/api/client, types; used by usePipeline.
 */
