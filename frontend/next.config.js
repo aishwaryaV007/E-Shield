@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Next to present evidence for human review.
+ 1. FILE PURPOSE: Next.js configuration, including API rewrites/proxy to the FastAPI backend.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Next functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Define rewrites so /api/* proxies to NEXT_PUBLIC_API_URL (avoids CORS in dev).
+    - Set React strict mode and build options.
+ 3. PLANNED CONTENTS: module.exports nextConfig with async rewrites().
+ 4. INPUTS / OUTPUTS: Inputs: env NEXT_PUBLIC_API_URL. Outputs: Next.js build/runtime config.
+ 5. DEPENDS ON / USED BY: Next.js build; pairs with lib/api/client.ts base URL.
 */
