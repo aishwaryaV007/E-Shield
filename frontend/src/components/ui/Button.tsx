@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Button to present evidence for human review.
+ 1. FILE PURPOSE: Reusable button component with variants.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Button functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Render a styled button (primary/secondary/ghost); handle disabled/loading.
+ 3. PLANNED CONTENTS: Button({ variant, ... }) component.
+ 4. INPUTS / OUTPUTS: Inputs: props + onClick. Outputs: a styled <button>.
+ 5. DEPENDS ON / USED BY: clsx, Tailwind; used across pages.
 */
