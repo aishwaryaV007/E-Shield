@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Usepipeline.
+ 1. FILE PURPOSE: Frontend UI layer for Usepipeline to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage usepipeline logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Usepipeline features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Usepipeline.
- 5. DEPENDS ON / USED BY: Dependencies for Usepipeline module.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Usepipeline functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
