@@ -185,7 +185,7 @@ python ../scripts/seed_demo_data.py     # generates 35+ scripts with planted err
 Optional — run both apps in containers:
 
 ```bash
-docker compose up --build
+docker compose -f deploy/docker-compose.yml up --build
 ```
 
 `docker-compose.yml` defines two services: **backend** (FastAPI) and **frontend** (Next.js). It is currently a commented stub — fill in before relying on it.
@@ -219,13 +219,13 @@ python ../scripts/download_models.py
 
 ```
 E-Shield/
-├── SETUP.md                 # ← this file
-├── README.md                # monorepo overview
-├── docker-compose.yml       # backend + frontend containers (stub)
+├── SETUP.md                 # ← this file (root)
+├── README.md                # monorepo overview (root)
 ├── Makefile                 # install / dev / test / lint targets
-├── PROBLEM_STATEMENT.md     # hackathon brief
-├── ExamShield_Workflow.md   # workflow + roadmap
-├── TECH_STACK.md            # stack rationale
+├── .gitignore
+│
+├── deploy/                  # deployment/infra config
+│   └── docker-compose.yml   # backend + frontend containers (stub)
 │
 ├── backend/                 # Python / FastAPI backend
 │   ├── requirements.txt / requirements-dev.txt / pyproject.toml
@@ -255,8 +255,14 @@ E-Shield/
 ├── models_cache/            # local model weights
 ├── tests/                   # pytest suites (target backend/app/*)
 ├── scripts/                 # download_models.py, seed_demo_data.py
-└── docs/                    # architecture / planning / security / engine docs
+└── docs/                    # ALL project docs live here:
+    ├── architecture / planning / security / engine docs
+    ├── PROBLEM_STATEMENT.md, ExamShield_Workflow.md   # hackathon brief + workflow
+    ├── context.md, plan.md, implementation_plan.md    # planning docs
+    └── TECH_STACK.md, TECH_STACK_ORIGINAL.md          # stack rationale
 ```
+
+> **Root stays clean:** only `README.md` and `SETUP.md` are visible at the top level. Every other `.md` lives in `docs/`, and deployment config lives in `deploy/`.
 
 ---
 
@@ -295,7 +301,7 @@ npm run build
 npm run start          # serves on :3000
 ```
 
-Or containerised: `docker compose up --build`.
+Or containerised: `docker compose -f deploy/docker-compose.yml up --build`.
 
 **Mobile app:** none — E-Shield is a web dashboard only.
 
