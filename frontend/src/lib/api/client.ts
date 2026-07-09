@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: FastAPI routing/schema layer for Client.
+ 1. FILE PURPOSE: Configured Axios instance for all backend calls.
  2. RESPONSIBILITIES:
-    - Expose API contracts for the frontend.
-    - Ensure strict type validation.
- 3. PLANNED CONTENTS: Code block defining Client functionality.
- 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Set baseURL from NEXT_PUBLIC_API_URL; default headers; error interceptor.
+ 3. PLANNED CONTENTS: `export const api = axios.create({ baseURL })`.
+ 4. INPUTS / OUTPUTS: Inputs: env base URL. Outputs: a shared axios client.
+ 5. DEPENDS ON / USED BY: axios; used by lib/api/ingestion|pipeline|results.
 */
