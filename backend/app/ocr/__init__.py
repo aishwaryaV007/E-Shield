@@ -1,7 +1,6 @@
-# 1. FILE PURPOSE: Supports the   Init   process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
+# 1. FILE PURPOSE: Package for dual-tier OCR (digit grids + prose) with an ambiguity fallback.
 # 2. RESPONSIBILITIES:
-#    - Handle   init   operations.
-#    - Integrate with the shared ingestion pipeline.
-# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Group digit_ocr, prose_ocr, and the ambiguity guard.
+# 3. PLANNED CONTENTS: Package docstring.
+# 4. INPUTS / OUTPUTS: Inputs: none. Outputs: none.
+# 5. DEPENDS ON / USED BY: Used by the engines after ingestion.
