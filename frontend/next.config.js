@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Next.
+ 1. FILE PURPOSE: Frontend UI layer for Next to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage next logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Next features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Next.
- 5. DEPENDS ON / USED BY: Dependencies for Next module.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Next functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
