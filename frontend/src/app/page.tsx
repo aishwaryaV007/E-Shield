@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Next.js page component for Page.
+ 1. FILE PURPOSE: Frontend UI layer for Page to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage page logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Page component function for server/client rendering.
- 4. INPUTS / OUTPUTS: Inputs: Route params. Outputs: Full page layout.
- 5. DEPENDS ON / USED BY: Next.js routing, page-specific components.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Page functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
