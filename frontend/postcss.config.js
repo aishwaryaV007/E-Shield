@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Postcss.
+ 1. FILE PURPOSE: Frontend UI layer for Postcss to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage postcss logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Postcss features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Postcss.
- 5. DEPENDS ON / USED BY: Dependencies for Postcss module.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Postcss functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
