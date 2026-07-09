@@ -1,3 +1,4 @@
+# NOTE: Calls services/batch_service.py and pipeline/orchestrator.py
 # 1. FILE PURPOSE: Exposes the main FastAPI endpoints to trigger the evaluation pipeline (Scan -> Preprocess -> OCR -> Features) and check batch status.
 # 2. RESPONSIBILITIES:
 #    - POST /run to start processing.
