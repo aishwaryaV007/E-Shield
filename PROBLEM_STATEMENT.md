@@ -1,4 +1,4 @@
-# ExamShield v2 — Problem Statement & Solution
+# ExamShield — Problem Statement & Solution
 
 **Hackathon:** HACK-THE-MATRIX 2026 (TECHNIDHI) — SNIST, 9–11 July | 24 Hours
 **Track:** 03 — Computer Vision
@@ -28,7 +28,7 @@ The existing "solution" is more manual labor: moderation committees, second eval
 
 ## 2. Proposed Solution
 
-**ExamShield v2** — an AI evaluation engine for answer sheets. Upload a batch of scanned answer scripts; ExamShield finds the copying no human can catch, verifies every total, and highlights the evidence a grader needs — in minutes, not weeks.
+**ExamShield** — an AI evaluation engine for answer sheets. Upload a batch of scanned answer scripts; ExamShield finds the copying no human can catch, verifies every total, and highlights the evidence a grader needs — in minutes, not weeks.
 
 ### Design principle
 

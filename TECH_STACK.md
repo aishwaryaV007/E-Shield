@@ -1,4 +1,4 @@
-# ExamShield v2 — Tech Stack
+# ExamShield — Tech Stack
 
 **Track:** 03 — Computer Vision | **Format:** 24-hour hackathon
 

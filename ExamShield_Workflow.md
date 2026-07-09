@@ -1,4 +1,4 @@
-# ExamShield v2 — Complete Build Workflow
+# ExamShield — Complete Build Workflow
 
 **Hackathon:** HACK-THE-MATRIX 2026 (TECHNIDHI) — SNIST, 9–11 July
 **Track:** 03 — Computer Vision
