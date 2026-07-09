@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: FastAPI routing/schema layer for   Init  .
+# 1. FILE PURPOSE: Aggregates all API route modules into a single router.
 # 2. RESPONSIBILITIES:
-#    - Expose API contracts for the frontend.
-#    - Ensure strict type validation.
-# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Import the ingestion, calibration, pipeline, and results routers.
+#    - Combine them into one APIRouter for main.py to include.
+# 3. PLANNED CONTENTS: `api_router = APIRouter()` including each sub-router with prefixes/tags.
+# 4. INPUTS / OUTPUTS: Inputs: sub-routers. Outputs: a combined api_router.
+# 5. DEPENDS ON / USED BY: fastapi.APIRouter; routes/*; included by main.py.
