@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Flagcard to present evidence for human review.
+ 1. FILE PURPOSE: Card presenting a single ranked flag from an engine.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Flagcard functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Show engine, severity, reason, and an evidence thumbnail.
+    - Offer human-review actions (keep open / mark reviewed) — never auto-resolves.
+ 3. PLANNED CONTENTS: FlagCard({ flag }) component.
+ 4. INPUTS / OUTPUTS: Inputs: a FlagOut object. Outputs: card JSX + action callbacks.
+ 5. DEPENDS ON / USED BY: ui/Card, ui/Badge, review/EvidenceCrop; used by FlagList.
 */
