@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Header to present evidence for human review.
+ 1. FILE PURPOSE: Top header bar of the dashboard shell.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Header functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Show app title, current batch, and global actions.
+ 3. PLANNED CONTENTS: Header() component.
+ 4. INPUTS / OUTPUTS: Inputs: batch state (Zustand). Outputs: header JSX.
+ 5. DEPENDS ON / USED BY: store/batchStore; rendered in layout.tsx.
 */
