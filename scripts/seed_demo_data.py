@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Seed Demo Data.
+# 1. FILE PURPOSE: Supports the Seed Demo Data process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 # 2. RESPONSIBILITIES:
-#    - Manage seed demo data logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Seed Demo Data features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Seed Demo Data.
-# 5. DEPENDS ON / USED BY: Dependencies for Seed Demo Data module.
+#    - Handle seed demo data operations.
+#    - Integrate with the shared ingestion pipeline.
+# 3. PLANNED CONTENTS: Code block defining Seed Demo Data functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
