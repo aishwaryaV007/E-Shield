@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Flaglist to present evidence for human review.
+ 1. FILE PURPOSE: Ranked list of flags for the review dashboard.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Flaglist functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Fetch flags (useFlags), sort by severity, render FlagCards.
+ 3. PLANNED CONTENTS: FlagList({ batchId }) component.
+ 4. INPUTS / OUTPUTS: Inputs: batch id. Outputs: a list of FlagCard.
+ 5. DEPENDS ON / USED BY: hooks/useFlags, review/FlagCard; used by review/page.tsx.
 */
