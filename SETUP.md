@@ -250,16 +250,16 @@ E-Shield/
 │       ├── hooks/           # useFlags, usePipeline (TanStack Query)
 │       ├── store/           # batchStore (Zustand)
 │       └── types/           # TS types mirroring backend schemas
+│   └── (backend/tests/)     # pytest suites (target backend/app/*) — run from backend/
 │
 ├── data/                    # gitignored inputs/outputs (raw, processed, templates, registers, results)
 ├── models_cache/            # local model weights
-├── tests/                   # pytest suites (target backend/app/*)
 ├── scripts/                 # download_models.py, seed_demo_data.py
 └── docs/                    # ALL project docs live here:
     ├── architecture / planning / security / engine docs
     ├── PROBLEM_STATEMENT.md, ExamShield_Workflow.md   # hackathon brief + workflow
     ├── context.md, plan.md, implementation_plan.md    # planning docs
-    └── TECH_STACK.md, TECH_STACK_ORIGINAL.md          # stack rationale
+    └── TECH_STACK.md                                  # stack rationale
 ```
 
 > **Root stays clean:** only `README.md` and `SETUP.md` are visible at the top level. Every other `.md` lives in `docs/`, and deployment config lives in `deploy/`.
