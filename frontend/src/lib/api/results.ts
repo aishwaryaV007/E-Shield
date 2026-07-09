@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: FastAPI routing/schema layer for Results.
+ 1. FILE PURPOSE: API calls to fetch results — flags, script detail, collusion graph.
  2. RESPONSIBILITIES:
-    - Expose API contracts for the frontend.
-    - Ensure strict type validation.
- 3. PLANNED CONTENTS: Code block defining Results functionality.
- 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - getFlags(batchId); getScript(id); getCollusionGraph(batchId).
+ 3. PLANNED CONTENTS: async functions using the shared axios client.
+ 4. INPUTS / OUTPUTS: Inputs: batch/script ids. Outputs: FlagOut[], ScriptOut, graph JSON.
+ 5. DEPENDS ON / USED BY: lib/api/client, types; used by useFlags + review/scripts pages.
 */
