@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Results.
+ 1. FILE PURPOSE: FastAPI routing/schema layer for Results.
  2. RESPONSIBILITIES:
-    - Manage results logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Results features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Results.
- 5. DEPENDS ON / USED BY: Dependencies for Results module.
+    - Expose API contracts for the frontend.
+    - Ensure strict type validation.
+ 3. PLANNED CONTENTS: Code block defining Results functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
