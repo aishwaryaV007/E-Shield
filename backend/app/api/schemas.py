@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Schemas.
+# 1. FILE PURPOSE: FastAPI routing/schema layer for Schemas.
 # 2. RESPONSIBILITIES:
-#    - Manage schemas logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Schemas features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Schemas.
-# 5. DEPENDS ON / USED BY: Dependencies for Schemas module.
+#    - Expose API contracts for the frontend.
+#    - Ensure strict type validation.
+# 3. PLANNED CONTENTS: Code block defining Schemas functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
