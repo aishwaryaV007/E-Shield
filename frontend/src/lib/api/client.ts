@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Client.
+ 1. FILE PURPOSE: FastAPI routing/schema layer for Client.
  2. RESPONSIBILITIES:
-    - Manage client logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Client features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Client.
- 5. DEPENDS ON / USED BY: Dependencies for Client module.
+    - Expose API contracts for the frontend.
+    - Ensure strict type validation.
+ 3. PLANNED CONTENTS: Code block defining Client functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
