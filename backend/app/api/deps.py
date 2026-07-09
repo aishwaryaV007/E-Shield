@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Deps.
+# 1. FILE PURPOSE: FastAPI routing/schema layer for Deps.
 # 2. RESPONSIBILITIES:
-#    - Manage deps logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Deps features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Deps.
-# 5. DEPENDS ON / USED BY: Dependencies for Deps module.
+#    - Expose API contracts for the frontend.
+#    - Ensure strict type validation.
+# 3. PLANNED CONTENTS: Code block defining Deps functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
