@@ -1,7 +1,6 @@
-# 1. FILE PURPOSE: Test suite for   Init  .
+# 1. FILE PURPOSE: Makes tests/ a Python package so pytest discovers test modules correctly.
 # 2. RESPONSIBILITIES:
-#    - Verify logic.
-#    - Prevent regressions.
-# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Mock data. Outputs: Pass/fail results.
-# 5. DEPENDS ON / USED BY: pytest
+#    - Package marker for test discovery.
+# 3. PLANNED CONTENTS: Empty (package marker only).
+# 4. INPUTS / OUTPUTS: N/A.
+# 5. DEPENDS ON / USED BY: pytest (test discovery).
