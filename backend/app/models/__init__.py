@@ -1,7 +1,6 @@
-# 1. FILE PURPOSE: Model loader for   Init   (offline, local).
+# 1. FILE PURPOSE: Package for local ML model loaders (MiniLM embedder, NLI cross-encoder).
 # 2. RESPONSIBILITIES:
-#    - Load weights.
-#    - Run inference locally without APIs.
-# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
-# 5. DEPENDS ON / USED BY: sentence-transformers, PaddleOCR
+#    - Group cached, CPU-only model loaders used by the engines.
+# 3. PLANNED CONTENTS: Package docstring.
+# 4. INPUTS / OUTPUTS: Inputs: none. Outputs: none.
+# 5. DEPENDS ON / USED BY: embedder.py, nli.py; used by CopyCatch and RubricLens.
