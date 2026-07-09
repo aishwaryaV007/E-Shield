@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Usepipeline to present evidence for human review.
+ 1. FILE PURPOSE: Hooks to run the pipeline and poll its status.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Usepipeline functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Mutation to POST /run; query to GET /status; ingest/blankcheck triggers.
+ 3. PLANNED CONTENTS: useRunPipeline(); usePipelineStatus(batchId).
+ 4. INPUTS / OUTPUTS: Inputs: batch id. Outputs: run mutation + status query.
+ 5. DEPENDS ON / USED BY: @tanstack/react-query, lib/api/pipeline; used by ingestion/review pages.
 */
