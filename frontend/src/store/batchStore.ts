@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Batchstore to present evidence for human review.
+ 1. FILE PURPOSE: Zustand store for client-side selection state.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Batchstore functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Hold the selected batchId and scriptId with setters.
+ 3. PLANNED CONTENTS: useBatchStore = create(...) with { batchId, scriptId, setBatch, setScript }.
+ 4. INPUTS / OUTPUTS: Inputs: UI selections. Outputs: shared client state.
+ 5. DEPENDS ON / USED BY: zustand; used by Header, pages, and hooks.
 */
