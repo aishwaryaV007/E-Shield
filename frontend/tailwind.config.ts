@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Tailwind.
+ 1. FILE PURPOSE: Frontend UI layer for Tailwind to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage tailwind logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Tailwind features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Tailwind.
- 5. DEPENDS ON / USED BY: Dependencies for Tailwind module.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Tailwind functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
