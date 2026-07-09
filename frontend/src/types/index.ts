@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Index to present evidence for human review.
+ 1. FILE PURPOSE: Shared TypeScript types mirroring backend/app/api/schemas.py (the API contract).
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Index functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Define Batch, Script, Flag, Template, PipelineStatus, CollusionGraph types.
+    - Keep in sync with the Pydantic schemas on the backend.
+ 3. PLANNED CONTENTS: exported interfaces/types.
+ 4. INPUTS / OUTPUTS: Inputs: none. Outputs: types used across lib/api, hooks, components.
+ 5. DEPENDS ON / USED BY: Mirrors api/schemas.py; used throughout the frontend.
 */
