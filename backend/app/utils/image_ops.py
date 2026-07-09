@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Image Ops.
+# 1. FILE PURPOSE: Supports the Image Ops process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 # 2. RESPONSIBILITIES:
-#    - Manage image ops logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Image Ops features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Image Ops.
-# 5. DEPENDS ON / USED BY: Dependencies for Image Ops module.
+#    - Handle image ops operations.
+#    - Integrate with the shared ingestion pipeline.
+# 3. PLANNED CONTENTS: Code block defining Image Ops functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
