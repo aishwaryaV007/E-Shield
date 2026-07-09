@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for   Init  .
+# 1. FILE PURPOSE: Model loader for   Init   (offline, local).
 # 2. RESPONSIBILITIES:
-#    - Manage   init   logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement   Init   features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for   Init  .
-# 5. DEPENDS ON / USED BY: Dependencies for   Init   module.
+#    - Load weights.
+#    - Run inference locally without APIs.
+# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: sentence-transformers, PaddleOCR
