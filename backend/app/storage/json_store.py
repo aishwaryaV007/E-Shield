@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Supports the Json Store process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
+# 1. FILE PURPOSE: Read/write JSON artefacts (calibration templates and result exports).
 # 2. RESPONSIBILITIES:
-#    - Handle json store operations.
-#    - Integrate with the shared ingestion pipeline.
-# 3. PLANNED CONTENTS: Code block defining Json Store functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Save/load zone templates to data/templates/*.json.
+#    - Persist pipeline results/flags to data/results/*.json.
+# 3. PLANNED CONTENTS: save_json(path, obj); load_json(path); save_template(); load_template().
+# 4. INPUTS / OUTPUTS: Inputs: dict payloads + file paths. Outputs: JSON files on disk / parsed dicts.
+# 5. DEPENDS ON / USED BY: json, pathlib, config.DATA_DIR; used by calibration + pipeline.
