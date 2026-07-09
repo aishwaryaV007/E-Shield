@@ -1,7 +1,7 @@
--- 1. FILE PURPOSE: Handles logic for Schema.
+-- 1. FILE PURPOSE: Supports the Schema process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 -- 2. RESPONSIBILITIES:
---    - Manage schema logic.
-Integrate with related modules.
--- 3. PLANNED CONTENTS: Functions/Classes to implement Schema features.
--- 4. INPUTS / OUTPUTS: Inputs and outputs for Schema.
--- 5. DEPENDS ON / USED BY: Dependencies for Schema module.
+--    - Handle schema operations.
+--    - Integrate with the shared ingestion pipeline.
+-- 3. PLANNED CONTENTS: Code block defining Schema functionality.
+-- 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+-- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
