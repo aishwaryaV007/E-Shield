@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Config.
+# 1. FILE PURPOSE: Supports the Config process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 # 2. RESPONSIBILITIES:
-#    - Manage config logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Config features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Config.
-# 5. DEPENDS ON / USED BY: Dependencies for Config module.
+#    - Handle config operations.
+#    - Integrate with the shared ingestion pipeline.
+# 3. PLANNED CONTENTS: Code block defining Config functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
