@@ -9,8 +9,9 @@ description = "E-Shield backend — OCR + ML evaluation pipeline for exam script
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
-# Adds backend/ to sys.path so that `import app` resolves from tests/
-pythonpath = ["backend"]
+# Config lives in backend/, so rootdir is backend/. "." puts backend/ on sys.path
+# (so `import app` resolves), and tests live in backend/tests. Run: `cd backend && pytest`.
+pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.black]
