@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: FastAPI routing/schema layer for Ingestion.
+ 1. FILE PURPOSE: API calls for ingestion + BlankCheck.
  2. RESPONSIBILITIES:
-    - Expose API contracts for the frontend.
-    - Ensure strict type validation.
- 3. PLANNED CONTENTS: Code block defining Ingestion functionality.
- 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - uploadScripts(batchId, files); runBlankCheck(scriptId).
+ 3. PLANNED CONTENTS: async functions using the shared axios client.
+ 4. INPUTS / OUTPUTS: Inputs: files/ids. Outputs: typed ingest/blankcheck responses.
+ 5. DEPENDS ON / USED BY: lib/api/client, types; used by usePipeline / ingestion page.
 */
