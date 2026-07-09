@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Page to present evidence for human review.
+ 1. FILE PURPOSE: Single-script evidence view.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Page functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Show a script's flags, marks breakdown, and side-by-side evidence crops.
+    - Let the auditor review each flag; never auto-resolves.
+ 3. PLANNED CONTENTS: ScriptDetailPage({ params }) reading the route id.
+ 4. INPUTS / OUTPUTS: Inputs: script id (route param). Outputs: detailed evidence UI.
+ 5. DEPENDS ON / USED BY: lib/api/results.getScript, review/EvidenceCrop; App Router.
 */
