@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Embedder.
+# 1. FILE PURPOSE: Model loader for Embedder (offline, local).
 # 2. RESPONSIBILITIES:
-#    - Manage embedder logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Embedder features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Embedder.
-# 5. DEPENDS ON / USED BY: Dependencies for Embedder module.
+#    - Load weights.
+#    - Run inference locally without APIs.
+# 3. PLANNED CONTENTS: Code block defining Embedder functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: sentence-transformers, PaddleOCR
