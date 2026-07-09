@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Logging.
+# 1. FILE PURPOSE: Supports the Logging process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
 # 2. RESPONSIBILITIES:
-#    - Manage logging logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Logging features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Logging.
-# 5. DEPENDS ON / USED BY: Dependencies for Logging module.
+#    - Handle logging operations.
+#    - Integrate with the shared ingestion pipeline.
+# 3. PLANNED CONTENTS: Code block defining Logging functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
