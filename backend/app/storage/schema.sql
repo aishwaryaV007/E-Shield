@@ -1,7 +1,30 @@
--- 1. FILE PURPOSE: Supports the Schema process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
--- 2. RESPONSIBILITIES:
---    - Handle schema operations.
---    - Integrate with the shared ingestion pipeline.
--- 3. PLANNED CONTENTS: Code block defining Schema functionality.
--- 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
--- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+-- FILE PURPOSE: SQLite schema for E-Shield. Describes the tables the backend creates on boot.
+-- NOTE: Descriptions only (comments) — no executable DDL yet, per the skeleton convention.
+-- Principle: the DB stores ranked flags and evidence; it never stores a verdict.
+--
+-- TABLE batches   — one row per uploaded batch of scripts.
+--   id (PK), name, template_id (FK->templates), status, created_at
+--
+-- TABLE scripts   — one row per physical answer script in a batch.
+--   id (PK), batch_id (FK->batches), roll_no_ocr, page_count,
+--   blankcheck_status, created_at
+--
+-- TABLE pages     — one row per scanned page of a script.
+--   id (PK), script_id (FK->scripts), page_index, image_path, ink_present
+--
+-- TABLE marks     — per-question marks extracted by MarkSafe.
+--   id (PK), script_id (FK->scripts), question_no, mark_value, is_ambiguous,
+--   written_total, computed_total   -- for sum verification
+--
+-- TABLE flags     — every ranked flag raised by any engine (never a verdict).
+--   id (PK), script_id (FK->scripts),
+--   engine (marksafe|copycatch|scriptid|reeval|rubric),
+--   severity_score, reason, evidence_ref, status (open|reviewed), created_at
+--
+-- TABLE registers — imported class-register rows (from CSV) for ScriptID.
+--   id (PK), batch_id (FK->batches), roll_no, student_name, seat_no
+--
+-- TABLE templates — calibrated zone templates per sheet format.
+--   id (PK), name, zones_json (marks/total/roll-no/answer bboxes), created_at
+--
+-- DEPENDS ON / USED BY: app/storage/db.py initialises these; engines write marks/flags here.
