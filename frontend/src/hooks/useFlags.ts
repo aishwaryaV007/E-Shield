@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Handles logic for Useflags.
+ 1. FILE PURPOSE: Frontend UI layer for Useflags to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage useflags logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: Functions/Classes to implement Useflags features.
- 4. INPUTS / OUTPUTS: Inputs and outputs for Useflags.
- 5. DEPENDS ON / USED BY: Dependencies for Useflags module.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Useflags functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
