@@ -1,41 +1,7 @@
-[build-system]
-requires = ["setuptools>=70.0", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
-
-[project]
-name = "examshield-backend"
-version = "0.1.0"
-description = "ExamShield offline handwritten answer-sheet evaluation pipeline"
-requires-python = ">=3.11"
-readme = "README.md"
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | __pycache__
-)/
-'''
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-select = ["E", "F", "I", "UP", "N", "S", "B", "A"]
-ignore = ["S101"]  # allow assert in tests
-exclude = [".venv", "__pycache__", "build"]
-
-[tool.mypy]
-python_version = "3.11"
-strict = true
-ignore_missing_imports = true
-exclude = ["tests/", ".venv/"]
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["../tests"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
+# 1. FILE PURPOSE: Handles logic for Pyproject.
+# 2. RESPONSIBILITIES:
+#    - Manage pyproject logic.
+Integrate with related modules.
+# 3. PLANNED CONTENTS: Functions/Classes to implement Pyproject features.
+# 4. INPUTS / OUTPUTS: Inputs and outputs for Pyproject.
+# 5. DEPENDS ON / USED BY: Dependencies for Pyproject module.
