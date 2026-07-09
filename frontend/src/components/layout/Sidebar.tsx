@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Sidebar to present evidence for human review.
+ 1. FILE PURPOSE: Left navigation sidebar.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Sidebar functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Link to Overview, Ingestion, Calibration, and Review pages.
+ 3. PLANNED CONTENTS: Sidebar() component with nav links (next/link, lucide icons).
+ 4. INPUTS / OUTPUTS: Inputs: current route. Outputs: nav JSX.
+ 5. DEPENDS ON / USED BY: next/link, lucide-react; rendered in layout.tsx.
 */
