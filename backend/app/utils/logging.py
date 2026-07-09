@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Supports the Logging process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
+# 1. FILE PURPOSE: Centralised logger configuration.
 # 2. RESPONSIBILITIES:
-#    - Handle logging operations.
-#    - Integrate with the shared ingestion pipeline.
-# 3. PLANNED CONTENTS: Code block defining Logging functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Configure log format and level from settings (LOG_LEVEL).
+#    - Provide get_logger(name) for modules.
+# 3. PLANNED CONTENTS: setup_logging(level); get_logger(name) -> logging.Logger.
+# 4. INPUTS / OUTPUTS: Inputs: LOG_LEVEL. Outputs: configured Logger instances.
+# 5. DEPENDS ON / USED BY: logging, config.py; used across the backend.
