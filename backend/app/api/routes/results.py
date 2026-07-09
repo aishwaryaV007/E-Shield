@@ -1,3 +1,4 @@
+# NOTE: Calls services/batch_service.py to fetch flags and evidence
 # 1. FILE PURPOSE: Provides the API contract for the frontend review dashboard to fetch ranked flags, single-script evidence crops, and CopyCatch graph JSON.
 # 2. RESPONSIBILITIES:
 #    - GET /flags for ranked review queue.
