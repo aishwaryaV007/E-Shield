@@ -1,9 +1,8 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Badge to present evidence for human review.
+ 1. FILE PURPOSE: Reusable badge/pill (severity, engine label, status).
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Badge functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Render a small labelled pill with variant colours.
+ 3. PLANNED CONTENTS: Badge({ variant, children }) component.
+ 4. INPUTS / OUTPUTS: Inputs: variant + text. Outputs: a styled span.
+ 5. DEPENDS ON / USED BY: clsx, Tailwind; used by FlagCard and others.
 */
