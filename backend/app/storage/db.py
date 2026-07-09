@@ -1,7 +1,8 @@
-# 1. FILE PURPOSE: Supports the Db process as part of the pipeline. Ranks and flags evidence; never accuses, never finalizes; the human decides.
+# 1. FILE PURPOSE: SQLite persistence layer (via aiosqlite).
 # 2. RESPONSIBILITIES:
-#    - Handle db operations.
-#    - Integrate with the shared ingestion pipeline.
-# 3. PLANNED CONTENTS: Code block defining Db functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Open/close the SQLite connection at DB_PATH.
+#    - Initialise the schema from schema.sql on startup.
+#    - Provide CRUD helpers for scripts, marks, flags, registers, templates.
+# 3. PLANNED CONTENTS: init_db(); get_connection(); insert/query helpers per table.
+# 4. INPUTS / OUTPUTS: Inputs: SQL params. Outputs: rows / cursors.
+# 5. DEPENDS ON / USED BY: aiosqlite, config.py, schema.sql; used by services + engines for persistence.
