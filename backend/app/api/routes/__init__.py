@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: API routing for   Init  .
+# 1. FILE PURPOSE: FastAPI routing/schema layer for   Init  .
 # 2. RESPONSIBILITIES:
-#    - Manage   init   logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: FastAPI endpoints for   Init   operations.
-# 4. INPUTS / OUTPUTS: Inputs: HTTP Requests (JSON). Outputs: HTTP Responses (JSON).
-# 5. DEPENDS ON / USED BY: FastAPI router, schema models, backend services.
+#    - Expose API contracts for the frontend.
+#    - Ensure strict type validation.
+# 3. PLANNED CONTENTS: Code block defining   Init   functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
+# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
