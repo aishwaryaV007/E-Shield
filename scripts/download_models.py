@@ -1,7 +1,7 @@
-# 1. FILE PURPOSE: Handles logic for Download Models.
+# 1. FILE PURPOSE: Model loader for Download Models (offline, local).
 # 2. RESPONSIBILITIES:
-#    - Manage download models logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Download Models features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Download Models.
-# 5. DEPENDS ON / USED BY: Dependencies for Download Models module.
+#    - Load weights.
+#    - Run inference locally without APIs.
+# 3. PLANNED CONTENTS: Code block defining Download Models functionality.
+# 4. INPUTS / OUTPUTS: Inputs: Upstream pipeline data. Outputs: Formatted results/evidence.
+# 5. DEPENDS ON / USED BY: sentence-transformers, PaddleOCR
