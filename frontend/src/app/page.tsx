@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Page to present evidence for human review.
+ 1. FILE PURPOSE: Landing page — batch overview and entry into the workflow.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Page functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - List batches and their status; link to ingestion/calibration/review.
+    - Show high-level stats (scripts processed, open flags).
+ 3. PLANNED CONTENTS: Home() page component fetching batch summary via hooks.
+ 4. INPUTS / OUTPUTS: Inputs: backend batch list. Outputs: overview UI.
+ 5. DEPENDS ON / USED BY: hooks (useFlags/usePipeline), components/review, ui/*.
 */
