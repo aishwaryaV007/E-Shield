@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: React component for Flagcard feature.
+ 1. FILE PURPOSE: Frontend UI layer for Flagcard to present evidence for human review.
  2. RESPONSIBILITIES:
-    - Manage flagcard logic.
-Integrate with related modules.
- 3. PLANNED CONTENTS: React component `Flagcard` managing local state and rendering.
- 4. INPUTS / OUTPUTS: Inputs: Props and Global State. Outputs: JSX.
- 5. DEPENDS ON / USED BY: React, Zustand, UI components.
+    - Render UI elements.
+    - Fetch/Manage state.
+ 3. PLANNED CONTENTS: Code block defining Flagcard functionality.
+ 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
+ 5. DEPENDS ON / USED BY: Core E-Shield architecture.
 */
