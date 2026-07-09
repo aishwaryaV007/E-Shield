@@ -1,7 +1,8 @@
-# 1. FILE PURPOSE: Handles logic for Digit Ocr.
+# 1. FILE PURPOSE: Executes robust PaddleOCR digit recognition exclusively on calibrated zones (never full-page) for MarkSafe and ScriptID.
 # 2. RESPONSIBILITIES:
-#    - Manage digit ocr logic.
-Integrate with related modules.
-# 3. PLANNED CONTENTS: Functions/Classes to implement Digit Ocr features.
-# 4. INPUTS / OUTPUTS: Inputs and outputs for Digit Ocr.
-# 5. DEPENDS ON / USED BY: Dependencies for Digit Ocr module.
+#    - Run OCR configured for digits only.
+#    - Extract confidence scores per digit.
+#    - Ignore out-of-zone noise.
+# 3. PLANNED CONTENTS: DigitOCR class. Takes image crops, returns numeric strings and confidences.
+# 4. INPUTS / OUTPUTS: Inputs: image crops of marks/totals/roll-no. Outputs: text strings + confidence.
+# 5. DEPENDS ON / USED BY: PaddleOCR.
