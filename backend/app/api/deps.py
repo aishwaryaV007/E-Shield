@@ -1,7 +1,8 @@
-# 1. FILE PURPOSE: FastAPI routing/schema layer for Deps.
+# 1. FILE PURPOSE: Shared FastAPI dependencies injected into route handlers.
 # 2. RESPONSIBILITIES:
-#    - Expose API contracts for the frontend.
-#    - Ensure strict type validation.
-# 3. PLANNED CONTENTS: Code block defining Deps functionality.
-# 4. INPUTS / OUTPUTS: Inputs: Frontend HTTP requests. Outputs: JSON responses.
-# 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+#    - Provide an aiosqlite DB connection dependency.
+#    - Provide a settings dependency (get_settings).
+#    - Provide the batch service dependency used by routes.
+# 3. PLANNED CONTENTS: get_db() async generator; get_settings_dep(); get_batch_service().
+# 4. INPUTS / OUTPUTS: Inputs: settings + DB path. Outputs: yielded db connection / service instances.
+# 5. DEPENDS ON / USED BY: fastapi.Depends; config.py, storage/db.py, services/batch_service.py; used by all routes.
