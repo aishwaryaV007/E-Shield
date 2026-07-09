@@ -1,9 +1,9 @@
 /*
- 1. FILE PURPOSE: Frontend UI layer for Globals to present evidence for human review.
+ 1. FILE PURPOSE: Global stylesheet — Tailwind layer directives and base styles.
  2. RESPONSIBILITIES:
-    - Render UI elements.
-    - Fetch/Manage state.
- 3. PLANNED CONTENTS: Code block defining Globals functionality.
- 4. INPUTS / OUTPUTS: Inputs: Backend API JSON. Outputs: User interface.
- 5. DEPENDS ON / USED BY: Core E-Shield architecture.
+    - Include @tailwind base/components/utilities.
+    - Define CSS variables and base element styles for the dashboard.
+ 3. PLANNED CONTENTS: @tailwind directives; :root design tokens; base resets.
+ 4. INPUTS / OUTPUTS: Inputs: Tailwind. Outputs: app-wide CSS.
+ 5. DEPENDS ON / USED BY: Imported by src/app/layout.tsx.
 */
