@@ -1,0 +1,42 @@
+# ExamShield — docker-compose (STUB — uncomment and configure before production use)
+# Design / Planned — not yet implemented
+
+version: "3.9"
+
+services:
+  # ── Backend: FastAPI + OCR/ML Pipeline ──────────────────────────────────────
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: examshield_backend
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./data:/app/data
+  #     - ./models_cache:/app/models_cache
+  #   env_file:
+  #     - ./backend/.env
+  #   environment:
+  #     - DB_PATH=/app/data/examshield.sqlite3
+  #     - MODEL_DIR=/app/models_cache
+  #     - DATA_DIR=/app/data
+  #   restart: unless-stopped
+
+  # ── Frontend: Next.js Dashboard ─────────────────────────────────────────────
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: examshield_frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://backend:8000
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+
+# volumes:
+#   data:
+#   models_cache:
