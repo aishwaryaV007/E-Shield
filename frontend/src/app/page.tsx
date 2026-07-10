@@ -31,6 +31,7 @@ const C = {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [keyFile, setKeyFile] = useState<File | null>(null);
+  const [qpFile, setQpFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -56,6 +57,7 @@ export default function Home() {
       fd.append("file", file);
       fd.append("max_marks", "2");
       if (keyFile) fd.append("answer_key", keyFile);
+      if (qpFile) fd.append("question_paper", qpFile);
       // Call the backend directly (CORS-enabled); avoids the Next dev-proxy timeout on ~40s grading.
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const res = await fetch(`${API}/api/v1/grade`, { method: "POST", body: fd });
@@ -93,6 +95,15 @@ export default function Home() {
                  onChange={(e) => setKeyFile(e.target.files?.[0] || null)}
                  style={{ color: "#e2e8f0" }} />
           {keyFile && <span style={{ marginLeft: 10, color: "#34d399", fontSize: 13 }}>✓ {keyFile.name}</span>}
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
+            Question paper (optional) — the model reads per-question marks from it (e.g. "(2 Marks Each)", "[8]")
+          </label>
+          <input type="file" accept=".txt,.csv"
+                 onChange={(e) => setQpFile(e.target.files?.[0] || null)}
+                 style={{ color: "#e2e8f0" }} />
+          {qpFile && <span style={{ marginLeft: 10, color: "#34d399", fontSize: 13 }}>✓ {qpFile.name}</span>}
         </div>
         <button onClick={grade} disabled={!file || loading}
                 style={{ padding: "9px 20px", borderRadius: 8, border: "none",

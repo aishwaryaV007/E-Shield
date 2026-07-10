@@ -7,21 +7,23 @@ from app.evaluation.feedback import build_feedback
 
 
 def build_report(script_id: str, answers: dict[str, dict], answer_key: dict[str, str],
-                 max_marks: float = 2.0) -> dict:
-    """answers: {qno: {answer, similarity}} from Model A. Returns the full evaluated sheet."""
+                 max_marks: float | dict[str, float] = 2.0) -> dict:
+    """answers: {qno: {answer, similarity}} from Model A. max_marks may be a single value or a
+    per-question dict {qno: marks}. Returns the full evaluated sheet."""
     rows, total, max_total = [], 0.0, 0.0
     for qno in sorted(answers, key=lambda q: int(q)):
         student = answers[qno]["answer"]
         key = answer_key.get(qno, "")
-        sc = score_answer(student, key, max_marks)
+        mm = max_marks.get(qno, 2.0) if isinstance(max_marks, dict) else max_marks
+        sc = score_answer(student, key, mm)
         fb = build_feedback(student, key, sc)
         total += sc["predicted_mark"]
-        max_total += max_marks
+        max_total += mm
         rows.append({
             "question_no": qno,
             "student_answer": student,
             "predicted_mark": sc["predicted_mark"],
-            "max_marks": max_marks,
+            "max_marks": mm,
             "percent": sc["percent"],
             "similarity": sc["similarity"],
             "feedback": fb["summary"],

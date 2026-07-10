@@ -28,10 +28,12 @@ def health():
 async def grade(
     file: UploadFile = File(...),
     answer_key: UploadFile | None = File(None),
+    question_paper: UploadFile | None = File(None),
     max_marks: float = 2.0,
 ):
-    """Upload a handwritten answer-script PDF (+ optional answer-key file) -> evaluated sheet.
-    The answer key is a CSV: Question_Number,Type,Correct_Answer (Type = Short_Answer)."""
+    """Upload a handwritten answer-script PDF (+ optional answer-key and question-paper files) ->
+    evaluated sheet. Answer key: CSV Question_Number,Type,Correct_Answer[,Max_Marks].
+    Question paper: text; per-question max marks are parsed from it (e.g. '(2 Marks Each)', '[8]')."""
     import time
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Please upload a PDF answer script.")
@@ -49,10 +51,16 @@ async def grade(
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as kf:
             kf.write(kb); key_path = kf.name; tmp_paths.append(key_path)
 
+    question_path = QUESTIONS if os.path.exists(QUESTIONS) else None
+    if question_paper is not None:
+        qb = await question_paper.read()
+        with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as qf:
+            qf.write(qb); question_path = qf.name; tmp_paths.append(question_path)
+
     t0 = time.time()
     try:
         sheet = grade_script(pdf_path, key_path,
-                             question_path=QUESTIONS if os.path.exists(QUESTIONS) else None,
+                             question_path=question_path,
                              max_marks=max_marks,
                              script_id=file.filename.replace(".pdf", ""))
     finally:

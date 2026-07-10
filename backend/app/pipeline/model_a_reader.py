@@ -31,6 +31,45 @@ def load_answer_key(path: str) -> dict[str, str]:
     return {r["Question_Number"]: r["Correct_Answer"] for r in rows if r.get("Type") == "Short_Answer"}
 
 
+_SECTION_MARKS = re.compile(r"\((\d+(?:\.\d+)?)\s*marks?\s*(?:each)?\)", re.I)
+# inline marks on a question line: [8], (8), [8m], (4 marks)
+_INLINE_MARKS = re.compile(r"[\[(]\s*(\d+(?:\.\d+)?)\s*(?:m|marks?)?\s*[\])]", re.I)
+_QLINE = re.compile(r"^\s*(\d{1,2})\s*[.)]")
+
+
+def parse_max_marks(answer_key_path: str, question_path: str | None,
+                    keys: dict[str, str], default: float = 2.0) -> dict[str, float]:
+    """Per-question max marks. Priority: answer-key Max_Marks column > question-paper parsing > default.
+    Question paper: a section header like '(2 Marks Each)' applies to the questions under it; an inline
+    '[8]' / '(4 marks)' on a question line overrides. Best-effort — falls back to `default`."""
+    marks = {q: default for q in keys}
+    # 1) reliable: Max_Marks column in the answer key, if present
+    try:
+        for r in csv.DictReader(open(answer_key_path)):
+            if r.get("Question_Number") in marks and r.get("Max_Marks"):
+                marks[r["Question_Number"]] = float(r["Max_Marks"])
+    except Exception:
+        pass
+    # 2) parse the question paper. Question lines take inline marks (else the current section's
+    #    marks); section headers only update `current` on non-question lines (so an inline
+    #    "(4 marks)" on one question doesn't leak into the following questions).
+    if question_path and os.path.exists(question_path):
+        current = None
+        for line in open(question_path, encoding="latin-1"):
+            m = _QLINE.match(line)
+            if m and m.group(1) in marks:
+                inline = _INLINE_MARKS.search(line)
+                if inline:
+                    marks[m.group(1)] = float(inline.group(1))
+                elif current is not None:
+                    marks[m.group(1)] = current
+            else:
+                sec = _SECTION_MARKS.search(line)
+                if sec:
+                    current = float(sec.group(1))
+    return marks
+
+
 def _vocab(key: dict[str, str], question_path: str | None) -> list[str]:
     text = " ".join(key.values())
     if question_path and os.path.exists(question_path):
