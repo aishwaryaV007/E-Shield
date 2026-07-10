@@ -26,6 +26,16 @@ const newStudent = (): Student =>
      status: "idle", error: "", elapsed: 0, edits: {} });
 
 const pctColor = (p: number) => (p >= 75 ? "var(--success)" : p >= 40 ? "var(--warn)" : "var(--danger)");
+const half = (n: number) => (Math.round(n * 2) / 2).toString();  // 12 / 12.5 / 13
+function gradeBand(p: number): { g: string; c: string } {
+  if (p >= 90) return { g: "A+", c: "#059669" };
+  if (p >= 80) return { g: "A", c: "#16a34a" };
+  if (p >= 70) return { g: "B", c: "#2563eb" };
+  if (p >= 60) return { g: "C", c: "#7c3aed" };
+  if (p >= 50) return { g: "D", c: "#d97706" };
+  if (p >= 40) return { g: "E", c: "#ea580c" };
+  return { g: "F", c: "#dc2626" };
+}
 
 export default function Home() {
   const [keyFile, setKeyFile] = useState<File | null>(null);
@@ -95,8 +105,28 @@ export default function Home() {
     }
   }
 
-  const graded = students.filter((s) => s.status === "done");
+  const graded = students.filter((s) => s.status === "done" && s.sheet);
   const selected = students.find((s) => s.id === selectedId) || null;
+
+  const pcts = graded.map((s) => s.sheet!.percentage);
+  const stats = pcts.length ? {
+    avg: pcts.reduce((a, b) => a + b, 0) / pcts.length,
+    hi: Math.max(...pcts), lo: Math.min(...pcts),
+    pass: pcts.filter((p) => p >= 40).length,
+  } : null;
+
+  function exportCSV() {
+    const head = ["Name", "Roll No", "MCQ", "MCQ Max", "Descriptive", "Desc Max", "Total", "Max", "Percentage", "Grade"];
+    const rows = graded.map((s) => {
+      const h = s.sheet!;
+      return [s.name, s.roll, h.mcq_marks, h.mcq_max, h.descriptive_marks, h.descriptive_max,
+              h.total_marks, h.max_total, h.percentage, gradeBand(h.percentage).g];
+    });
+    const csv = [head, ...rows].map((r) => r.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = document.createElement("a"); a.href = url; a.download = "examshield_results.csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <>
@@ -133,6 +163,20 @@ export default function Home() {
               </div>
             </div>
 
+            {/* class statistics */}
+            {stats && (
+              <>
+                <h2 className="section-title">Class summary ({graded.length} graded)</h2>
+                <div className="stats" style={{ marginBottom: 20 }}>
+                  <div className="stat hi"><div className="k">Class average</div>
+                    <div className="v" style={{ color: pctColor(stats.avg) }}>{stats.avg.toFixed(1)}%</div></div>
+                  <div className="stat"><div className="k">Highest</div><div className="v small" style={{ color: "var(--success)" }}>{stats.hi}%</div></div>
+                  <div className="stat"><div className="k">Lowest</div><div className="v small" style={{ color: pctColor(stats.lo) }}>{stats.lo}%</div></div>
+                  <div className="stat"><div className="k">Passed (≥40%)</div><div className="v small">{stats.pass} / {graded.length}</div></div>
+                </div>
+              </>
+            )}
+
             {/* roster */}
             <h2 className="section-title">Students ({students.length})</h2>
             <div className="card">
@@ -165,8 +209,13 @@ export default function Home() {
                           {s.status === "grading" && <span className="status st-grading">⏱ grading… {s.elapsed.toFixed(1)}s</span>}
                           {s.status === "error" && <span className="status st-error" title={s.error}>error</span>}
                           {s.status === "done" && s.sheet && (
-                            <span className="score-pill" style={{ color: pctColor(s.sheet.percentage) }}>
-                              {s.sheet.total_marks}/{s.sheet.max_total} · {s.sheet.percentage}%
+                            <span className="result-cell">
+                              <span className="score-pill" style={{ color: pctColor(s.sheet.percentage) }}>
+                                {half(s.sheet.total_marks)}/{s.sheet.max_total} · {s.sheet.percentage}%
+                              </span>
+                              <span className="grade-badge" style={{ background: gradeBand(s.sheet.percentage).c }}>
+                                {gradeBand(s.sheet.percentage).g}
+                              </span>
                             </span>)}
                         </td>
                         <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
@@ -191,14 +240,10 @@ export default function Home() {
                 onClick={gradeAll} disabled={!students.some((s) => s.file && s.status !== "done")}>
                 Grade all
               </button>
+              {graded.length > 0 &&
+                <button className="btn btn-ghost btn-sm" onClick={exportCSV}>⬇ Export results (CSV)</button>}
               <span className="spacer" />
-              {graded.length > 0 && (
-                <span className="count">
-                  {graded.length} graded · class average{" "}
-                  <b style={{ color: "var(--text)" }}>
-                    {(graded.reduce((a, s) => a + (s.sheet!.percentage), 0) / graded.length).toFixed(1)}%
-                  </b>
-                </span>)}
+              {graded.length > 0 && <span className="count">{graded.length} of {students.length} graded</span>}
             </div>
 
             {error && <div className="alert alert-error" style={{ marginTop: 16 }}>⚠️ {error}</div>}
@@ -220,9 +265,12 @@ function Detail({ student, onBack, onEdit, onRegrade }: {
       <h2 className="section-title">{student.name}{student.roll && ` · ${student.roll}`}</h2>
       <div className="stats" style={{ marginBottom: 20 }}>
         <div className="stat hi"><div className="k">Percentage</div>
-          <div className="v" style={{ color: pctColor(s.percentage) }}>{s.percentage}%</div></div>
+          <div className="v" style={{ color: pctColor(s.percentage), display: "flex", alignItems: "center" }}>
+            {s.percentage}%
+            <span className="grade-badge" style={{ background: gradeBand(s.percentage).c }}>{gradeBand(s.percentage).g}</span>
+          </div></div>
         <div className="stat"><div className="k">Total marks</div>
-          <div className="v">{s.total_marks}<span style={{ color: "var(--faint)", fontWeight: 500 }}> / {s.max_total}</span></div></div>
+          <div className="v">{half(s.total_marks)}<span style={{ color: "var(--faint)", fontWeight: 500 }}> / {s.max_total}</span></div></div>
         {s.mcq_max > 0 && <div className="stat"><div className="k">MCQs</div><div className="v small">{s.mcq_marks} / {s.mcq_max}</div></div>}
         <div className="stat"><div className="k">Descriptive</div><div className="v small">{s.descriptive_marks} / {s.descriptive_max}</div></div>
         {s.elapsed_seconds != null && <div className="stat"><div className="k">⏱ Time</div><div className="v small">{s.elapsed_seconds}s</div></div>}

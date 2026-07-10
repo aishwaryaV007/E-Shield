@@ -150,6 +150,9 @@ select.inp { width: auto; min-width: 64px; }
 .st-error { background: #fef2f2; color: var(--danger); }
 
 .score-pill { font-weight: 700; font-size: 14px; }
+.grade-badge { display: inline-grid; place-items: center; min-width: 30px; height: 24px; padding: 0 8px;
+  border-radius: 7px; font-weight: 800; font-size: 13px; color: #fff; margin-left: 8px; }
+.result-cell { display: flex; align-items: center; }
 .iconbtn { border: none; background: transparent; cursor: pointer; color: var(--faint); font-size: 15px;
   padding: 4px 6px; border-radius: 6px; }
 .iconbtn:hover { background: #f1f5f9; color: var(--danger); }
