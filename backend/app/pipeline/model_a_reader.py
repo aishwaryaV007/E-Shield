@@ -119,6 +119,7 @@ class ModelAReader:
         blocks, cur, mcq = [], None, {}
         for bgr in pages:
             rgb = bgr[:, :, ::-1]
+            prev_indent = False
             for ln in segment_lines(rgb):
                 crop = rgb[ln["y0"]:ln["y1"], ln["x0"]:ln["x1"]]
                 res = self.ocr.recognize_text(crop)
@@ -130,15 +131,21 @@ class ModelAReader:
                 if mm and mm.group(1) in self.mcq_key:
                     conf = float(np.mean(res["confidences"])) if res["confidences"] else 1.0
                     mcq[mm.group(1)] = (mm.group(2).upper(), conf)
-                    cur = None
+                    cur = None; prev_indent = False
                     continue
-                if ln["is_header"]:
-                    numm = _QNUM_RE.match(txt)            # the question number the student wrote
+                # A new answer block starts when the line begins with a question number (works for
+                # flush-left synthetic text) OR when the text dedents to the margin after an indented
+                # continuation (works for real handwriting whose numbers OCR poorly).
+                numm = _QNUM_RE.match(txt)
+                at_margin = ln["is_header"]
+                new_block = (numm is not None) or (at_margin and prev_indent)
+                if new_block:
                     cur = {"t": [_LEAD.sub("", txt, 1)], "c": list(res["confidences"]),
                            "qnum": numm.group(1) if numm else None}
                     blocks.append(cur)
                 elif cur is not None:
                     cur["t"].append(txt); cur["c"].extend(res["confidences"])
+                prev_indent = not at_margin
 
         result: dict[str, dict] = {}
         # --- MCQs: always emit every MCQ question. The narrow stacked letter-column OCRs
