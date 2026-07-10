@@ -6,42 +6,83 @@
 
 **Hackathon track:** 02 — Predictive Analytics (ML / DL)
 
-**Status:** Model A (the Reader) implemented & tested (~90% char accuracy). Model B (the trained
-mark-predictor) in progress.
+**Status:** working end-to-end — Model A (reader, TrOCR-large) + Model B (XGBoost marker) + FastAPI
+API + Next.js dashboard. Runs fully offline after a one-time model download.
 
 ---
 
-## Running Model A (the Reader)
+## Running the project locally
 
-Model A reads a handwritten answer-script PDF, extracts each question's answer with **TrOCR-large**,
-and matches it to the answer key with a semantic **matching score**. One-time setup caches the
-models (needs internet once); after that it runs fully offline.
+### Prerequisites
+- **Python 3.11+** (3.14 works) · **Node.js 20+** · **git**
+- ~3 GB free disk for the cached models · **internet once** (to download TrOCR-large + MiniLM), then offline
+- macOS/Linux/Windows. On Apple Silicon it uses MPS automatically.
 
+### 1. Clone
 ```bash
-cd backend
-python3 -m venv .venv && source .venv/bin/activate     # first time only
-pip install -r requirements.txt                        # first time only
-
-# Run Model A on a script (Student_1 .. Student_50):
-PYTHONPATH=. python -c "
-from app.pipeline.model_a_reader import ModelAReader, load_answer_key
-key = load_answer_key('../dataset/answer_keys/answerkey.txt')
-reader = ModelAReader(key, question_path='../dataset/answer_keys/Question.txt')
-res = reader.read_script('../dataset/raw_scripts/Student_Pdf/Student_1.pdf')
-for q in sorted(res, key=int):
-    print(f\"Q{q} (match {res[q]['similarity']:.2f}): {res[q]['answer'][:100]}\")
-print(f'{len(res)}/15 answers')
-"
+git clone https://github.com/aishwaryaV007/E-Shield.git
+cd E-Shield
 ```
 
-**Reading it:** each line prints the question, its matching score (0–1), and the extracted answer;
-the last line shows how many of the 15 questions were found. Scores below ~0.2 flag a likely
-mis-read/mis-assignment. First run is slower (loads TrOCR-large ~1.3 GB from cache).
+### 2. Backend (FastAPI + the ML pipeline)
+```bash
+cd backend
+python3 -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install -r requirements.txt                        # first time only (installs torch, xgboost, etc.)
 
-Run the tests: `cd backend && PYTHONPATH=. pytest -q` (expect **11 passed**).
+# Start the API (first run downloads ~1.5 GB of models, then caches them):
+PYTHONPATH=. python -m uvicorn main:app --host 127.0.0.1 --port 8000
+# API is now at http://127.0.0.1:8000  (health: /health, docs: /docs)
+```
+> ⚠️ Keep `transformers==4.57.6` and `opencv-python==4.11.0.86` (pinned in requirements — newer
+> versions break TrOCR / segfault). Do **not** install `surya-ocr` or `paddleocr`.
 
-**Note (Track 02 compliance):** Model A only *reads*. Marks are decided later by the trained model
-in `evaluation/scorer.py` (Model B) — never by an LLM.
+### 3. Frontend (Next.js dashboard) — in a second terminal
+```bash
+cd frontend
+npm install                                            # first time only
+npm run dev
+# Dashboard is now at http://localhost:3000
+```
+
+### 4. Use it
+Open **http://localhost:3000**, then:
+1. **Upload** a student answer-script PDF (e.g. `dataset/raw_scripts/Student_Pdf/Student_1.pdf`).
+   Optionally upload an answer key (CSV) and question paper.
+2. Click **Grade script** (~30–45 s — TrOCR reads the handwriting).
+3. See **MCQ + descriptive subtotals**, the total `/50`, per-question marks, the extracted answer,
+   and the correct answer. **Edit** any mis-read answer and hit **Re-grade** for the fixed mark.
+
+### Command-line / tests (optional)
+```bash
+cd backend && source .venv/bin/activate
+
+# Grade one script from the CLI:
+PYTHONPATH=. python -c "
+from app.pipeline.grade_pipeline import grade_script
+s = grade_script('../dataset/raw_scripts/Student_Pdf/Student_1.pdf',
+                 '../dataset/answer_keys/answerkey.txt',
+                 question_path='../dataset/answer_keys/Question.txt')
+print(s['total_marks'], '/', s['max_total'], '=', s['percentage'], '%')
+"
+
+# Train Model B (regenerates models_cache/mark_predictor.pkl + metrics):
+PYTHONPATH=. python -m app.training.trainer
+
+# Run the test suite (expect 11 passed):
+PYTHONPATH=. pytest -q
+```
+
+### Troubleshooting
+| Symptom | Fix |
+|---|---|
+| Segfault / `cv2 has no attribute` | one OpenCV only: `pip uninstall -y opencv-python-headless` |
+| TrOCR tokenizer error | `pip install "transformers==4.57.6"` (5.x is incompatible) |
+| Frontend upload times out | the browser calls the backend directly on `:8000` — make sure the backend is running |
+| Marks all look like the similarity baseline | train Model B: `python -m app.training.trainer` |
+
+**Track 02 compliance:** the mark is produced by the trained XGBoost model — never by an LLM.
+An LLM is not used anywhere in the grading path.
 
 ---
 
