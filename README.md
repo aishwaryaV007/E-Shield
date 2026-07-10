@@ -6,7 +6,42 @@
 
 **Hackathon track:** 02 — Predictive Analytics (ML / DL)
 
-*Design / Planned — Not yet implemented*
+**Status:** Model A (the Reader) implemented & tested (~90% char accuracy). Model B (the trained
+mark-predictor) in progress.
+
+---
+
+## Running Model A (the Reader)
+
+Model A reads a handwritten answer-script PDF, extracts each question's answer with **TrOCR-large**,
+and matches it to the answer key with a semantic **matching score**. One-time setup caches the
+models (needs internet once); after that it runs fully offline.
+
+```bash
+cd backend
+python3 -m venv .venv && source .venv/bin/activate     # first time only
+pip install -r requirements.txt                        # first time only
+
+# Run Model A on a script (Student_1 .. Student_50):
+PYTHONPATH=. python -c "
+from app.pipeline.model_a_reader import ModelAReader, load_answer_key
+key = load_answer_key('../dataset/answer_keys/answerkey.txt')
+reader = ModelAReader(key, question_path='../dataset/answer_keys/Question.txt')
+res = reader.read_script('../dataset/raw_scripts/Student_Pdf/Student_1.pdf')
+for q in sorted(res, key=int):
+    print(f\"Q{q} (match {res[q]['similarity']:.2f}): {res[q]['answer'][:100]}\")
+print(f'{len(res)}/15 answers')
+"
+```
+
+**Reading it:** each line prints the question, its matching score (0–1), and the extracted answer;
+the last line shows how many of the 15 questions were found. Scores below ~0.2 flag a likely
+mis-read/mis-assignment. First run is slower (loads TrOCR-large ~1.3 GB from cache).
+
+Run the tests: `cd backend && PYTHONPATH=. pytest -q` (expect **11 passed**).
+
+**Note (Track 02 compliance):** Model A only *reads*. Marks are decided later by the trained model
+in `evaluation/scorer.py` (Model B) — never by an LLM.
 
 ---
 
