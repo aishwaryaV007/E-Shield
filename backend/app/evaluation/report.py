@@ -53,11 +53,17 @@ def build_report(script_id: str, answers: dict[str, dict], keys: dict[str, dict]
             "deduction_reasons": fb["deduction_reasons"],
             "low_confidence": ocr_conf < 0.55,
         })
+    mcq_rows = [r for r in rows if r["type"] == "mcq"]
+    short_rows = [r for r in rows if r["type"] != "mcq"]
     return {
         "script_id": script_id,
         "total_marks": round(total, 2),
         "max_total": round(max_total, 2),
         "percentage": round(100 * total / max_total, 1) if max_total else 0.0,
+        "mcq_marks": round(sum(r["predicted_mark"] for r in mcq_rows), 2),
+        "mcq_max": round(sum(r["max_marks"] for r in mcq_rows), 2),
+        "descriptive_marks": round(sum(r["predicted_mark"] for r in short_rows), 2),
+        "descriptive_max": round(sum(r["max_marks"] for r in short_rows), 2),
         "low_confidence_count": sum(r["low_confidence"] for r in rows),
         "answers": rows,
     }
