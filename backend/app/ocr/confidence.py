@@ -1,8 +1,17 @@
-# 1. FILE PURPOSE: OCR confidence handling — flags low-confidence handwriting recognition so the grader can be told "verify this answer".
-# 2. RESPONSIBILITIES:
-#    - Aggregate per-token confidence into an answer-level confidence score.
-#    - Mark answers below threshold as LOW_CONFIDENCE (surfaced in the report, never silently trusted).
-#    - Keep the auto-grader honest: an unreadable answer is flagged, not guessed.
-# 3. PLANNED CONTENTS: answer_confidence(ocr_result) -> float; needs_human_check(score) -> bool.
-# 4. INPUTS / OUTPUTS: Inputs: OCR tokens + confidences. Outputs: confidence score + LOW_CONFIDENCE flag.
-# 5. DEPENDS ON / USED BY: numpy; used by ocr/handwriting_ocr.py and evaluation/report.py.
+import numpy as np
+
+def answer_confidence(confidences: list[float]) -> float:
+    """
+    Computes the aggregate confidence score of an OCR transcription.
+    Returns the average probability of the generated tokens, or 1.0 if no tokens were produced (e.g., blank answer).
+    """
+    if not confidences:
+        return 1.0
+    return float(np.mean(confidences))
+
+def needs_human_check(score: float, threshold: float = 0.8) -> bool:
+    """
+    Flags whether the overall transcription confidence score is below the threshold,
+    requiring manual verification by a human evaluator.
+    """
+    return score < threshold
