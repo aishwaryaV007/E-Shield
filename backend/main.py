@@ -25,22 +25,38 @@ def health():
 
 
 @app.post("/api/v1/grade")
-async def grade(file: UploadFile = File(...), max_marks: float = 2.0):
-    """Upload a handwritten answer-script PDF -> evaluated sheet (question-wise marks, total, %)."""
+async def grade(
+    file: UploadFile = File(...),
+    answer_key: UploadFile | None = File(None),
+    max_marks: float = 2.0,
+):
+    """Upload a handwritten answer-script PDF (+ optional answer-key file) -> evaluated sheet.
+    The answer key is a CSV: Question_Number,Type,Correct_Answer (Type = Short_Answer)."""
+    import time
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Please upload a PDF answer script.")
     # import here so the heavy ML libs load lazily (not at app import time)
     from app.pipeline.grade_pipeline import grade_script
 
+    tmp_paths = []
     data = await file.read()
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-        tmp.write(data)
-        tmp_path = tmp.name
+        tmp.write(data); pdf_path = tmp.name; tmp_paths.append(pdf_path)
+
+    key_path = ANSWER_KEY
+    if answer_key is not None:
+        kb = await answer_key.read()
+        with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as kf:
+            kf.write(kb); key_path = kf.name; tmp_paths.append(key_path)
+
+    t0 = time.time()
     try:
-        sheet = grade_script(tmp_path, ANSWER_KEY,
+        sheet = grade_script(pdf_path, key_path,
                              question_path=QUESTIONS if os.path.exists(QUESTIONS) else None,
                              max_marks=max_marks,
                              script_id=file.filename.replace(".pdf", ""))
     finally:
-        os.unlink(tmp_path)
+        for p in tmp_paths:
+            os.unlink(p)
+    sheet["elapsed_seconds"] = round(time.time() - t0, 1)
     return sheet

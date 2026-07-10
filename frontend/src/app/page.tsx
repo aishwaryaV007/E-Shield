@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Answer = {
   question_no: string;
@@ -18,6 +18,7 @@ type Sheet = {
   max_total: number;
   percentage: number;
   low_confidence_count: number;
+  elapsed_seconds?: number;
   answers: Answer[];
 };
 
@@ -29,9 +30,23 @@ const C = {
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [keyFile, setKeyFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sheet, setSheet] = useState<Sheet | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const timer = useRef<any>(null);
+
+  // live seconds counter while grading
+  useEffect(() => {
+    if (loading) {
+      setElapsed(0);
+      timer.current = setInterval(() => setElapsed((s) => +(s + 0.1).toFixed(1)), 100);
+    } else if (timer.current) {
+      clearInterval(timer.current);
+    }
+    return () => timer.current && clearInterval(timer.current);
+  }, [loading]);
 
   async function grade() {
     if (!file) return;
@@ -40,6 +55,7 @@ export default function Home() {
       const fd = new FormData();
       fd.append("file", file);
       fd.append("max_marks", "2");
+      if (keyFile) fd.append("answer_key", keyFile);
       // Call the backend directly (CORS-enabled); avoids the Next dev-proxy timeout on ~40s grading.
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const res = await fetch(`${API}/api/v1/grade`, { method: "POST", body: fd });
@@ -61,16 +77,32 @@ export default function Home() {
       </p>
 
       <div style={{ ...C.card, marginBottom: 24 }}>
-        <input type="file" accept="application/pdf"
-               onChange={(e) => setFile(e.target.files?.[0] || null)}
-               style={{ color: "#e2e8f0" }} />
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
+            Student answer script (PDF) *
+          </label>
+          <input type="file" accept="application/pdf"
+                 onChange={(e) => setFile(e.target.files?.[0] || null)}
+                 style={{ color: "#e2e8f0" }} />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
+            Answer key (optional CSV: Question_Number,Type,Correct_Answer) — uses the default exam key if omitted
+          </label>
+          <input type="file" accept=".txt,.csv"
+                 onChange={(e) => setKeyFile(e.target.files?.[0] || null)}
+                 style={{ color: "#e2e8f0" }} />
+          {keyFile && <span style={{ marginLeft: 10, color: "#34d399", fontSize: 13 }}>✓ {keyFile.name}</span>}
+        </div>
         <button onClick={grade} disabled={!file || loading}
-                style={{ marginLeft: 12, padding: "8px 18px", borderRadius: 8, border: "none",
+                style={{ padding: "9px 20px", borderRadius: 8, border: "none",
                          background: loading ? "#475569" : "#3b82f6", color: "#fff",
                          cursor: file && !loading ? "pointer" : "not-allowed", fontWeight: 600 }}>
-          {loading ? "Grading… (~40s)" : "Grade script"}
+          {loading ? `⏱ Grading… ${elapsed.toFixed(1)}s` : "Grade script"}
         </button>
-        {file && <span style={{ marginLeft: 12, color: "#94a3b8" }}>{file.name}</span>}
+        {loading && <span style={{ marginLeft: 12, color: "#94a3b8", fontSize: 13 }}>
+          reading handwriting + scoring — usually 30–45s
+        </span>}
       </div>
 
       {error && <div style={{ ...C.card, borderColor: "#ef4444", color: "#fca5a5", marginBottom: 24 }}>⚠️ {error}</div>}
@@ -90,6 +122,12 @@ export default function Home() {
               <div style={{ fontSize: 13, color: "#94a3b8" }}>Percentage</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#34d399" }}>{sheet.percentage}%</div>
             </div>
+            {sheet.elapsed_seconds != null && (
+              <div>
+                <div style={{ fontSize: 13, color: "#94a3b8" }}>⏱ Time</div>
+                <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.elapsed_seconds}s</div>
+              </div>
+            )}
             {sheet.low_confidence_count > 0 && (
               <div style={{ color: "#fbbf24" }}>⚑ {sheet.low_confidence_count} low-confidence — verify</div>
             )}
