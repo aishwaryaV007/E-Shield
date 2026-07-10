@@ -54,6 +54,10 @@ dataset/training_csv/*
 !dataset/answer_keys/.gitkeep
 !dataset/training_csv/.gitkeep
 
+# Student-derived extracted text / marks — keep local (never commit real student data).
+# Public benchmark data (dataset/external/) and its derived table are committable.
+dataset/processed/student_scripts_*.csv
+
 # ── Environment / secrets ─────────────────────────────────
 .env
 .env.local
