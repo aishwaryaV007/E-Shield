@@ -122,3 +122,37 @@ select.inp { width: auto; min-width: 64px; }
   padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
 
 .footnote { color: var(--muted); font-size: 12.5px; margin-top: 16px; }
+
+/* ── roster / batch ── */
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+.btn-ghost { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background: #f8fafc; }
+.spacer { flex: 1; }
+.count { color: var(--muted); font-size: 13px; }
+
+.inp-name { border: 1px solid transparent; background: transparent; font-weight: 600; font-size: 14px;
+  color: var(--text); padding: 6px 8px; border-radius: 7px; width: 100%; max-width: 200px; }
+.inp-name:hover { border-color: var(--border); background: #fbfcfe; }
+.inp-name:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+.inp-roll { border: 1px solid var(--border); background: #fff; font-size: 13px; color: var(--muted);
+  padding: 6px 8px; border-radius: 7px; width: 90px; }
+.file-sm { font-size: 12px; color: var(--muted); }
+.file-sm::file-selector-button { margin-right: 8px; border: 1px solid var(--border); background: #fff;
+  padding: 4px 10px; border-radius: 7px; font-weight: 600; color: var(--text); cursor: pointer; }
+
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.st-idle { background: #f1f5f9; color: var(--muted); }
+.st-grading { background: #eff6ff; color: #2563eb; }
+.st-done { background: var(--success-bg); color: var(--success); }
+.st-error { background: #fef2f2; color: var(--danger); }
+
+.score-pill { font-weight: 700; font-size: 14px; }
+.iconbtn { border: none; background: transparent; cursor: pointer; color: var(--faint); font-size: 15px;
+  padding: 4px 6px; border-radius: 6px; }
+.iconbtn:hover { background: #f1f5f9; color: var(--danger); }
+.link { color: var(--primary); font-weight: 600; cursor: pointer; font-size: 13px; background: none; border: none; padding: 0; }
+.link:hover { text-decoration: underline; }
+.back { color: var(--muted); font-weight: 600; cursor: pointer; font-size: 13px; background: none; border: none; padding: 0; margin-bottom: 12px; }
+.back:hover { color: var(--text); }
