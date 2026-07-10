@@ -1,114 +1,90 @@
 # ExamShield Data Flow & State Transitions
-> Data transformation pipeline, input image processing, vector state calculations, and manual database override states.
+> How data moves through both phases, and the states an evaluation passes through.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Data Transformation Overview
-
-The data flow pipeline transforms physical handwritten documents into validated database records through sequential image processing and natural language modeling stages:
+## 1. Phase 1 — Training data flow
 
 ```
-[Raw Physical Booklet] 
-      │ 
-      ▼ (pypdfium2 Rasterization at 300 DPI)
-[Raw Page Image Matrix (RGB)] 
-      │ 
-      ▼ (OpenCV Bilateral Filter & Gaussian Adaptive Binarization)
-[High-Contrast Binary Image Matrix (0/255)] 
-      │ 
-      ▼ (Template coordinates crop splits)
-  ┌───┴──────────────────────────────────────────┐
-  │                                              │
-  ▼ (Zone: Marks Table / ID)                     ▼ (Zone: Written answers)
-[Digit Bounding Box Crops]                     [Prose Bounding Box Crops]
-  │                                              │
-  ▼ (Tier-1 OCR)                                 ▼ (Tier-2 OCR)
-[Digit Tokens + Confidence]                     [Prose Tokens + Confidence]
-  │                                              │
-  ▼ (MarkSafe / ScriptID logic)                  ▼ (all-MiniLM-L6-v2 Embeddings)
-[Calculated Sums & Match States]               [384-Dimensional Vectors]
-  │                                              │
-  │                                              ▼ (Pairwise Cosine calculations)
-  │                                            [Similarity Matrix Rows]
-  │                                              │
-  └──────────────────────┬───────────────────────┘
-                         │
-                         ▼ (State logic evaluations)
-                  [SQLite database Records]
-                         │
-                         ▼ (Auditor manual overrides)
-                  [Final Result CSV / Archive]
+[Historical corrected scripts + teacher marks + answer keys + rubrics]
+      │  (dataset_builder)
+      ▼
+[Labeled table: one row per (student_answer, answer_key, teacher_mark)]
+      │  (features: similarity, concept coverage, keyword recall, length ratio, …)
+      ▼
+[Feature matrix X + label vector y]
+      │  (trainer: XGBoost regressor, tuned)
+      ▼
+[mark_predictor.pkl]  ──(evaluate)──►  [metrics: RMSE / MAE / R² / ±1-mark accuracy]
+```
+
+## 2. Phase 2 — Evaluation data flow
+
+```
+[Raw scanned booklet (PDF/JPG)]
+      │  (pypdfium2 → OpenCV deskew/denoise/binarize)
+      ▼
+[Clean page images]
+      │  (handwriting OCR + confidence)
+      ▼
+[Per-answer text + confidence]
+      │  (segmentation: split questions, match answer key + rubric)
+      ▼
+[Grading units: (student_answer, answer_key, rubric, max_marks)]
+      │  (similarity + concept coverage → same feature vector as training)
+      ▼
+[Feature vector per answer]
+      │  (scorer: trained model → predicted mark, percentage bands, clamp[0,max])
+      ▼
+[Per-question marks]  ──(feedback)──►  [deduction reasons + feedback]
+      │  (report)
+      ▼
+[Evaluated sheet: question-wise marks, total, percentage]  →  SQLite / JSON
 ```
 
 ---
 
-## 2. Component Data Formats
+## 3. Per-answer record format
 
-### 1. Ingestion Output
-*   **Source:** Raw scan files.
-*   **Format:** Binarized PNG file matrix.
-*   **Metadata:** Page count, image dimensions `(W, H)`, file size.
-
-### 2. Digit Zone Extraction
-*   **Source:** Marks column crop, written total box crop, roll number box crop.
-*   **Format:** Numeric string arrays and confidence scores:
-    ```python
-    {
-      "roll_number": {"text": "26SN101012", "confidence": 0.94},
-      "marks_column": [
-        {"question": "Q1.a", "text": "5", "confidence": 0.98},
-        {"question": "Q1.b", "text": "4", "confidence": 0.89},
-        {"question": "Q2.a", "text": "10", "confidence": 0.91}
-      ],
-      "written_total": {"text": "19", "confidence": 0.96}
-    }
-    ```
-
-### 3. Prose Vector Representation
-*   **Source:** Hand-written student answer crops.
-*   **Format:** Cosine similarity vectors:
-    ```python
-    {
-      "script_id": "s22a8c9e",
-      "question_number": "Q2",
-      "tokens_extracted": "The process is exothermic because heat is released during the reaction...",
-      "vector_embedding": [0.045, -0.012, 0.128, ..., 0.009]  # 384-dimensions
-    }
-    ```
+```python
+{
+  "script_id": "s22a8c9e",
+  "question_no": "Q2",
+  "answer_text": "The process is exothermic because heat is released...",
+  "similarity": 0.86,          # semantic similarity to the answer key
+  "predicted_mark": 6.5,       # from the trained model
+  "max_marks": 8,
+  "percent_match": 0.82,
+  "feedback": "Covers the exothermic definition and heat release; misses activation energy.",
+  "deduction_reasons": ["missing: activation energy"],
+  "low_confidence": 0          # 1 => OCR unreadable, verify before publishing
+}
+```
 
 ---
 
-## 3. Audit Flag State Transitions
-
-Discrepancies identified during engine processing transition through states as human graders audit and resolve them:
+## 4. Evaluation state transitions
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING : Engine processes batch and raises anomaly flag
-    
-    state PENDING {
-        [*] --> Unreviewed
-        Unreviewed --> Under_Review : Auditor selects flag in dashboard
-    }
-    
-    PENDING --> RESOLVED : Auditor confirms OCR sum or inputs override
-    PENDING --> AMBIGUOUS : Low-confidence OCR forces fallback
-    
-    AMBIGUOUS --> RESOLVED : Manual grade override input by Auditor
-    
-    RESOLVED --> [*] : Results updated & grade card generated
+    [*] --> QUEUED : batch uploaded, answer key attached
+    QUEUED --> EVALUATING : evaluate_pipeline runs
+    EVALUATING --> EVALUATED : marks + feedback persisted
+    EVALUATING --> NEEDS_VERIFICATION : some answers low-confidence OCR
+    NEEDS_VERIFICATION --> EVALUATED : human verifies flagged answers
+    EVALUATED --> PUBLISHED : exam cell releases results
+    PUBLISHED --> [*]
 ```
 
-*   **PENDING:** Default state for any validation discrepancies flagged by the engine (e.g., MarkSafe sum mismatches).
-*   **AMBIGUOUS:** Triggered when the digit OCR confidence falls below `0.85`, indicating bad handwriting or strikeouts.
-*   **RESOLVED:** The finalized state. This is set when an auditor manually confirms the marks value in the Streamlit panel, updating the record in SQLite.
+- **NEEDS_VERIFICATION:** an answer's OCR confidence fell below threshold — flagged for a human,
+  never guessed. The mark itself always comes from the trained model.
 
 ---
 
-## 4. Related Documents
+## 5. Related Documents
 
-*   [Overall Architecture Spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ARCHITECTURE.md)
-*   [Database Design Document](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
-*   [MarkSafe Specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/engines/MARKSAFE.md)
+*   [Architecture](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ARCHITECTURE.md)
+*   [Database Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
+*   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)

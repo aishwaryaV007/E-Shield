@@ -1,5 +1,5 @@
 # ExamShield Database Design Spec
-> SQLite database schema definitions, entity-relationship structures, primary indexing paths, and transaction rules.
+> SQLite schema, entity relationships, and indexing for the auto-grader.
 
 *Design / Planned — Not yet implemented*
 
@@ -7,117 +7,93 @@
 
 ## 1. Database Paradigm
 
-ExamShield uses a local serverless database architecture via **SQLite**. This ensures portability, zero runtime installation overhead, and fast read/write times on standard local storage drives during hackathons and university examinations.
+Local, serverless **SQLite** — portable, zero-install, fast on local storage. The authoritative
+schema lives in [`backend/app/storage/schema.sql`](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/storage/schema.sql).
 
 ---
 
 ## 2. Entity-Relationship Schema
 
-The database schema isolates transactional batch runs from static coordination templates and auditing alerts:
-
 ```mermaid
 erDiagram
+    MODELS ||--o{ BATCHES : grades-with
+    ANSWER_KEYS ||--o{ QUESTIONS : defines
+    ANSWER_KEYS ||--o{ BATCHES : graded-against
     BATCHES ||--o{ SCRIPTS : contains
-    SCRIPTS ||--o{ PARSED_MARKS : tracks
-    SCRIPTS ||--o{ AUDIT_FLAGS : raises
-    SCRIPTS ||--o{ SIMILARITY_MATRIX : correlates-A
-    SCRIPTS ||--o{ SIMILARITY_MATRIX : correlates-B
+    SCRIPTS ||--o{ PAGES : has
+    SCRIPTS ||--o{ EVALUATIONS : produces
+    QUESTIONS ||--o{ EVALUATIONS : scored-for
 
+    MODELS {
+        int id PK
+        text name
+        text artifact_path "models_cache/mark_predictor.pkl"
+        text metrics_json "RMSE/MAE/R2/±1-acc"
+    }
+    ANSWER_KEYS { int id PK  text name }
+    QUESTIONS {
+        int id PK
+        int answer_key_id FK
+        text question_no
+        text key_text "model answer"
+        text rubric_json "key points"
+        real max_marks
+    }
     BATCHES {
-        text id PK "UUID"
-        timestamp created_at
-        text status "processing/completed/failed"
-        integer script_count
+        int id PK
+        int answer_key_id FK
+        int model_id FK
+        text status "created/ingested/evaluated"
     }
-
     SCRIPTS {
-        text id PK "UUID"
-        text batch_id FK
-        text roll_number "Extracted Student ID"
-        text original_file_path
-        integer page_count
-        text blank_pages "JSON Array"
-        integer is_borderline "0/1 Boolean"
+        int id PK
+        int batch_id FK
+        text roll_no
+        int page_count
+        real total_marks
+        real percentage
     }
-
-    PARSED_MARKS {
-        text id PK "UUID"
-        text script_id FK
-        text question_number
-        real marks_extracted
-        real marks_resolved
-        real confidence
-        text bounding_box "JSON Coordinates Array"
-    }
-
-    AUDIT_FLAGS {
-        text id PK "UUID"
-        text script_id FK
-        text engine_name "MarkSafe/CopyCatch/ScriptID"
-        text flag_type "SUM_MISMATCH/DUPLICATE_ID"
-        text evidence_payload "JSON Crops and Metadata"
-        text status "PENDING/RESOLVED"
-    }
-
-    SIMILARITY_MATRIX {
-        text script_a_id PK, FK
-        text script_b_id PK, FK
-        real similarity_score
+    EVALUATIONS {
+        int id PK
+        int script_id FK
+        int question_id FK
+        text answer_text "OCR'd"
+        real similarity
+        real predicted_mark "trained model"
+        real max_marks
+        real percent_match
+        text feedback
+        text deduction_reasons
+        int low_confidence "0/1"
     }
 ```
 
 ---
 
-## 3. Database Table Specifications
+## 3. Key Tables
 
-### 1. `batches` Table
-Tracks ingestion pipeline status.
-*   `id`: `TEXT` Primary Key (UUIDv4 format).
-*   `status`: `TEXT` NOT NULL. Constrained to `processing`, `completed`, `failed`.
-*   `script_count`: `INTEGER` NOT NULL.
-
-### 2. `scripts` Table
-Holds metadata for each scanned booklet.
-*   `id`: `TEXT` Primary Key (UUIDv4 format).
-*   `batch_id`: `TEXT` REFERENCES `batches(id)` ON DELETE CASCADE.
-*   `roll_number`: `TEXT` (nullable to handle OCR failures or unregistered booklets).
-*   `is_borderline`: `INTEGER` DEFAULT `0` (used by ReEval Guard for quick filtering).
-
-### 3. `parsed_marks` Table
-Stores extracted question-wise scores and manual overrides.
-*   `id`: `TEXT` Primary Key.
-*   `script_id`: `TEXT` REFERENCES `scripts(id)` ON DELETE CASCADE.
-*   `marks_extracted`: `REAL` (nullable to allow for blank or unreadable cells).
-*   `marks_resolved`: `REAL` (contains the human auditor override value).
+- **`models`** — registry of trained mark-predictors + their metrics (Phase 1 output).
+- **`answer_keys` / `questions`** — the question paper, model answers, rubric points, and max marks.
+- **`batches` / `scripts` / `pages`** — the uploaded scripts to grade.
+- **`evaluations`** — the core auto-grader output: one row per (script, question) with the
+  **predicted mark**, similarity, feedback, deduction reasons, and a low-confidence flag.
 
 ---
 
-## 4. Performance Indexes
-
-To maintain responsive query performance on large batches (e.g., $O(N^2)$ comparisons across hundreds of scripts):
+## 4. Indexes
 
 ```sql
--- Index optimization queries
--- Speed up script queries during batch runs
-CREATE INDEX IF NOT EXISTS idx_scripts_batch ON scripts(batch_id);
-
--- Speed up roll number validation runs
-CREATE INDEX IF NOT EXISTS idx_scripts_roll ON scripts(roll_number);
-
--- Speed up marks aggregation calculations
-CREATE INDEX IF NOT EXISTS idx_marks_script ON parsed_marks(script_id);
-
--- Speed up dashboard alert views
-CREATE INDEX IF NOT EXISTS idx_flags_status ON audit_flags(status);
-
--- Speed up collusion graph renders
-CREATE INDEX IF NOT EXISTS idx_similarity_lookup ON similarity_matrix(script_a_id, script_b_id);
+CREATE INDEX IF NOT EXISTS idx_scripts_batch   ON scripts(batch_id);
+CREATE INDEX IF NOT EXISTS idx_questions_key   ON questions(answer_key_id);
+CREATE INDEX IF NOT EXISTS idx_evals_script    ON evaluations(script_id);
+CREATE INDEX IF NOT EXISTS idx_evals_question  ON evaluations(question_id);
+CREATE INDEX IF NOT EXISTS idx_pages_script    ON pages(script_id);
 ```
 
 ---
 
 ## 5. Related Documents
 
-*   [Database Concepts](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DBMS_CONCEPTS.md)
-*   [Storage Module Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
-*   [Scalability Analysis](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)
+*   [DBMS Concepts](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DBMS_CONCEPTS.md)
+*   [Storage module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/storage/README.md)
+*   [Data Flow](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)

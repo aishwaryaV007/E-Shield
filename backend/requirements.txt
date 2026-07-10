@@ -5,27 +5,27 @@ python-multipart>=0.0.9
 pydantic>=2.7.0
 pydantic-settings>=2.3.0
 
-# ── Computer vision / image processing ───────────────────
+# ── Image processing (Phase 2 input) ─────────────────────
 opencv-python>=4.9.0.80
 Pillow>=10.3.0
 pypdfium2>=4.30.0
 
-# ── OCR ───────────────────────────────────────────────────
+# ── Handwriting OCR ──────────────────────────────────────
 paddleocr>=2.7.3
 paddlepaddle>=2.6.1
+transformers>=4.41.0          # TrOCR handwritten (optional)
 
-# ── ML / NLP ──────────────────────────────────────────────
+# ── ML / NLP (Phase 1 training + Phase 2 scoring) ────────
 sentence-transformers>=3.0.0
 torch>=2.2.0
-transformers>=4.41.0
+scikit-learn>=1.5.0
+xgboost>=2.0.3                # mark-predictor regressor
+joblib>=1.4.0                 # model persistence
 
 # ── Numerics / data ───────────────────────────────────────
 numpy>=1.26.4
 pandas>=2.2.2
-scikit-learn>=1.5.0
-
-# ── Graph computation ─────────────────────────────────────
-networkx>=3.3
+rapidfuzz>=3.9.0             # answer↔question matching
 
 # ── Storage ───────────────────────────────────────────────
 aiosqlite>=0.20.0

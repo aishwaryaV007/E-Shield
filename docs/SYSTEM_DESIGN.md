@@ -1,91 +1,81 @@
 # ExamShield System Design
-> System architecture, modular subsystems interaction, data caching strategy, and local process threading models.
+> Subsystem interaction, execution model, and caching for the two-phase auto-grader.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Subsystem Interaction Model
-
-ExamShield operates as a local application that decouples visual dashboard interfaces from the core evaluation engines. This allows for background processing and helps prevent Streamlit UI freezes during high-compute OCR steps.
+## 1. Subsystem Interaction (Phase 2 evaluation)
 
 ```mermaid
 sequenceDiagram
-    participant User as Grader/CoE
-    participant UI as Streamlit UI
+    participant User as Evaluator/CoE
+    participant UI as Next.js UI
     participant API as FastAPI Backend
-    participant Pipe as Ingestion Pipeline
+    participant Pipe as Evaluation Pipeline
     participant DB as SQLite DB
-    participant LocalAI as Local OCR/Embedding Models
+    participant AI as Local OCR + Embedder + Trained Model
 
-    User->>UI: Selects batch PDF and class roster CSV
-    UI->>API: POST /api/v1/batch/upload
-    API->>DB: Create batch record (status: processing)
-    API-->>UI: Return batch_id (processing started async)
-    UI->>User: Displays progress bar
-    
+    User->>UI: Upload scripts + answer key, click Evaluate
+    UI->>API: POST /evaluate {batch_id, answer_key_id}
+    API->>DB: Create/patch batch (status: evaluating)
+    API-->>UI: Ack (async run started)
     activate Pipe
-    API->>Pipe: Trigger Ingestion Spine
-    Pipe->>Pipe: Rasterize & Deskew images (OpenCV)
-    Pipe->>LocalAI: Crop & Extract digit OCR & prose text
-    LocalAI-->>Pipe: Coordinates, parsed tokens & confidence
-    
-    Pipe->>DB: Save parsed_marks & similarity_matrix records
-    Pipe->>DB: Evaluate engines & save PENDING audit_flags
+    API->>Pipe: run evaluate_pipeline(batch_id)
+    Pipe->>AI: OCR handwriting → text + confidence
+    Pipe->>Pipe: segment questions, match answer key
+    Pipe->>AI: similarity + coverage features
+    Pipe->>AI: trained model → predicted mark per answer
+    AI-->>Pipe: marks + feature values
+    Pipe->>DB: save evaluations (marks, feedback, totals)
     deactivate Pipe
-    
-    API->>DB: Update batch record (status: completed)
-    UI->>API: GET /api/v1/batch/{id}/results
-    API->>DB: Query results and flags
-    DB-->>API: Return DB rows
-    API-->>UI: Return formatted results JSON
-    UI->>User: Renders ranked flags and collusion graph
+    API->>DB: Update batch (status: evaluated)
+    UI->>API: GET /results/{script_id}
+    API-->>UI: Evaluated sheet JSON
+    UI->>User: Question-wise marks, total, %, feedback
 ```
 
----
-
-## 2. Process Threading & Execution Model
-
-To run efficiently on standard university laptops, the system coordinates concurrency using Python's `asyncio` and thread workers:
-
-*   **Ingestion Concurrency:** Image pre-processing (deskewing, binarizing, page counting) uses a thread pool (`concurrent.futures.ThreadPoolExecutor`) to run parallel processes on multiple CPU cores.
-*   **Sequential AI Inference:** Local AI model invocations (PaddleOCR extraction and sentence vector embeddings) run sequentially on a single thread. This prevents CPU core congestion and memory paging errors on machines with limited RAM (e.g., 8 GB).
-*   **Non-Blocking API Calls:** FastAPI handles requests asynchronously using `async def`, allowing the dashboard to query processing logs while the pipeline runs in the background.
+Phase 1 (training) runs the analogous flow: `POST /train` → `train_pipeline` →
+dataset_builder → features → trainer → evaluate → persist model + metrics → `GET /train/metrics`.
 
 ---
 
-## 3. Local Cache & Workspace File Management
+## 2. Execution Model
 
-To optimize performance and avoid re-processing scanned files:
-
-*   **Scanned Image Storage:** Rasterized pages are stored locally in `/data/corpus/{batch_id}/{script_id}/page_{n}.png`. Bounding box evidence crops are generated dynamically and cached in memory.
-*   **Model Weights Caching:** PaddleOCR and Hugging Face weights are cached in default system folders (`~/.cache/paddleocr/` and `~/.cache/huggingface/`).
-*   **Database Writes:** SQL writes are managed using a thread-safe connection pool, queuing transactions to prevent database locks on SQLite.
+- **Async API:** FastAPI `async def`; pipelines run as background tasks so the dashboard can poll status.
+- **Sequential AI inference:** OCR, embeddings, and model prediction run single-threaded to avoid
+  CPU/RAM contention on 8 GB laptops. Image preprocessing may use a small thread pool.
+- **Training is a batch job:** Phase 1 runs offline and writes one model artifact; Phase 2 only
+  *loads* it (fast, cached).
 
 ---
 
-## 4. Subsystem Components Specification
+## 3. Caching & Files
 
-### 1. Ingestion Subsystem (`app/ingestion/`)
-*   **Components:** `pypdfium2` for PDF loading, OpenCV for deskewing and denoising, and `BlankCheck` pixel validation.
-*   **Outputs:** Standardized, high-contrast binarized PNGs.
+- **Model weights:** MiniLM + OCR cached under `models_cache/` and default HF/Paddle caches.
+- **Trained mark-predictor:** `models_cache/mark_predictor.pkl` (loaded once, cached in-process).
+- **Scanned images:** `data/raw/{batch_id}/{script_id}/page_{n}.png`.
+- **Outputs:** evaluated sheets in `data/results/`, training metrics in `data/metrics/`, answer keys
+  in `data/answer_keys/`.
+- **DB writes:** thread-safe SQLite connection; evaluations queued to avoid locks.
 
-### 2. OCR Subsystem (`app/ocr/`)
-*   **Components:** Local PaddleOCR pipeline, bounding box crop managers, and digit classification filters.
-*   **Outputs:** Numeric mark extraction records and raw prose text logs.
+---
 
-### 3. Engines Subsystem (`app/engines/`)
-*   **Components:** MarkSafe logic engine, CopyCatch cosine calculations, ScriptID register matching, and ReEval Guard border sorting.
-*   **Outputs:** Structured anomaly records saved to the database.
+## 4. Subsystem Components
 
-### 4. Interface Subsystem (`app/dashboard/`)
-*   **Components:** Streamlit server, drawable alignment canvas, NetworkX graph plotting modules, and manual override fields.
-*   **Outputs:** Interactive result dashboards and exportable final grading sheets.
+1. **Training (`app/training/`)** — dataset_builder, features, trainer (XGBoost), evaluate. Output:
+   trained model + metrics.
+2. **Ingestion + OCR (`app/ingestion/`, `app/ocr/`)** — PDF→image, deskew/binarize, handwriting
+   recognition + confidence.
+3. **Segmentation (`app/segmentation/`)** — question splitting + answer-key matching.
+4. **Evaluation (`app/evaluation/`)** — similarity, concept_coverage, scorer (trained model),
+   feedback, report. Output: evaluated sheets.
+5. **Interface (`frontend/`)** — Training metrics, upload, and evaluated-sheet views.
 
 ---
 
 ## 5. Related Documents
 
-*   [System Scalability Spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)
-*   [Data Flow and State Transitions](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)
-*   [Database Design Document](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
+*   [Scalability](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)
+*   [Data Flow](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)
+*   [Database Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)

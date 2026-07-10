@@ -1,5 +1,5 @@
 # Product Features Specifications
-> Detailed user-facing feature list, execution triggers, data inputs, and audit outputs.
+> User-facing features of the AI answer-sheet evaluator (Track 02).
 
 *Design / Planned — Not yet implemented*
 
@@ -7,62 +7,53 @@
 
 ## 1. Feature Architecture
 
-ExamShield provides six primary evaluation and auditing features. These features are powered by a unified image processing and local OCR pipeline, and are accessed via the Streamlit dashboard:
-
 ```
-┌────────────────────────────────────────────────────────┐
-│ ExamShield Core Dashboard                              │
-├─────────────┬─────────────┬─────────────┬──────────────┤
-│ MarkSafe    │ CopyCatch   │ ScriptID    │ ReEval Guard │
-│ Sum checks  │ Collusion   │ Identity    │ Borderline   │
-│             │ network     │ check       │ queue        │
-└─────────────┴─────────────┴─────────────┴──────────────┘
+┌────────────────────────────────────────────────────────────┐
+│ ExamShield Dashboard                                       │
+├───────────────┬───────────────┬────────────────────────────┤
+│ Train Model   │ Auto-Evaluate │ Evaluated Sheets           │
+│ (Phase 1)     │ (Phase 2)     │ (marks + feedback)         │
+└───────────────┴───────────────┴────────────────────────────┘
 ```
 
 ---
 
-## 2. Core Features Directory
+## 2. Core Features
 
-### 1. MarkSafe (Sum Auditing)
-*   **What it does:** Verifies page-wise question marks and validates the sum against the written total.
-*   **Who uses it:** Graders and Exam-Cell Auditors.
-*   **Data Inputs:** Digit crops from the marks table and overall total boxes.
-*   **Outputs & Flags:** `SUM_MISMATCH` flag (when page sum does not equal written total), `AMBIGUOUS_MARK` flag (when OCR confidence is low).
+### 1. Model Training (Phase 1)
+- **What it does:** Learns teacher marking behaviour from historical corrected scripts + marks.
+- **Who uses it:** Exam-cell admins (once per exam/subject, reused after).
+- **Inputs:** Historical answers + teacher marks, answer keys, rubrics.
+- **Outputs:** A trained mark-predictor + metrics (RMSE / MAE / R² / ±1-mark accuracy) and feature importance.
 
-### 2. CopyCatch (Collusion Detection)
-*   **What it does:** Compares student answer prose to map similarity networks.
-*   **Who uses it:** Controllers of Examinations (CoE).
-*   **Data Inputs:** Answer prose text extracted via Tier-2 OCR.
-*   **Outputs & Flags:** `SIMILARITY_CLUSTER` (raised when student similarity z-scores exceed the class-wide baseline), interactive HTML community graphs.
+### 2. Handwriting OCR + Segmentation
+- **What it does:** Reads handwritten answers and splits each script into question-wise answers.
+- **Inputs:** Scanned PDF/image scripts.
+- **Outputs:** Per-question answer text (+ low-confidence flags), matched to the answer key.
 
-### 3. ScriptID (Identity Check)
-*   **What it does:** Verifies handwritten student roll numbers against the roster database.
-*   **Who uses it:** Exam-Cell Staff.
-*   **Data Inputs:** Hand-written roll number crop, student roster CSV.
-*   **Outputs & Flags:** `UNREGISTERED_ID`, `DUPLICATE_ID`, `ABSENTEE_WITH_SCRIPT` alerts.
+### 3. Semantic Scoring (Auto-Evaluation)
+- **What it does:** Measures semantic similarity to the answer key + concept coverage, then the
+  **trained model** assigns percentage-based marks.
+- **Inputs:** Grading units (answer, key, rubric, max marks).
+- **Outputs:** Predicted mark per question. *(The mark comes from the model, never an LLM.)*
 
-### 4. ReEval Guard (Borderline Queue)
-*   **What it does:** Automatically routes borderline scores (e.g., scoring 39 when 40 is a pass) to a priority audit queue.
-*   **Who uses it:** Exam-Cell Auditors.
-*   **Data Inputs:** Graded totals from MarkSafe, grade boundary configurations.
-*   **Outputs & Flags:** `BORDERLINE_PASS_FAIL` priority review markers.
+### 4. Feedback & Deduction Reasons
+- **What it does:** Explains each mark — covered points, missing points, contradictions.
+- **Outputs:** Per-answer feedback + explicit reasons marks were lost.
 
-### 5. BlankCheck (Page Triage)
-*   **What it does:** Performs a fast pixel-density scan to check for blank pages.
-*   **Who uses it:** Ingestion Operators.
-*   **Data Inputs:** High-contrast binary page image matrices.
-*   **Outputs & Flags:** Page count audits, `PAGE_BLANK` log lists.
+### 5. Evaluated Sheet
+- **What it does:** Assembles question-wise marks, total, and percentage into one sheet.
+- **Outputs:** A fully evaluated answer sheet resembling a human examiner's, with low-confidence
+  answers flagged for verification.
 
-### 6. RubricLens (Grading Assistant)
-*   **What it does:** Uses local NLI models to highlight answer text segments that align with or contradict rubric guidelines.
-*   **Who uses it:** Graders.
-*   **Data Inputs:** Answer prose text, grading rubric text files.
-*   **Outputs & Flags:** Color-coded text overlays (green for entailment, red for contradiction).
+### 6. Consistency Metrics
+- **What it does:** Reports agreement with teacher marks (±1-mark accuracy) on held-out data —
+  the Track-02 measurable-performance story.
 
 ---
 
 ## 3. Related Documents
 
-*   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
-*   [Product Roadmap](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ROADMAP.md)
-*   [CopyCatch Specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/engines/COPYCATCH.md)
+*   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
+*   [Roadmap](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ROADMAP.md)
+*   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)

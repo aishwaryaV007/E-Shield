@@ -1,20 +1,23 @@
 # services/ — Application service layer
 
-Business-logic layer that sits **between the API routes and the pipeline/engines**. Routes stay thin (parse request → call a service → return a schema); services coordinate the actual work and persistence.
+Business-logic layer between the API routes and the two pipelines. Routes stay thin
+(parse request → call a service → return a schema); the service coordinates the work.
 
 ## Files
 
-- **`batch_service.py`** — the main service. Responsibilities:
-  - create a batch and register its calibration template,
-  - run the evaluation pipeline for a batch (delegates to `app/pipeline/orchestrator.py`),
-  - fetch ranked flags for review,
-  - fetch per-script evidence (marks, crops, collusion edges).
+- **`evaluation_service.py`** — the main service. Responsibilities:
+  - create a batch and register its answer key + rubric,
+  - run **Phase 1** training (delegates to `app/training/*`) and expose metrics,
+  - run **Phase 2** evaluation for a batch (delegates to `app/pipeline/orchestrator.py`),
+  - fetch evaluated sheets (question-wise marks, totals, feedback) for the frontend.
 
 ## Depends on / used by
 
-- **Depends on:** `app/pipeline/`, `app/storage/` (db + json_store), `app/engines/`.
-- **Used by:** `app/api/routes/*`, injected via the `get_batch_service()` dependency in `app/api/deps.py`.
+- **Depends on:** `app/training/`, `app/pipeline/`, `app/evaluation/`, `app/storage/`.
+- **Used by:** `app/api/routes/*`, injected via `get_evaluation_service()` in `app/api/deps.py`.
 
 ## Principle
 
-Rank and flag evidence; **never accuse, never finalize; the human decides.** Services return ranked/flagged data — they never write a final grade or resolve a flag automatically.
+The mark for every answer is produced by the **trained model** in `app/evaluation/scorer.py`
+— never by an LLM prompt (Track 02 rule). Low-confidence OCR answers are flagged for optional
+human verification before results are published.

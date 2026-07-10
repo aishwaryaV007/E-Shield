@@ -1,5 +1,5 @@
 # ExamShield Architecture Specification
-> High-level architectural pattern, processing lifecycle, and component separation schemas.
+> High-level architecture, the two-phase lifecycle, and component separation.
 
 *Design / Planned — Not yet implemented*
 
@@ -7,73 +7,73 @@
 
 ## 1. Architectural Strategy
 
-ExamShield is structured around a **Local Modular Pipeline** design. The application runs entirely on the host machine to meet strict privacy constraints and ensure reliable performance without internet dependencies.
+ExamShield is a **local, two-phase ML pipeline** with a decoupled web dashboard. Everything runs on
+the host machine for privacy and offline reliability. **The mark is produced by a trained model,
+never an LLM.**
 
 ```mermaid
 graph TD
-    subgraph UI_Layer [User Interface Layer - Streamlit]
-        A[Dashboard UI] <--> B[Layout Calibration UI]
+    subgraph UI [Dashboard - Next.js]
+        A[Training metrics] & B[Upload / Ingestion] & C[Evaluated sheets]
     end
-    
-    subgraph Service_Layer [Service Orchestration - FastAPI]
-        C[REST API Controllers] <--> D[Pipeline Coordinator]
+    subgraph API [Service - FastAPI]
+        D[training routes] & E[evaluation routes] & F[results routes]
     end
-    
-    subgraph Core_Pipeline [Processing Spine - OpenCV & OCR]
-        E[Image Preprocess] --> F[Zone Crop Extractor]
-        F --> G[Dual-Tier OCR Engine]
+    subgraph P1 [Phase 1 - Training]
+        G[dataset_builder] --> H[features] --> I[trainer XGBoost] --> J[evaluate metrics]
+        I --> K[(mark_predictor.pkl)]
     end
-    
-    subgraph Analytics_Layer [Verification Engines]
-        H[MarkSafe] & I[CopyCatch] & J[ScriptID] & K[ReEval Guard] & L[RubricLens]
+    subgraph P2 [Phase 2 - Evaluation]
+        L[ingestion] --> M[handwriting OCR] --> N[segmentation] --> O[similarity + coverage]
+        O --> Q[scorer: trained model → marks]
+        K --> Q
+        Q --> R[feedback] --> S[report: evaluated sheet]
     end
-    
-    subgraph Storage_Layer [Persistence]
-        M[(Local SQLite DB)] <--> N[JSON Templates]
+    subgraph DB [Persistence]
+        T[(SQLite)] <--> U[JSON: keys / results / metrics]
     end
-    
-    UI_Layer <-->|HTTP / JSON| Service_Layer
-    Service_Layer <--> Core_Pipeline
-    Core_Pipeline --> Analytics_Layer
-    Analytics_Layer --> Storage_Layer
-    Service_Layer <--> Storage_Layer
+    UI <-->|HTTP/JSON| API
+    API --> P1
+    API --> P2
+    P1 --> DB
+    P2 --> DB
 ```
 
-*   **Offline Sandboxing:** No external cloud processing. AI inference and OCR text extraction use lightweight CPU models that run locally.
-*   **Decoupled Frontend/Backend:** The Streamlit user interface communicates with the FastAPI service layer via standard REST calls. This structure allows the core execution engine to run as a CLI tool or integration script if needed.
-*   **Coordinate-Based Routing:** An answer sheet binarized by OpenCV is cropped into zones based on a calibration profile, allowing target OCR engines to scan only specified regions.
+- **Offline sandboxing:** local CPU models only; no cloud, no LLM in the grading path.
+- **Decoupled frontend/backend:** Next.js talks to FastAPI over REST; the pipeline can also run as a CLI.
+- **Train once, grade many:** Phase 1 produces a reusable model artifact that Phase 2 loads.
 
 ---
 
-## 2. Ingestion to Verification Lifecycle
+## 2. Two-Phase Lifecycle
 
-When a user processes a new batch of answer sheets, the request executes sequentially through these stages:
+### Phase 1 — Training (offline, run when historical data changes)
+1. **Build dataset:** pair historical answers with keys + teacher marks (labels).
+2. **Engineer features:** similarity, concept coverage, keyword recall, etc.
+3. **Train:** fit + tune the XGBoost regressor; save the artifact.
+4. **Evaluate:** RMSE / MAE / R² / ±1-mark accuracy on a held-out split.
 
-1.  **Ingestion & Binarization:** Scanned physical papers (PNG, JPG, or PDF) are rasterized at 300 DPI, deskewed, and binarized using adaptive thresholding.
-2.  **Calibration Alignment:** The system matches pages with a selected zone calibration template. If coordinates are missing, it prompts the user to calibrate the layout.
-3.  **Region Extraction & OCR:** Bounding boxes are cropped. The system routes marks column and roll number zones to the Tier-1 Digit OCR, while answer regions are sent to the Tier-2 Prose OCR.
-4.  **Engine Analysis:**
-    *   **MarkSafe** validates column sums against written overall totals.
-    *   **CopyCatch** vectorizes prose and computes pairwise similarity clusters.
-    *   **ScriptID** validates roll numbers against the student roster database.
-    *   **ReEval Guard** filters borderline scores.
-    *   **RubricLens** extracts rubric evidence.
-5.  **Persistence & Audit Flags:** The system writes all extraction metrics to the local SQLite database. Flagged anomalies remain in a `PENDING` review state.
-6.  **Human Resolution:** The Controller of Examinations reviews flags in the dashboard, inputting overrides to resolve discrepancies before finalizing grades.
+### Phase 2 — Evaluation (per uploaded batch)
+1. **Ingest & binarize** scanned scripts (OpenCV, pypdfium2).
+2. **OCR** the handwriting + confidence.
+3. **Segment** into questions; match each answer to its key + rubric.
+4. **Score:** similarity + coverage → feature vector → **trained model** → marks (percentage bands).
+5. **Feedback + report:** deduction reasons; question-wise marks, total, percentage.
+6. **Persist:** evaluated sheets in SQLite/JSON; the API serves them; low-confidence answers flagged.
 
 ---
 
 ## 3. Key Design Patterns
 
-*   **Pipeline Pattern:** Sequential filters process images and text, passing clean data structures downstream.
-*   **Repository Pattern:** A data access layer isolates engine evaluations from raw SQL execution queries.
-*   **Strategy Pattern (OCR):** The system dynamically switches between digit-specific recognition and prose classification configurations depending on the target region.
-*   **Observer Pattern (Dashboard):** Streamlit views react dynamically as background threads resolve database records.
+- **Pipeline pattern:** sequential stages pass clean data structures downstream (both phases).
+- **Repository pattern:** the storage layer isolates evaluation records from raw SQL.
+- **Shared-feature contract:** one feature function for train + inference (no skew).
+- **Strategy (OCR):** handwriting recognition is swappable (TrOCR / PaddleOCR).
 
 ---
 
 ## 4. Related Documents
 
-*   [Technology Stack Justifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/TECH_STACK.md)
-*   [Data Flow and State Transitions](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)
-*   [API Contracts Spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_CONTRACT.md)
+*   [Technology Stack](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/TECH_STACK.md)
+*   [Data Flow](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)
+*   [API Contract](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_CONTRACT.md)

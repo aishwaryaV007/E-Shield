@@ -1,198 +1,102 @@
 # ExamShield — Complete Build Workflow
 
 **Hackathon:** HACK-THE-MATRIX 2026 (TECHNIDHI) — SNIST, 9–11 July
-**Track:** 03 — Computer Vision
-**Pitch:** *"Upload a batch of answer scripts. ExamShield finds the copying no human can catch, verifies every total, and highlights the evidence a grader needs — in minutes, not weeks."*
+**Track:** 02 — Predictive Analytics (ML / DL)
+**Pitch:** *"Train ExamShield on a few previously corrected answer sheets, and it grades new
+handwritten scripts the way your teachers do — question-wise marks, feedback, and a percentage,
+in minutes."*
 
 ---
 
-## 🧭 The One-Line Answer: What Starts First?
+## 🧭 What starts first?
 
-> **The shared ingestion pipeline (Scan → Preprocess → OCR) starts first — everything is built on top of it. The first FEATURE built is MarkSafe (guaranteed win), then CopyCatch (headline demo).**
-
-Order of construction:
+> **Phase 1 (train the mark-predictor) proves the core idea. Phase 2 (OCR → segment → score) grades
+> new scripts. Build the training + scoring path first; OCR/segmentation feeds it.**
 
 ```
-STEP 0          STEP 1        STEP 2       STEP 3        STEP 4      STEP 5      STEP 6       STEP 7
-Ingestion  →   MarkSafe  →  CopyCatch → ReEval Guard → ScriptID → BlankCheck → RubricLens → Demo UI
-(pipeline)     (trust)      (headline)   (1-hr add)    (quick)    (if time)    (stretch)    + Pitch
+STEP 0          STEP 1         STEP 2        STEP 3         STEP 4        STEP 5        STEP 6
+Storage/DB  →  Phase-1 train → Ingestion → Handwriting → Segmentation → Scoring →   Results UI
+(schema)       (features →     (PDF→img)    OCR           (Q + key)      (model →     + feedback
+               XGBoost →                                                marks)       + metrics
+               metrics)
 ```
-
-*(EvaluatorLens = roadmap slide only, not built.)*
 
 ---
 
-## 🏗️ System Architecture — The Total Workflow
-
-Every feature runs on ONE shared pipeline. Build the spine once, hang features off it.
+## 🏗️ The two-phase workflow
 
 ```
-                        ┌─────────────────────────────┐
-                        │   INPUT: Batch of scanned    │
-                        │   answer-sheet images/PDFs   │
-                        └──────────────┬──────────────┘
-                                       │
-                        ┌──────────────▼──────────────┐
-                        │  STAGE 1 — INGESTION         │
-                        │  • Load batch                │
-                        │  • Page count per script     │
-                        │  • Deskew / denoise /        │
-                        │    binarize (preprocess)     │
-                        └──────────────┬──────────────┘
-                                       │
-                        ┌──────────────▼──────────────┐
-                        │  STAGE 2 — ZONE CALIBRATION  │
-                        │  (one-time, 2 min/format)    │
-                        │  • Draw marks column zone    │
-                        │  • Draw total box zone       │
-                        │  • Draw roll-number box zone │
-                        │  • Draw answer regions       │
-                        └──────────────┬──────────────┘
-                                       │
-                 ┌─────────────────────┼─────────────────────┐
-                 │                     │                     │
-      ┌──────────▼─────────┐ ┌────────▼────────┐ ┌─────────▼─────────┐
-      │ STAGE 3A            │ │ STAGE 3B         │ │ STAGE 3C           │
-      │ DIGIT OCR (robust)  │ │ PROSE OCR (fuzzy)│ │ INK-PRESENCE CV    │
-      │ marks, totals,      │ │ answer text with │ │ writing detected   │
-      │ roll numbers        │ │ confidence scores│ │ per answer region  │
-      └──────────┬─────────┘ └────────┬────────┘ └─────────┬─────────┘
-                 │                     │                     │
-     ┌───────────┼──────────┐          │                     │
-     │           │          │          │                     │
-┌────▼───┐ ┌────▼─────┐ ┌──▼──────┐ ┌─▼──────────┐ ┌───────▼────────┐
-│MarkSafe│ │ ReEval   │ │ ScriptID│ │ CopyCatch  │ │ BlankCheck     │
-│ verify │ │ Guard    │ │ roll-no │ │ pairwise   │ │ pages present, │
-│ totals │ │borderline│ │ vs      │ │ similarity │ │ attempted vs   │
-│        │ │ flags    │ │ register│ │ + clusters │ │ blank          │
-└────┬───┘ └────┬─────┘ └──┬──────┘ └─┬──────────┘ └───────┬────────┘
-     │          │          │          │        ┌───────────┘
-     │          │          │          │        │   ┌────────────┐
-     │          │          │          │        │   │ RubricLens │ (stretch)
-     │          │          │          │        │   │ NLI rubric │
-     │          │          │          │        │   │ highlights │
-     │          │          │          │        │   └─────┬──────┘
-     └──────────┴────────┬─┴──────────┴────────┴─────────┘
-                         │
-          ┌──────────────▼──────────────┐
-          │  STAGE 4 — REVIEW DASHBOARD │
-          │  • Ranked flags (never      │
-          │    verdicts) + image-level  │
-          │    side-by-side evidence    │
-          │  • Human reviews & decides  │
-          └─────────────────────────────┘
+PHASE 1 — TRAINING (learn how teachers grade)
+  Historical corrected scripts + teacher marks + answer keys + rubrics
+      → dataset_builder → features → trainer (XGBoost, tuned) → evaluate
+      → mark_predictor.pkl + metrics (RMSE / MAE / R² / ±1-mark accuracy)
+
+PHASE 2 — EVALUATION (grade new scripts)
+  Scanned scripts → ingestion (deskew/binarize) → handwriting OCR (+confidence)
+      → segmentation (split questions, match answer key + rubric)
+      → similarity + concept coverage → scorer (trained model → marks, % bands)
+      → feedback + deduction reasons → report (question-wise marks, total, %)
 ```
 
-**Design principle (repeat in every answer to judges):** *The system never accuses and never finalizes. Every output is a ranked flag with image-level evidence for human review.*
+**Design principle (repeat to judges):** *The mark is produced by the trained model — never by
+an LLM. Unreadable answers are flagged for human verification, never guessed.*
 
 ---
 
 ## 📅 24-Hour Battle Plan
 
-### PRE-EVENT (before the clock starts) ⚡ NON-NEGOTIABLE PREP
-
-You do NOT have time to create demo data inside the 24 hours. Do this before you walk in:
-
+### PRE-EVENT (before the clock) — non-negotiable prep
 | # | Task | Why it can't wait |
 |---|------|-------------------|
-| 0.1 | **Collect 30–40 real handwritten scripts from classmates**, including **2 planted colluder pairs** | CopyCatch's baseline math is only valid at 30+ sheets. Cannot be created at the venue. |
-| 0.2 | Scan/photograph all scripts at consistent quality | Dataset ready at hour 0 |
-| 0.3 | Register CSV with planted errors: 1 duplicate roll no, 1 absentee-with-sheet, 1 present-without-sheet | ScriptID demo data |
-| 0.4 | Grade some scripts with **planted totaling errors** + borderline totals (39 when pass=40) | MarkSafe + ReEval Guard demo data |
-| 0.5 | Repo + stack ready; OCR lib (PaddleOCR/Tesseract), sentence-embedding model, NLI model **downloaded and tested offline** on your laptops | Venue Wi-Fi will betray you |
+| 0.1 | **Collect a small historical corpus:** past answers with teacher-awarded marks (even 100–200 answer/mark pairs) | Phase-1 training needs labels; can't be created at the venue. |
+| 0.2 | Prepare a question paper + model answer key + rubric | Phase-2 grading target |
+| 0.3 | Scan a fresh batch of student scripts to grade live | Demo input |
+| 0.4 | Download + test OCR + `all-MiniLM-L6-v2` offline; install `xgboost` | Venue Wi-Fi will betray you |
 
-### THE 24 HOURS — hour by hour
+### THE 24 HOURS
+- **H0–H2 — Storage:** schema (models, answer_keys, questions, scripts, evaluations), DB init.
+- **H2–H7 — Phase-1 training:** dataset_builder → features → XGBoost trainer → evaluate. **GATE:
+  report RMSE + ±1-mark accuracy vs teacher marks.** Fallback: unsupervised similarity-to-key baseline.
+- **H7–H11 — Ingestion + OCR:** PDF→image, deskew/binarize, handwriting OCR + confidence.
+- **H11–H14 — Segmentation:** split into questions, match answer key + rubric.
+- **H14–H18 — Scoring:** similarity + coverage → trained model → marks; feedback + report. **GATE:
+  a scanned script → a full evaluated sheet.**
+- **H18–H21 — Results UI:** Training metrics view + evaluated-sheet view; **feature freeze at H21**.
+- **H21–H24 — Demo prep:** fallback video, two full rehearsals, pitch.
 
-**⏱️ H0–H3 — The spine (everything depends on this)**
-- H0–H1: Batch image loader + preprocessing (deskew, denoise, binarize)
-- H1–H2: Zone calibration tool — draw rectangles for marks column, total box, roll-no box, answer regions → save template JSON
-- H2–H3: Digit OCR on calibrated zones with confidence scores
-
-**⏱️ H3–H7 — MarkSafe (Priority 1: the guaranteed win)**
-- Parse per-question marks (integers, decimals, evaluable `a+b`)
-- Sum vs written total → `OK` / `MISMATCH` / `AMBIGUOUS — human review` (never guess strikeouts)
-- Ink-presence check: answer written but marks cell empty → flag
-- Minimal results table with image-crop evidence
-
-✅ **H7 GATE:** MarkSafe catches the planted totaling errors on the real corpus. **You now have a demo no matter what happens next.**
-
-**⏱️ H7–H14 — CopyCatch (Priority 2: the shock demo)**
-- H7–H9: Prose OCR of answer regions with per-token confidence
-- H9–H11: Sentence embeddings (confidence-weighted tokens only) → pairwise similarity (~600 pairs at 35 scripts)
-- H11–H12: Class-baseline anomaly ranking (class-wide shared mistakes auto-discounted)
-- H12–H14: Copying-network graph + **Tier-2 side-by-side image evidence view**
-
-✅ **H14 GATE:** the 2 planted colluder pairs light up; innocent pairs don't.
-
-**⏱️ H14–H16 — The two quick wins (cheap points)**
-- H14–H15: **ReEval Guard** — pure logic on MarkSafe's totals → borderline-sheet recheck queue (the PDF says it "ships in an hour" — hold it to that)
-- H15–H16: **ScriptID** — digit-OCR roll-no box vs register CSV → duplicates / absentees-with-sheets / present-without-sheets
-
-**⏱️ H16–H19 — One dashboard + polish**
-- Wire all 4 features into a single review dashboard: ranked flags, evidence crops, copying graph front and center
-- **H19 = FEATURE FREEZE.** Bug-fix on the real corpus only after this.
-
-**⏱️ H19–H21 — Stretch (ONLY if everything above is stable)**
-- **BlankCheck:** page count + attempted-vs-blank per script (ink presence)
-- **RubricLens:** retrieval + NLI highlights, never outputs a mark
-- If anything upstream is shaky, spend these 2 hours hardening instead. Cut without mercy.
-
-**⏱️ H21–H24 — Demo prep (do not skip to keep coding)**
-- H21–H22: Record a **fallback demo video** of the full flow (insurance against live-demo death)
-- H22–H23: Rehearse the live-judge demo **twice, full run**, including scanning judges' handwriting on the spot
-- H23–H24: Pitch deck / talking points, sleep-deprived sanity check, charge everything
-
-### If you fall behind — the cut order
-
-Cut from the bottom, never the top: RubricLens → BlankCheck → ScriptID → ReEval Guard. **MarkSafe + CopyCatch + dashboard is a complete winning demo by itself.** Never sacrifice the H21–H24 demo-prep block to build one more feature.
+### If you fall behind — cut order
+Cut from the bottom: feedback phrasing → concept-coverage NLI → fancy UI. **Trained model +
+similarity scoring + one evaluated sheet is a complete winning demo.** Never sacrifice demo prep.
 
 ---
 
-## 🎬 Live Demo Script (the judging flow)
+## 🎬 Live Demo Script
 
-1. **Hook (30 s):** "An evaluator grading 300 sheets can't remember what sheet #12 said by sheet #200."
-2. **The shock moment — CopyCatch live:** 4 judges each handwrite a short answer; 2 secretly copy each other → scan → the graph lights up exactly the colluding pair, matching regions side-by-side. **The judges are the demo.**
-3. **The trust layer — MarkSafe on the 35-script corpus:** "…and while checking copying, it also caught 3 totaling errors that would have become paid revaluation cases."
-4. **Rapid-fire utility:** ReEval Guard borderline queue → ScriptID register mismatches → (BlankCheck triage if built)
-5. **Honesty beat:** show a strikeout flagged "ambiguous — human review" — *a wrong guess is impossible by construction.*
-6. **Closing pitch:** *"120 answer sheets are waiting for you after judging this hackathon. ExamShield would have them integrity-checked, error-verified, and evidence-highlighted before dinner — and every flag it raises is reviewed by a human, never decided by a machine."*
-
----
-
-## 📋 Feature Reference Table
-
-| Priority | Feature | Role | OCR need | When built |
-|----------|---------|------|----------|------------|
-| 1 | **MarkSafe** | Trust layer — totaling verification | Digits only (robust) | H3–H7 |
-| 2 | **CopyCatch** | Headline — collusion graph | Fuzzy prose (tolerant) | H7–H14 |
-| 3 | **ReEval Guard** | Borderline-sheet pre-check | None (reuses MarkSafe) | H14–H15 |
-| 4 | **ScriptID** | Roll-number vs register | Digits only (robust) | H15–H16 |
-| 5 | **BlankCheck** | Pre-grading triage | Ink presence only | H19–H21, if time |
-| 6 | **RubricLens** | Grader evidence assist (never grades) | Prose (assist-only, safe) | H19–H21, stretch |
-| — | **EvaluatorLens** | Marks-consistency stats | None (register data) | Roadmap slide only |
-| ✂️ | ~~VivaFair~~ | Dropped — confound unfixable | — | One-line roadmap note |
+1. **Training:** show a model trained on the historical corpus with RMSE + ±1-mark accuracy vs teacher marks.
+2. **Upload** a fresh scanned script + answer key; run Phase 2 live.
+3. **Evaluated sheet:** question-wise marks, total, percentage, per-answer feedback + deduction reasons.
+4. **Agreement:** compare a few predicted marks to a teacher's marks.
+5. **Honesty beat:** an unreadable answer flagged *"low confidence — verify"*, never guessed; and
+   *"the mark is our trained model's prediction, never an LLM's."*
 
 ---
 
-## ⚠️ Rules That Keep You Safe in Q&A
+## ⚠️ Rules that keep you safe in Q&A
 
-- **Never say "detects cheating"** — say *"ranks anomalous similarity for human review with seating data."*
-- **Never let OCR convict** — machine similarity only *ranks* pairs (Tier 1); confirmation is always human eyes on original images (Tier 2).
-- **Never guess ambiguous marks** — strikeouts/overwrites → "ambiguous, human review" flag. Failure mode = extra flag, never a wrong verdict.
-- **RubricLens never outputs a mark** — a missed highlight is a shrug, not a scandal.
-- **Disclose the corpus honestly** — "volunteer-written corpus of 30–40 real scripts with 2 planted colluder pairs."
-- **Template dependence is a feature** — "2-minute one-time zone calibration per institution: bring your format."
+- **Never let an LLM assign a mark** — Track 02 prohibits it. The mark is the XGBoost regressor's output.
+- **Report real metrics** — RMSE / MAE / R² / ±1-mark accuracy on a held-out split.
+- **Same features at train + inference** — one feature function, no skew.
+- **Flag, don't guess** — low-confidence OCR answers go to a human before publishing.
+- **Disclose the corpus honestly** — "trained on N teacher-marked answers; metrics on a held-out split."
 
 ---
 
 ## ✅ Milestone Checklist
 
-- [ ] Pre-event: 30–40 script corpus scanned (2 colluder pairs, planted total errors, register CSV with errors)
-- [ ] Pre-event: OCR + embedding + NLI models downloaded and verified running offline
-- [ ] H3: shared pipeline — ingest → preprocess → calibrate → digit OCR
-- [ ] H7: MarkSafe catches planted totaling errors ← **guaranteed win secured**
-- [ ] H14: CopyCatch graph lights up planted colluder pairs ← **shock demo secured**
-- [ ] H16: ReEval Guard + ScriptID wired in
-- [ ] H19: everything in one dashboard → **FEATURE FREEZE**
-- [ ] H21: stretch features only if stable — otherwise harden
-- [ ] H24: fallback video recorded + 2 full demo rehearsals done + pitch ready
+- [ ] Pre-event: historical teacher-marked corpus + answer key + fresh scripts + models downloaded
+- [ ] H2: storage schema live
+- [ ] H7: Phase-1 model trained, metrics reported ← **core idea proven**
+- [ ] H14: script → questions matched to answer key
+- [ ] H18: script → full evaluated sheet ← **end-to-end secured**
+- [ ] H21: Results + Training UI wired → **FEATURE FREEZE**
+- [ ] H24: fallback video + 2 rehearsals + pitch ready

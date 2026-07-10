@@ -1,127 +1,53 @@
 # ExamShield Detailed Implementation Plan
-> Granular task breakdown, target code locations, verification checks, and current status for each developmental milestone.
+> Granular tasks, target files, and verification checks per milestone.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Milestone M0: Core Ingestion Spine
+## 1. M0 — Storage & Schema
+- [ ] venv + install `requirements.txt` (includes `xgboost`, `joblib`, `sentence-transformers`).
+- [ ] SQLite schema — *File:* `backend/app/storage/schema.sql` (models, answer_keys, questions, batches, scripts, pages, evaluations).
+- [ ] DB init + CRUD helpers — *File:* `backend/app/storage/db.py`.
+- **Verify:** DB creates on boot; tables exist.
 
-### Tasks & File Allocations
-- [ ] Create Python virtual environment and install primary dependencies (`requirements.txt`).
-- [ ] Implement image load utility handles rasterizing PDF files using `pypdfium2`.
-  *   *File:* `app/ingestion/loader.py`
-- [ ] Code image preprocessing pipeline using OpenCV for binarization, deskewing, and noise reduction.
-  *   *File:* `app/ingestion/preprocess.py`
-- [ ] Write Streamlit coordinate calibration canvas dashboard.
-  *   *File:* `app/calibration/canvas.py`
-- [ ] Establish JSON template storage model to load coordinate boundaries for marks tables, roll numbers, and answer text boxes.
-  *   *File:* `app/storage/templates.py`
+## 2. M1 — Phase-1 Training  ← the core innovation
+- [ ] Build labeled dataset from historical corpus — *File:* `backend/app/training/dataset_builder.py`.
+- [ ] Feature engineering (similarity, concept coverage, keyword recall, length ratio, negation) — *File:* `backend/app/training/features.py`.
+- [ ] Train + tune XGBoost mark-predictor, save artifact — *File:* `backend/app/training/trainer.py`.
+- [ ] Evaluate: RMSE / MAE / R² / ±1-mark accuracy — *File:* `backend/app/training/evaluate.py`.
+- **Verify:** metrics report written; predicted marks track teacher marks on a held-out split.
 
-### M0 Verification Checks
-*   Verify image preprocessing successfully aligns skewed input pages.
-*   Verify Canvas UI outputs correct rectangle coordinate bounds `(x, y, w, h)` to a local `.json` file.
+## 3. M2 — Ingestion + OCR + Segmentation
+- [ ] PDF→image — *File:* `backend/app/ingestion/pdf_loader.py`.
+- [ ] Deskew/denoise/binarize — *File:* `backend/app/ingestion/preprocess.py`.
+- [ ] Handwriting OCR + confidence — *Files:* `backend/app/ocr/handwriting_ocr.py`, `confidence.py`.
+- [ ] Question segmentation + answer-key matching — *Files:* `backend/app/segmentation/question_segmenter.py`, `answer_matcher.py`.
+- **Verify:** a scanned script yields ordered (question, answer, key, max_marks) units; unreadable answers flagged.
 
----
+## 4. M3 — Evaluation
+- [ ] Semantic similarity + aligned points — *File:* `backend/app/evaluation/similarity.py`.
+- [ ] Concept coverage (optional NLI) — *File:* `backend/app/evaluation/concept_coverage.py`.
+- [ ] Scorer: features → trained model → marks (% bands, clamp) — *File:* `backend/app/evaluation/scorer.py`.
+- [ ] Feedback + deduction reasons — *File:* `backend/app/evaluation/feedback.py`.
+- [ ] Report: question-wise marks, total, % — *File:* `backend/app/evaluation/report.py`.
+- **Verify:** the mark comes from the trained model; totals/percentages correct; feedback references missing points.
 
-## 2. Milestone M1: MarkSafe Verification Engine
+## 5. M4 — API + Dashboard
+- [ ] Routes: training, evaluation, results, ingestion — *Files:* `backend/app/api/routes/*`.
+- [ ] Frontend: Training metrics, Ingestion/upload, Results (evaluated sheets) — *Files:* `frontend/src/app/*`.
+- **Verify:** train → metrics; upload → evaluate → evaluated sheet renders.
 
-### Tasks & File Allocations
-- [ ] Initialize local CPU instance of PaddleOCR digit recognition pipeline.
-  *   *File:* `app/ocr/digit_ocr.py`
-- [ ] Implement target OCR crop extractor using calibrated coordinate rectangles.
-  *   *File:* `app/ocr/crop_extractor.py`
-- [ ] Write MarkSafe arithmetic engine checking parsed values (e.g., decimals, integers, `a+b` sub-marks) against the written total box.
-  *   *File:* `app/engines/marksafe.py`
-- [ ] Design regex parse rules identifying strikeouts, empty boxes, or overwritten digits, routing them to the manual audit flag.
-  *   *File:* `app/engines/helpers.py`
+## 6. M5 — Stretch
+- [ ] NLI negation-aware coverage; feature-importance chart; CSV export.
 
-### M1 Verification Checks
-*   Verify digit extraction scores high accuracy on clear mock grading boxes.
-*   Confirm summation anomalies trigger mismatch flags and prevent false automatic correction.
-
----
-
-## 3. Milestone M2: CopyCatch Collusion Engine
-
-### Tasks & File Allocations
-- [ ] Build prose-oriented OCR pipeline extracting multi-paragraph handwritten answers with confidence thresholds.
-  *   *File:* `app/ocr/prose_ocr.py`
-- [ ] Integrate local sentence transformer `all-MiniLM-L6-v2` to vectorize prose OCR outputs.
-  *   *File:* `app/engines/embeddings.py`
-- [ ] Write pairwise similarity engine using cosine similarity math.
-  *   *File:* `app/engines/copycatch.py`
-- [ ] Write class-wide anomaly z-score filter. It automatically discounts identical answers caused by matching classroom slides or syllabus formulas.
-  *   *File:* `app/engines/anomaly.py`
-- [ ] Implement graph network mapper using NetworkX and export it as an interactive HTML document via PyVis.
-  *   *File:* `app/engines/graph.py`
-
-### M2 Verification Checks
-*   Confirm pairwise comparisons run within seconds for a batch of 35 files.
-*   Verify the NetworkX/PyVis HTML rendering accurately plots student pairs exceeding the similarity threshold.
-
----
-
-## 4. Milestone M3: Administrative Helpers
-
-### Tasks & File Allocations
-- [ ] Implement ScriptID roster validator cross-referencing OCR-parsed roll numbers against the class CSV register.
-  *   *File:* `app/engines/scriptid.py`
-- [ ] Write ReEval Guard queue classifier. It filters scripts with final marks within borderline proximity of pass boundaries (e.g., scoring 39 when pass limit is 40).
-  *   *File:* `app/engines/reeval_guard.py`
-
-### M3 Verification Checks
-*   Verify ScriptID correctly flags roll numbers missing from the CSV register or duplicated across pages.
-*   Verify ReEval Guard flags and groups scripts meeting the border threshold configuration.
-
----
-
-## 5. Milestone M4: Unified Streamlit Dashboard
-
-### Tasks & File Allocations
-- [ ] Set up FastAPI routes delivering parsed SQLite data.
-  *   *File:* `app/api.py`
-- [ ] Build the Streamlit dashboard tabs structure.
-  *   *File:* `app/dashboard/main.py`
-- [ ] Design side-by-side verification crop viewer within the Streamlit UI.
-  *   *File:* `app/dashboard/views.py`
-
-### M4 Verification Checks
-*   Ensure the local dashboard loads and runs on a standard web browser at `localhost:8501`.
-*   Confirm visual crops display correct images corresponding to highlighted discrepancies.
-
----
-
-## 6. Milestone M5: Stretch Features
-
-### Tasks & File Allocations
-- [ ] Implement BlankCheck: pixel-density scans checking for attempted pages.
-  *   *File:* `app/engines/blankcheck.py`
-- [ ] Set up RubricLens: loads local NLI deberta cross-encoder and outputs green/red markup overlays on candidate text.
-  *   *File:* `app/engines/rubriclens.py`
-
-### M5 Verification Checks
-*   Verify BlankCheck correctly marks entirely blank answer sheets.
-*   Verify RubricLens generates color-coded highlights matching rubric directives.
-
----
-
-## 7. Milestone M6: Validation & Hardening
-
-### Tasks & File Allocations
-- [ ] Perform integration runs on the 35 volunteer scripts.
-  *   *File:* `app/test_runner.py`
-- [ ] Resolve memory leaks in local OCR initialization and SQLite transaction writes.
-- [ ] Clean temporary files and write scripts for demo execution backups.
-
-### M6 Verification Checks
-*   Ensure zero crash loops occur during consecutive batch processing.
-*   Confirm final SQLite records match input volunteer metrics exactly.
+## 7. M6 — Validation & Hardening
+- [ ] Run on demo corpus + batch; verify predicted vs teacher marks; fallback video; freeze.
 
 ---
 
 ## 8. Related Documents
 
-*   [Overall Build Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/plan.md)
-*   [Database Design Document](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
-*   [API Schema Specification](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_CONTRACT.md)
+*   [Build Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/plan.md)
+*   [Database Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
+*   [API Contract](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_CONTRACT.md)

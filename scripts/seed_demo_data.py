@@ -1,12 +1,10 @@
-# 1. FILE PURPOSE: Generates the 35+ script demo corpus with planted errors for evaluation testing
-#    and live judging demo (per ExamShield_Workflow.md pre-event checklist).
+# 1. FILE PURPOSE: Generates demo data for both phases — a small historical training corpus and a
+#    fresh batch of scanned scripts to auto-grade (for testing + the live judging demo).
 # 2. RESPONSIBILITIES:
-#    - Generate synthetic answer-sheet images with marks grids and prose answers.
-#    - Plant exactly 2 colluder pairs (near-identical prose answers) detectable by backend/app/engines/copycatch.py.
-#    - Plant totaling errors detectable by backend/app/engines/marksafe.py.
-#    - Plant 1 duplicate roll-no, 1 absentee-with-sheet, 1 present-without-sheet for backend/app/engines/scriptid.py.
-#    - Plant borderline totals (39 when pass=40) for backend/app/engines/reeval_guard.py.
-#    - Write output images to data/raw/ and register CSV to data/registers/.
-# 3. PLANNED CONTENTS: seed_batch() function; per-engine error-planting helpers.
-# 4. INPUTS / OUTPUTS: Inputs: Config (batch size, error counts). Outputs: data/raw/ images + data/registers/register.csv.
-# 5. DEPENDS ON / USED BY: Pillow, NumPy, pandas; output consumed by the backend ingestion pipeline.
+#    - Phase 1: generate a historical corpus of answers with teacher-awarded marks -> data/corpus/.
+#    - Phase 2: generate a question paper + answer key + rubric -> data/answer_keys/.
+#    - Generate a batch of student answer scripts (varying quality) -> data/raw/ to grade against the key.
+#    - Include a few deliberately hard cases (partial answers, a strikeout, an off-topic answer).
+# 3. PLANNED CONTENTS: seed_corpus() and seed_batch() functions; helpers to render answer-sheet images.
+# 4. INPUTS / OUTPUTS: Inputs: Config (corpus size, batch size). Outputs: data/corpus/, data/answer_keys/, data/raw/.
+# 5. DEPENDS ON / USED BY: Pillow, NumPy, pandas; output consumed by the training + evaluation pipelines.

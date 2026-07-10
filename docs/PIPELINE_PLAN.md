@@ -1,5 +1,5 @@
-# Ingestion Pipeline Plan
-> Development steps, tasks, image pre-processing configurations, and calibration dashboard roadmaps.
+# Ingestion & Segmentation Plan (Phase 2 input)
+> Development steps for turning a scanned script into gradable (question, answer) units.
 
 *Design / Planned — Not yet implemented*
 
@@ -7,50 +7,42 @@
 
 ## 1. Development Focus
 
-The **Ingestion Pipeline** forms the backbone of ExamShield. It processes raw scanned documents and prepares them for OCR extraction and engine evaluation.
-
 ```
-[ Raw Scans Uploaded ] 
-         │ 
-         ▼ (Task 1: PDF to PNG Rasterization)
-[ Rasterized Page Images ] 
-         │ 
-         ▼ (Task 2: OpenCV Deskew & Denoise Filters)
-[ Pre-processed Binarized Matrices ] 
-         │ 
-         ▼ (Task 3: Calibration GUI template mapping)
-[ JSON Template coordinates mapping ] 
+[ Raw scans uploaded ]
+        │  (Task 1: PDF → PNG rasterization)
+[ Rasterized page images ]
+        │  (Task 2: OpenCV deskew / denoise / binarize)
+[ Clean binarized pages ]
+        │  (Task 3: segment questions + match answer key)
+[ Grading units: (student_answer, answer_key, rubric, max_marks) ]
 ```
 
 ---
 
 ## 2. Technical Task Breakdown
 
-### Task 1: Document Rasterization (`app/ingestion/loader.py`)
-*   **Objectives:** Convert multi-page scanned booklets (PDF format) into separate image arrays.
-*   **Implementation Steps:**
-    1.  Use `pypdfium2` to read PDFs offline.
-    2.  Rasterize pages to PNG format at a target resolution of **`300 DPI`**.
-    3.  Save files to the local temp path `/data/temp/{batch_id}/{script_id}/`.
+### Task 1: Document rasterization (`app/ingestion/pdf_loader.py`)
+1. Read PDFs offline with `pypdfium2`; rasterize pages to PNG at **~300 DPI**.
+2. Save to `data/raw/{batch_id}/{script_id}/page_{n}.png`.
 
-### Task 2: OpenCV Image Preprocessing (`app/ingestion/preprocess.py`)
-*   **Objectives:** Clean, align, and binarize images to improve OCR accuracy.
-*   **Implementation Steps:**
-    1.  **Denoising:** Apply a bilateral filter (`cv2.bilateralFilter`) to smooth background paper grain while preserving handwriting edges.
-    2.  **Deskewing:** Calculate the skew angle of the text using Hough Line Transform, rotating the image via affine transformation when necessary.
-    3.  **Adaptive Binarization:** Convert pages to high-contrast binary formats (0 or 255) using Gaussian adaptive thresholding.
+### Task 2: Image preprocessing (`app/ingestion/preprocess.py`)
+1. **Denoise:** bilateral filter (preserve handwriting edges).
+2. **Deskew:** estimate skew (Hough / minAreaRect), rotate via affine transform.
+3. **Binarize:** Gaussian adaptive thresholding for clean OCR input.
 
-### Task 3: Streamlit Alignment GUI (`app/calibration/canvas.py`)
-*   **Objectives:** Provide administrators with a visual canvas tool to define coordinates for various answer sheet layouts.
-*   **Implementation Steps:**
-    1.  Embed the `streamlit-drawable-canvas` widget.
-    2.  Map bounding boxes for roll numbers, marks columns, overall totals, and answer fields on a reference page image.
-    3.  Convert the pixel coordinates to relative ratios `(x/W, y/H, w/W, h/H)` and save them to a reusable layout template JSON file.
+### Task 3: Question segmentation (`app/segmentation/question_segmenter.py` + `answer_matcher.py`)
+1. Detect question numbers / answer boundaries from layout + OCR text.
+2. Group multi-page answers for the same question.
+3. Match each student answer to its question in the answer key; attach the model answer text,
+   rubric points, and `max_marks` → produce the grading units the scorer consumes.
+
+> This replaces the old zone-calibration approach — no per-institution rectangle drawing; questions
+> and answers are detected from the page + OCR text.
 
 ---
 
 ## 3. Related Documents
 
-*   [Ingestion Module specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/ingestion/README.md)
-*   [OCR Development Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/OCR_PLAN.md)
-*   [Local Performance & Scalability Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)
+*   [Ingestion module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/ingestion/README.md)
+*   [OCR Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/OCR_PLAN.md)
+*   [Scalability](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)

@@ -1,5 +1,6 @@
 # Project Value & Technical Analysis
-> Problem space analysis, productivity impacts, collusion coverage, and technical design justifications.
+> Problem-space analysis, productivity impact, and technical design justifications for the
+> AI answer-sheet evaluator (Track 02).
 
 *Design / Planned — Not yet implemented*
 
@@ -7,39 +8,51 @@
 
 ## 1. Problem Space Analysis
 
-Educational grading operations scale poorly when managed manually:
+Manual grading scales poorly and grades inconsistently:
 
-| Metric / Failure Mode | Legacy Manual Workflow | ExamShield Automated Audit |
+| Failure Mode | Legacy Manual Workflow | ExamShield Auto-Evaluator |
 | :--- | :--- | :--- |
-| **Collusion / Plagiarism Checks** | **0% Coverage.** Graders evaluate booklets sequentially, making it impossible to detect copying across hundreds of sheets. | **100% Coverage.** The system automatically runs pairwise vector comparisons across the entire batch in seconds. |
-| **Summation Auditing** | **Manual Verification.** Administrative staff manually check page calculations, resulting in arithmetic errors and transcription slips. | **Automated Sum Check.** MarkSafe validates sums automatically, flagging layout or arithmetic discrepancies for review. |
-| **Disputed Grade Resolution** | **Post-publication Revaluation.** Disputes are resolved retroactively via student-funded revaluations, causing administrative backlogs. | **Preemptive Queue.** ReEval Guard flags borderline grades, allowing staff to review scripts before final grades are posted. |
-| ** Roster Matches** | **Manual Key Entry.** Data entry errors can attribute grades to the wrong student enrollment ID. | **Automatic Validation.** ScriptID checks extracted roll numbers against student registers to flag duplicates or unregistered IDs. |
+| **Marking consistency** | Different evaluators award different marks for equivalent answers; fatigue drifts standards across a batch. | Every answer graded by the **same trained model** learned from real teacher marking — one consistent standard. |
+| **Speed** | A batch takes an office days to evaluate. | Question-wise marks + feedback for a batch in minutes. |
+| **Transparency** | A bare number with no explanation → revaluation disputes. | Each mark ships with feedback + explicit deduction reasons. |
+| **Institutional memory** | Rubric knowledge lives in evaluators' heads. | The trained model captures marking behaviour and reuses it every exam. |
 
 ---
 
-## 2. Productivity Impact Analysis
+## 2. Productivity Impact
 
-ExamShield provides measurable efficiency improvements across grading operations:
-
-*   **50% Reduction in Grading Times:** RubricLens highlights matching and contradicting rubric segments, helping graders evaluate answers faster without auto-grading.
-*   **Zero Arithmetic Slips:** MarkSafe verifies score additions, routing unclear markings or crossed-out numbers to the manual review queue rather than guessing values.
-*   **Reduced Roster Discrepancies:** ScriptID flags registry mismatches and duplicates, preventing identity mix-ups before final grades are posted.
-*   **Reduced Revaluation Backlogs:** ReEval Guard flags borderline scores for preemptive review, helping resolve potential grading disputes before publication.
+- **Consistency:** targets high agreement with teacher marks (e.g. ≥90% within ±1 mark on
+  held-out data) — a measurable Track-02 metric.
+- **Speed:** days → minutes per batch.
+- **Transparency:** feedback + deduction reasons on every answer reduce revaluation demand.
+- **Reusability:** train once on history, grade every subsequent exam the same way.
 
 ---
 
 ## 3. Technical Design Justifications
 
-The system stack was selected to support offline execution on standard university computers:
-
-*   **PaddleOCR (Offline) vs. Cloud OCR APIs:** Running PaddleOCR locally ensures student data privacy, runs for free, and works without internet connectivity in restricted exam-cell environments.
-*   **all-MiniLM-L6-v2 Embeddings vs. LLM API calls:** CopyCatch uses a local, lightweight vector model (~80 MB) to calculate pairwise similarity. This runs within seconds on standard CPUs, avoiding the cost and latency of cloud API calls.
-*   **NLI DeBERTa Cross-Encoder vs. Keyword Matching:** RubricLens uses a local cross-encoder model to identify semantic alignments, resolving negation issues (e.g., matching "is not correct" as a contradiction) that simple keyword searches miss.
+- **Trained XGBoost regressor vs LLM prompting:** Track 02 prohibits LLM-generated predictions.
+  A regressor on engineered features (similarity, concept coverage, …) is explainable, CPU-fast,
+  and reports real metrics (RMSE, MAE, R², ±1-accuracy) against teacher marks. This is the core
+  innovation: *learning marking behaviour*, not scripting rules.
+- **Semantic similarity (all-MiniLM-L6-v2) vs keyword matching:** correctly credits
+  differently-worded correct answers; runs locally in seconds, keeps student data private.
+- **NLI cross-encoder for concept coverage:** resolves negation ("is not correct" → contradiction)
+  that keyword search misses.
+- **Shared feature function (train == inference):** `training/features.py` produces the identical
+  vector at training and scoring time, so there is no train/serve skew.
 
 ---
 
-## 4. Related Documents
+## 4. Honest Limitations
+
+- Phase-1 training needs a **labeled** historical corpus (answers + teacher marks). Fallback:
+  unsupervised similarity-to-key scoring, upgraded to the trained model when labels exist.
+- The exam cell publishes results; low-confidence OCR answers are flagged for human verification.
+
+---
+
+## 5. Related Documents
 
 *   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [System Design Subsystems](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)

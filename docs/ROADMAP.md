@@ -1,5 +1,5 @@
 # Product Roadmap
-> Development timeline, target releases (v1.0 to v3.0), and future online extension plans.
+> Release timeline for the AI answer-sheet evaluator (Track 02).
 
 *Design / Planned — Not yet implemented*
 
@@ -7,45 +7,42 @@
 
 ## 1. Release Timeline
 
-The development roadmap is structured into three phases, expanding the core offline evaluation features before exploring online integrations:
-
 ```
-[ Phase 1: Core Offline MVP (v1.0) ] ──► [ Phase 2: Administrative Addons (v2.0) ] ──► [ Phase 3: Future Online Extensions (v3.0) ]
+[ v1.0 Core Auto-Grader ] ──► [ v2.0 Better Model & Feedback ] ──► [ v3.0 Institutional Scale ]
 ```
 
 ---
 
 ## 2. Release Phases
 
-### Phase 1: Core Offline MVP (v1.0)
-*   **Objectives:** Deliver the baseline image processing pipeline, digit auditing capabilities, and handwriting similarity graphs.
-*   **Key Features:**
-    *   Binarization, deskewing, and coordinate alignment canvas templates.
-    *   **MarkSafe:** Validates page score totals.
-    *   **CopyCatch:** Identifies similarity clusters using local `all-MiniLM-L6-v2` embeddings.
-    *   Streamlit review dashboard displaying ranked audit flags.
+### Phase 1: Core Auto-Grader (v1.0)
+- **Objectives:** Train on historical marks and auto-grade new scripts end-to-end.
+- **Key features:**
+  - **Phase-1 training:** dataset builder + engineered features + XGBoost mark-predictor + metrics
+    (RMSE / MAE / R² / ±1-mark accuracy).
+  - **Phase-2 evaluation:** handwriting OCR → question segmentation → semantic similarity →
+    trained-model scoring → feedback → evaluated sheet.
+  - Dashboard: Training metrics + evaluated sheets.
 
-### Phase 2: Administrative Automation Addons (v2.0)
-*   **Objectives:** Automate student roster validation and borderline grading audits.
-*   **Key Features:**
-    *   **ScriptID:** Matches roll numbers against student registers.
-    *   **ReEval Guard:** Prioritizes borderline grades for review.
-    *   **BlankCheck:** Automates page counting and page triage checks.
-    *   **RubricLens:** Matches student answers against rubrics using DeBERTa models.
-    *   Supports batch export of corrected grades to CSV.
+### Phase 2: Better Model & Feedback (v2.0)
+- **Objectives:** Improve accuracy and explanation quality.
+- **Key features:**
+  - Per-subject / per-question models; hyperparameter tuning + feature-importance dashboards.
+  - Concept-coverage NLI for negation-aware feedback.
+  - Confidence-calibrated flagging; batch CSV export of results.
+  - Active learning: teachers correct a few predictions → the model retrains and improves.
 
-### Phase 3: Future Online Extensions (v3.0)
-*   **Objectives:** Connect ExamShield's offline engine with online testing portals.
-*   **Key Features:**
-    *   **Secure Web-Exam Portal:** Enables digital exam delivery on personal devices.
-    *   **Integrated Secure Browser Client:** Implements browser lockdowns, disables keyboard shortcuts, and blocks copy-paste functions during exams.
-    *   **Automated Online Proctoring Subsystem:** Uses webcam video streams and audio analysis to flag suspicious student behavior.
-    *   **Unified Dashboard:** Displays collusion graphs for both offline handwritten scripts and online submissions.
+### Phase 3: Institutional Scale (v3.0)
+- **Objectives:** Multi-subject, multi-exam deployment.
+- **Key features:**
+  - Model registry across subjects/semesters; drift monitoring vs teacher marks over time.
+  - Reviewer workflow for low-confidence answers before publication.
+  - Optional integration with the exam-cell result system.
 
 ---
 
 ## 3. Related Documents
 
-*   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
+*   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [Future Implementation Tasks](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FUTURE_IMPLEMENTATION_TASKS.md)
-*   [Product Features List](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FEATURES.md)
+*   [Features](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FEATURES.md)

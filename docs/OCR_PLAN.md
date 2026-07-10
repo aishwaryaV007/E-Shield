@@ -1,5 +1,5 @@
-# OCR Subsystem Development Plan
-> Development steps, tasks, local PaddleOCR engine setups, and confidence score parser targets.
+# OCR Subsystem Development Plan (Phase 2)
+> Development steps for reading handwritten answers with confidence.
 
 *Design / Planned — Not yet implemented*
 
@@ -7,58 +7,45 @@
 
 ## 1. Development Focus
 
-The **OCR Subsystem** digitizes image regions cropped from the ingestion pipeline. It maps pixel coordinates to structured data, separating digits from handwritten prose text.
+The **OCR subsystem** converts clean answer-region images into text the evaluation pipeline can
+score. Recognition uses a **local handwriting OCR model** — never an LLM "reading" the image.
 
 ```
-                  ┌──────────────────────────────┐
-                  │ Crop Bounding Box Image      │
-                  └──────────────┬───────────────┘
-                                 │
-                  ┌──────────────▼───────────────┐
-                  │ Initialize local PaddleOCR   │
-                  └──────────────┬───────────────┘
-                                 │
-                 ┌───────────────┴───────────────┐
-                 │                               │
-                 ▼                               ▼
-        [ Task 1: Digit OCR ]           [ Task 2: Prose OCR ]
-        • whitelist: 0-9/.+             • full lexicon model
-        • limit: marks grid/ID          • limit: answer boxes
-                 │                               │
-                 ▼                               ▼
-        [ Save digits/confidence ]      [ Token confidence filtering ]
+[ Preprocessed answer-region image ]
+        │  (handwriting OCR: TrOCR handwritten / PaddleOCR)
+[ Recognised text + per-line/token confidence ]
+        │  (confidence aggregation)
+[ Answer text (+ LOW_CONFIDENCE flag if unreadable) ]
 ```
 
 ---
 
 ## 2. Technical Task Breakdown
 
-### Task 1: Digit-Specific OCR (`app/ocr/digit_ocr.py`)
-*   **Objectives:** Extract numbers from marks columns, overall total boxes, and roll number fields.
-*   **Implementation Steps:**
-    1.  Initialize local PaddleOCR with numeric-only configurations.
-    2.  Implement regex filters to clean extracted text and remove non-digit characters (e.g., converting `O` to `0` or `I` to `1` when reading IDs).
-    3.  Set the confidence cutoff to **`0.85`**. If the extraction confidence falls below this value, write `NULL` to SQLite and flag the zone as `AMBIGUOUS_MARK`.
+### Task 1: Handwriting OCR (`app/ocr/handwriting_ocr.py`)
+1. Initialise a local handwriting-capable OCR model (TrOCR handwritten, or PaddleOCR).
+2. Recognise the student's answer text for each answer region.
+3. Return recognised text plus per-line/token confidence scores.
 
-### Task 2: Prose-Specific OCR (`app/ocr/prose_ocr.py`)
-*   **Objectives:** Extract text paragraphs from handwritten answer areas for semantic similarity matching.
-*   **Implementation Steps:**
-    1.  Initialize PaddleOCR with English prose recognition weights.
-    2.  Filter extracted text: keep words with confidence scores above **`0.65`** to reduce noise.
-    3.  Strip punctuation and common stop words (e.g., *"and"*, *"the"*, *"is"*) to optimize vector embeddings downstream.
-
-### Task 3: Visual Crop Manager (`app/ocr/crop_extractor.py`)
-*   **Objectives:** Crop target regions from page image matrices using normalized coordinate values.
-*   **Implementation Steps:**
-    1.  Load the preprocessed page image.
-    2.  Convert relative ratios from JSON templates into actual pixel coordinates:
-        $$\text{Pixel}_x = \text{Ratio}_x \times W_{\text{image}}$$
-    3.  Save the cropped image to disk as a JPEG, which the dashboard uses to display visual evidence alongside audit flags.
+### Task 2: Confidence handling (`app/ocr/confidence.py`)
+1. Aggregate token confidences into an answer-level confidence score.
+2. If below threshold, mark the answer `LOW_CONFIDENCE` — surfaced on the evaluated sheet for
+   human verification, **never silently trusted or guessed**.
+3. The mark is still produced by the trained model from whatever text was read; low confidence
+   just flags it for a human check before publishing.
 
 ---
 
-## 3. Related Documents
+## 3. Notes
 
-*   [OCR Subsystem Module specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/ocr/README.md)
-*   [Ingestion Pipeline Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/PIPELINE_PLAN.md)
-*   [System Design Subsystems](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+- Digit-only OCR of a marks grid is no longer needed — ExamShield *produces* the marks; it does not
+  re-read a teacher's marks column.
+- Keep OCR local for privacy (student scripts never leave the machine) and offline reliability.
+
+---
+
+## 4. Related Documents
+
+*   [OCR module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/ocr/README.md)
+*   [Ingestion & Segmentation Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/PIPELINE_PLAN.md)
+*   [System Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
