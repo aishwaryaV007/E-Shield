@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamShield — Judge Pitch & Project Guide</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --emerald-600: #059669;
+            --emerald-50: #ecfdf5;
+            --red-600: #dc2626;
+            --red-50: #fef2f2;
+            --amber-600: #d97706;
+            --amber-50: #fffbeb;
+            --font-main: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--slate-900);
+            background-color: #fafafa;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--slate-200);
+        }
+
+        /* Print Settings */
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+                color: #000000;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .no-print-break {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .page-break {
+                page-break-before: always;
+                break-before: page;
+            }
+            a {
+                text-decoration: none;
+                color: var(--slate-900);
+            }
+            /* Force print backgrounds */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* Header Style */
+        header {
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .logo-area {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 2.2rem;
+            font-weight: 800;
+            padding: 10px 25px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-area span {
+            color: var(--slate-900);
+            margin-left: 5px;
+            font-weight: 500;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        header p.subtitle {
+            font-size: 1.15rem;
+            color: var(--slate-700);
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+
+        .meta-badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--slate-300);
+            background: var(--slate-100);
+            color: var(--slate-700);
+        }
+
+        .badge.primary {
+            background-color: var(--primary-light);
+            border-color: rgba(79, 70, 229, 0.2);
+            color: var(--primary-dark);
+        }
+
+        /* Section Typography */
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: var(--slate-700);
+            margin-bottom: 15px;
+        }
+
+        /* Cards and Callouts */
+        .callout {
+            background-color: var(--slate-50);
+            border-left: 4px solid var(--slate-700);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 25px;
+        }
+
+        .callout.info {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--slate-900);
+            margin-bottom: 5px;
+        }
+
+        /* Table Style */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--slate-800);
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 15px;
+            border: 1px solid var(--slate-800);
+        }
+
+        td {
+            padding: 12px 15px;
+            border: 1px solid var(--slate-200);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--slate-50);
+        }
+
+        .text-bold {
+            font-weight: 600;
+            color: var(--slate-900);
+        }
+
+        .text-green {
+            color: var(--emerald-600);
+            font-weight: 600;
+        }
+
+        .text-red {
+            color: var(--red-600);
+            font-weight: 600;
+        }
+
+        /* Pipeline Flowchart Visualizer (Static CSS) */
+        .pipeline-flow {
+            background: var(--slate-50);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--slate-200);
+            margin: 25px 0;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+        }
+
+        .step-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-details {
+            flex-grow: 1;
+        }
+
+        .step-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--slate-900);
+        }
+
+        .step-desc {
+            font-size: 0.8rem;
+            color: var(--slate-700);
+        }
+
+        .step-tech {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--slate-300);
+            font-size: 1.2rem;
+            line-height: 1;
+            margin: -5px 0;
+        }
+
+        /* Engine Cards layout */
+        .engines-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .engine-card {
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 20px;
+            background: #ffffff;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.01);
+        }
+
+        .engine-card:hover {
+            border-color: var(--slate-300);
+        }
+
+        .engine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--slate-100);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .engine-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--slate-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .engine-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .engine-badge.success { background: var(--emerald-50); color: var(--emerald-600); border: 1px solid rgba(5,150,105,0.2); }
+        .engine-badge.danger { background: var(--red-50); color: var(--red-600); border: 1px solid rgba(220,38,38,0.2); }
+        .engine-badge.warning { background: var(--amber-50); color: var(--amber-600); border: 1px solid rgba(217,119,6,0.2); }
+
+        .engine-tech-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--slate-700);
+            margin-bottom: 8px;
+            background: var(--slate-100);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .engine-bullets {
+            list-style-type: none;
+            font-size: 0.88rem;
+            color: var(--slate-700);
+        }
+
+        .engine-bullets li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .engine-bullets li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 2px;
+            top: -2px;
+        }
+
+        /* Q&A section */
+        .qa-item {
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary);
+            padding-left: 15px;
+            background: var(--slate-50);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .qa-question {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--slate-900);
+            margin-bottom: 6px;
+        }
+
+        .qa-answer {
+            font-size: 0.9rem;
+            color: var(--slate-700);
+        }
+
+        /* Demo Schedule styling */
+        .schedule {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .sched-item {
+            display: flex;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
+        }
+
+        .sched-time {
+            background: var(--slate-800);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 10px 15px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sched-details {
+            padding: 10px 15px;
+            background: #ffffff;
+            flex-grow: 1;
+        }
+
+        .sched-title {
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 2px;
+        }
+
+        .sched-desc {
+            color: var(--slate-700);
+            font-size: 0.8rem;
+        }
+
+        /* Code symbol styling */
+        code {
+            font-family: monospace;
+            background: var(--slate-100);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--red-600);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <header>
+            <div class="logo-area">🛡️ Exam<span>Shield</span></div>
+            <h1>Offline Handwritten Evaluation Auditor</h1>
+            <p class="subtitle">Ensuring Academic Integrity & Computational Sum Checks Before Results Publication</p>
+            <div class="meta-badges">
+                <span class="badge primary">Hackathon Track: Computer Vision</span>
+                <span class="badge">SNIST - Hack-The-Matrix 2026</span>
+                <span class="badge">Local & Offline Architecture</span>
+            </div>
+        </header>
+
+        <section class="no-print-break">
+            <h2>1. The 30-Second Elevator Pitch</h2>
+            <div class="callout info">
+                <div class="callout-title">The Pitch Concept</div>
+                <p style="margin-bottom: 0;">
+                    Every semester, academic institutions manually grade hundreds of thousands of handwritten scripts. This manual chain of trust suffers from transcription errors, summing slips, and student collusion networks that are invisible to a grader checking pages sequentially. 
+                    <strong>ExamShield</strong> is a local computer vision assistant for exam evaluation cells. It reads digit scoring blocks, validates cover page additions, maps student collusion graphs via prose semantic analysis, and flags borderline scores for double checking—all <strong>offline</strong> on standard CPUs, maintaining total data privacy.
+                </p>
+            </div>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>2. The Problem Space (Legacy vs. ExamShield)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Workflow / Category</th>
+                        <th style="width: 37%;">Legacy Manual Workflow</th>
+                        <th style="width: 38%;">🛡️ ExamShield Automated Audit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-bold">Collusion & Plagiarism</td>
+                        <td><span class="text-red">0% Coverage.</span> Graders evaluate scripts one-by-one. In a 300-paper cohort, cross-referencing involves <strong>44,850 pairs</strong>—which no human evaluator can complete.</td>
+                        <td><span class="text-green">100% Coverage.</span> Digitizes handwritten prose, computes similarity metrics, and maps student copying clusters in seconds.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Arithmetic Audits</td>
+                        <td><span class="text-red">Manual Totals Review.</span> Staff manually check math calculations across cover grids, leading to transcription slips and omitted question audits.</td>
+                        <td><span class="text-green">Automated Calculations.</span> MarkSafe parses OCR digits, verifies sums, and alerts administrators of math mismatches automatically.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Grade Boundary Disputes</td>
+                        <td><span class="text-red">Post-Publication Backlogs.</span> Students scoring just below thresholds (e.g. 39/100, passing score = 40) file retroactive paid revaluations.</td>
+                        <td><span class="text-green">Preemptive Audits.</span> ReEval Guard flags boundary margins, queuing them for checks <em>before</em> final scores are locked and published.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Roster Accuracy</td>
+                        <td><span class="text-red">Manual Keying Errors.</span> Administrative typing errors attribute grades to wrong students, resulting in enrollment scandals.</td>
+                        <td><span class="text-green">Registration Verifier.</span> ScriptID matches digit OCR roll numbers against class lists to flag absentees and duplicates instantly.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>3. Shared Ingestion Spine & Architecture</h2>
+            <p>Every feature functions along a unified local pipeline, routing document scans sequentially into specific validation blocks.</p>
+            
+            <div class="pipeline-flow">
+                <div class="flow-container">
+                    
+                    <div class="flow-step">
+                        <span class="step-num">1</span>
+                        <div class="step-details">
+                            <span class="step-name">Batch Ingestion</span>
+                            <span class="step-desc">Load answer booklets in PDF or images; count physical pages.</span>
+                        </div>
+                        <span class="step-tech">pypdfium2</span>
+                    </div>
+                    
+                    <div class="flow-arrow">▼</div>
+                    
+                    <div class="flow-step">
+                        <span class="step-num">2</span>
+                        <div class="step-details">
+                            <span class="step-name">Image Preprocessing</span>
+                            <span class="step-desc">Denoise, deskew, and binarize using adaptive thresholds.</span>
+                        </div>
+                        <span class="step-tech">OpenCV</span>
+                    </div>
+                    
+                    <div class="flow-arrow">▼</div>
+                    
+                    <div class="flow-step">
+                        <span class="step-num">3</span>
+                        <div class="step-details">
+                            <span class="step-name">Zone Calibration</span>
+                            <span class="step-desc">Establish bounding boxes for marks grids, roll number fields, and text zones.</span>
+                        </div>
+                        <span class="step-tech">JSON Template</span>
+                    </div>
+                    
+                    <div class="flow-arrow">▼</div>
+                    
+                    <div class="flow-step">
+                        <span class="step-num">4</span>
+                        <div class="step-details">
+                            <span class="step-name">Dual-Tier OCR Engine</span>
+                            <span class="step-desc">Read robust grid digits, extract handwritten prose paragraphs, and check ink presence.</span>
+                        </div>
+                        <span class="step-tech">PaddleOCR (Local CPU)</span>
+                    </div>
+                    
+                    <div class="flow-arrow">▼</div>
+                    
+                    <div class="flow-step">
+                        <span class="step-num">5</span>
+                        <div class="step-details">
+                            <span class="step-name">Modular Feature Analysis</span>
+                            <span class="step-desc">Send inputs to MarkSafe (math), CopyCatch (collusion), ScriptID (roster), and ReEval (margins).</span>
+                        </div>
+                        <span class="step-tech">FastAPI Backend</span>
+                    </div>
+                    
+                    <div class="flow-arrow">▼</div>
+                    
+                    <div class="flow-step">
+                        <span class="step-num">6</span>
+                        <div class="step-details">
+                            <span class="step-name">Admin Review Dashboard</span>
+                            <span class="step-desc">Visualize PyVis collusion graphs, audit queues, and review direct page-crop evidence.</span>
+                        </div>
+                        <span class="step-tech">Streamlit Dashboard</span>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>4. Core Evaluation Engines (Deep Dive)</h2>
+            <div class="engines-grid">
+                
+                <div class="engine-card">
+                    <div class="engine-header">
+                        <span class="engine-title">🔢 MarkSafe Engine</span>
+                        <span class="engine-badge success">Trust Layer</span>
+                    </div>
+                    <span class="engine-tech-label">PaddleOCR Digits + OpenCV Pixel Density</span>
+                    <ul class="engine-bullets">
+                        <li>Extracts question marks and cover page totals from predefined templates.</li>
+                        <li>Parses complex tokens using regular expressions, handling integers, decimals, fractions (e.g., <code>9/10</code>), and evaluable additions (e.g., <code>4+3.5</code>).</li>
+                        <li><strong>Safe Ambiguity Handling:</strong> Skipped and low-confidence markings (OCR confidence &lt; 0.85) are marked <code>AMBIGUOUS_MARK</code> and routed to a reviewer instead of making false guesses.</li>
+                        <li>Triggers <code>SUM_MISMATCH</code> if question sums fail to match the written overall total.</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card">
+                    <div class="engine-header">
+                        <span class="engine-title">✍️ CopyCatch Engine</span>
+                        <span class="engine-badge danger">Headline Demo</span>
+                    </div>
+                    <span class="engine-tech-label">Prose OCR + sentence-transformers (all-MiniLM-L6-v2)</span>
+                    <ul class="engine-bullets">
+                        <li>Converts handwritten answer prose to vector embeddings locally.</li>
+                        <li><strong>Class-Baseline Anomaly Ranking:</strong> Discards class-wide noise (common blackboard formulas, definitions) by computing z-scores: $Z_{A,B} = \frac{\text{Similarity}(A,B) - \mu_{\text{class}}}{\sigma_{\text{class}}}$.</li>
+                        <li>Links collusion paths only if $Z_{A,B} \geq 3.0$ (representing standard deviations away from class average).</li>
+                        <li>Generates interactive PyVis HTML node graphs. Graders click graph edges to inspect side-by-side student handwriting.</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card">
+                    <div class="engine-header">
+                        <span class="engine-title">👤 ScriptID Engine</span>
+                        <span class="engine-badge success">Roster Auditor</span>
+                    </div>
+                    <span class="engine-tech-label">Digit OCR + pandas Registration Lookup</span>
+                    <ul class="engine-bullets">
+                        <li>Processes the student Roll Number zone on answer booklet covers.</li>
+                        <li>Cross-references entries against class register database tables in CSV formats.</li>
+                        <li>Flags <code>UNREGISTERED_ID</code> (OCR adjustments are easy via visual cover crops) and <code>DUPLICATE_ID</code> (if multiple booklets share a roll number).</li>
+                        <li>Flags <code>ABSENTEE_WITH_SCRIPT</code> to protect institutions from exam-hall envelope logging leaks.</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card">
+                    <div class="engine-header">
+                        <span class="engine-title">📈 ReEval Guard Engine</span>
+                        <span class="engine-badge warning">Dispute Reducer</span>
+                    </div>
+                    <span class="engine-tech-label">Pure Python Logic Overlay</span>
+                    <ul class="engine-bullets">
+                        <li>Scans final scores against institutional grade cutoffs and pass-fail lines.</li>
+                        <li>Identifies scripts located within border margins (e.g. 1-2 points below passing thresholds).</li>
+                        <li>Adds scripts to high-priority review pipelines to resolve math checks prior to final score locking.</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card">
+                    <div class="engine-header">
+                        <span class="engine-title">📐 BlankCheck & RubricLens (Stretch Features)</span>
+                        <span class="engine-badge warning">Assist Engines</span>
+                    </div>
+                    <span class="engine-tech-label">OpenCV Density + cross-encoder/nli-deberta-v3-xsmall</span>
+                    <ul class="engine-bullets">
+                        <li><strong>BlankCheck:</strong> Runs pixel density checks to mark blank pages, preserving physical workload history.</li>
+                        <li><strong>RubricLens:</strong> Uses Natural Language Inference to check paragraphs against rubrics. Highlight outputs show <strong>Entailment (Green)</strong> or <strong>Contradiction (Red)</strong>. <em>It never awards grades—the human decides.</em></li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>5. Technical Stack & Local-Execution Justifications</h2>
+            <p>Designed for air-gapped exam rooms, our stack avoids external dependencies and runs efficiently on standard laptop hardware.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Stack Layer</th>
+                        <th style="width: 35%;">Technology Choice</th>
+                        <th style="width: 40%;">Why it Wins the Judge Q&A</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-bold">Image & CV Spine</td>
+                        <td>OpenCV, pypdfium2, Pillow</td>
+                        <td>Performs page extraction, deskewing, and image binarization instantly, with no licensing cost.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Local OCR Engine</td>
+                        <td>PaddleOCR (CNN-based)</td>
+                        <td>Offline, free, and yields character confidence levels—vital for checking scribbled or crossed-out scores.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Semantic Vectors</td>
+                        <td>sentence-transformers (all-MiniLM-L6-v2)</td>
+                        <td>Lightweight (~80 MB) and runs vector calculations on standard CPUs in fractions of a second.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">NLI Inference</td>
+                        <td>cross-encoder/nli-deberta-v3-xsmall</td>
+                        <td>Handles negation (e.g., flagging "is not exothermic" as a contradiction) which keyword searches miss completely.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">Dashboard UI</td>
+                        <td>Streamlit & PyVis (vis.js)</td>
+                        <td>Constructs interactive graphs and audit lists in hours, bypassing React development overhead.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>6. Live Demo Choreography</h2>
+            <div class="schedule">
+                
+                <div class="sched-item">
+                    <div class="sched-time">00:00 - 00:30</div>
+                    <div class="sched-details">
+                        <div class="sched-title">The Core Hook</div>
+                        <div class="sched-desc">"Judges, graders checking papers sequentially cannot see batch-wide networks. ExamShield finds what humans miss."</div>
+                    </div>
+                </div>
+
+                <div class="sched-item">
+                    <div class="sched-time">00:30 - 01:30</div>
+                    <div class="sched-details">
+                        <div class="sched-title">The Live Interactive Scan (Judges are the Data)</div>
+                        <div class="sched-desc">Judges write responses on physical sheets. Two judges copy each other. The team photographs the papers and uploads them live.</div>
+                    </div>
+                </div>
+
+                <div class="sched-item">
+                    <div class="sched-time">01:30 - 02:30</div>
+                    <div class="sched-details">
+                        <div class="sched-title">CopyCatch Collusion Map Update</div>
+                        <div class="sched-desc">The dashboard collusion graph updates live. The nodes representing the two copying judges connect with a red line. Clicking the link reveals side-by-side text overlaps.</div>
+                    </div>
+                </div>
+
+                <div class="sched-item">
+                    <div class="sched-time">02:30 - 03:00</div>
+                    <div class="sched-details">
+                        <div class="sched-title">MarkSafe cover-page error display</div>
+                        <div class="sched-desc">Load a pre-configured 35-paper test corpus. Show cover calculation mismatches and hand-drawn alterations marked "AMBIGUOUS". Show how easily an auditor overrides them.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="page-break no-print-break">
+            <h2>7. Q&A Defense Playbook (Judge Prep)</h2>
+            
+            <div class="qa-item">
+                <div class="qa-question">Q: OCR on handwriting is noisy. How do you avoid printing incorrect grades?</div>
+                <div class="qa-answer">
+                    <strong>A:</strong> We operate under a strict human-in-the-loop policy. The system never inputs final marks automatically. If PaddleOCR confidence score drops below 85% due to a strikeout or scribble, MarkSafe locks it as <code>AMBIGUOUS</code> and prompts visual cover-page card reviews.
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question">Q: Pairwise text comparison is $O(N^2)$. How does this scale for large batches?</div>
+                <div class="qa-answer">
+                    <strong>A:</strong> Text is digitized and vectorized once. Cosine similarity comparisons over 1,000 papers ($10^6$ operations) on a standard CPU require less than 1.5 seconds using optimized NumPy matrix calculations, making scaling highly manageable.
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question">Q: What if two students write similar answers because they memorized the same lecture slide?</div>
+                <div class="qa-answer">
+                    <strong>A:</strong> This is why we implemented Class-Baseline Anomaly Ranking. If the whole cohort shares similar wording, the baseline mean ($\mu_{\text{class}}$) rises. CopyCatch maps z-scores; links only light up if student pairs diverge significantly from the class-wide average.
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question">Q: Why not use commercial cloud models like GPT-4o?</div>
+                <div class="qa-answer">
+                    <strong>A:</strong> Examination data is highly confidential and cannot be sent to third-party servers. Additionally, local CNNs (PaddleOCR) and sentence vectors (MiniLM) are completely free, run offline in secure cells, and supply character coordinates and confidence boundaries that cloud models hide.
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+</body>
+</html>
