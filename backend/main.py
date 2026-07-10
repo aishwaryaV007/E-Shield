@@ -76,6 +76,7 @@ class Correction(BaseModel):
     student_answer: str
     answer_key: str = ""
     max_marks: float = 2.0
+    type: str = "short"
 
 
 class RescoreReq(BaseModel):

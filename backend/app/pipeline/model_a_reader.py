@@ -31,6 +31,17 @@ def load_answer_key(path: str) -> dict[str, str]:
     return {r["Question_Number"]: r["Correct_Answer"] for r in rows if r.get("Type") == "Short_Answer"}
 
 
+def load_mcq_key(path: str) -> dict[str, str]:
+    """-> {qno: correct_letter} for the MCQs (Type=MCQ)."""
+    rows = list(csv.DictReader(open(path)))
+    return {r["Question_Number"]: r["Correct_Answer"].strip().upper()[:1]
+            for r in rows if r.get("Type") == "MCQ"}
+
+
+# an MCQ answer line looks like "1. D", "20 C" — a number then a single isolated letter A-D
+_MCQ_RE = re.compile(r"^(?:[Il|]\s+)?[^\dA-Za-z]*(\d{1,2})\s*[.)]?\s*([A-Da-d])\s*[.)]?\s*$")
+
+
 _SECTION_MARKS = re.compile(r"\((\d+(?:\.\d+)?)\s*marks?\s*(?:each)?\)", re.I)
 # inline marks on a question line: [8], (8), [8m], (4 marks)
 _INLINE_MARKS = re.compile(r"[\[(]\s*(\d+(?:\.\d+)?)\s*(?:m|marks?)?\s*[\])]", re.I)
@@ -93,14 +104,16 @@ def _correct(text: str, vocab: list[str]) -> str:
 class ModelAReader:
     """Reads a handwritten answer script into per-question answers matched to the key."""
 
-    def __init__(self, answer_key: dict[str, str], question_path: str | None = None):
+    def __init__(self, answer_key: dict[str, str], mcq_key: dict[str, str] | None = None,
+                 question_path: str | None = None):
         self.key = answer_key
+        self.mcq_key = mcq_key or {}
         self.vocab = _vocab(answer_key, question_path)
         self.ocr = HandwritingOCR()
 
     def read_script(self, pdf_path: str) -> dict[str, dict]:
         pages = PDFLoader.rasterize_pdf(pdf_path, dpi=200)  # BGR arrays
-        blocks, cur = [], None
+        blocks, cur, mcq = [], None, {}
         for bgr in pages:
             rgb = bgr[:, :, ::-1]
             for ln in segment_lines(rgb):
@@ -109,25 +122,43 @@ class ModelAReader:
                 txt = res["text"].strip()
                 if not txt:
                     continue
+                # MCQ answer line? ("1. D" etc). Numbers 1-20 separate MCQs from short answers.
+                mm = _MCQ_RE.match(txt)
+                if mm and mm.group(1) in self.mcq_key:
+                    conf = float(np.mean(res["confidences"])) if res["confidences"] else 1.0
+                    mcq[mm.group(1)] = (mm.group(2).upper(), conf)
+                    cur = None
+                    continue
                 if ln["is_header"]:
                     cur = {"t": [_LEAD.sub("", txt, 1)], "c": list(res["confidences"])}
                     blocks.append(cur)
                 elif cur is not None:
                     cur["t"].append(txt); cur["c"].extend(res["confidences"])
 
-        # (text, ocr_confidence) per block; confidence = mean token probability
+        result: dict[str, dict] = {}
+        # --- MCQs: always emit every MCQ question. The narrow stacked letter-column OCRs
+        #     unreliably, so undetected ones are left blank (confidence 0) for the operator to
+        #     confirm — MCQs are AI-assisted + human-verified, then exact-match graded.
+        for qno in self.mcq_key:
+            if qno in mcq:
+                letter, conf = mcq[qno]
+                result[qno] = {"answer": letter, "type": "mcq", "similarity": 0.0,
+                               "ocr_confidence": round(conf, 3)}
+            else:
+                result[qno] = {"answer": "", "type": "mcq", "similarity": 0.0, "ocr_confidence": 0.0}
+
+        # --- short answers: (text, ocr_confidence) per block, matched to key by content ---
         cand = [(_correct(" ".join(b["t"]).strip(), self.vocab),
                  float(np.mean(b["c"])) if b["c"] else 1.0) for b in blocks]
         cand = [c for c in cand if len(c[0].split()) >= _MIN_WORDS]
-        if not cand:
-            return {}
-
-        qns = sorted(self.key, key=int)
-        S = similarity_matrix([c[0] for c in cand], [self.key[q] for q in qns])
-        keep = [i for i in range(len(cand)) if S[i].max() >= _KEEP_SIM] or list(range(len(cand)))
-        Sk = S[keep]
-        bi, ki = linear_sum_assignment(-Sk)
-        return {qns[k]: {"answer": cand[keep[b]][0],
-                         "similarity": round(float(Sk[b, k]), 3),
-                         "ocr_confidence": round(cand[keep[b]][1], 3)}
-                for b, k in zip(bi, ki)}
+        if cand:
+            qns = sorted(self.key, key=int)
+            S = similarity_matrix([c[0] for c in cand], [self.key[q] for q in qns])
+            keep = [i for i in range(len(cand)) if S[i].max() >= _KEEP_SIM] or list(range(len(cand)))
+            Sk = S[keep]
+            bi, ki = linear_sum_assignment(-Sk)
+            for b, k in zip(bi, ki):
+                result[qns[k]] = {"answer": cand[keep[b]][0], "type": "short",
+                                  "similarity": round(float(Sk[b, k]), 3),
+                                  "ocr_confidence": round(cand[keep[b]][1], 3)}
+        return result

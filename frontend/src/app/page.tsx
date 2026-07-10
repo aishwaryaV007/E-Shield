@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 type Answer = {
   question_no: string;
+  type: string;
   student_answer: string;
   answer_key: string;
   predicted_mark: number;
@@ -56,6 +57,7 @@ export default function Home() {
         script_id: sheet.script_id + " (corrected)",
         answers: sheet.answers.map((a) => ({
           question_no: a.question_no,
+          type: a.type,
           student_answer: edits[a.question_no] ?? a.student_answer,
           answer_key: a.answer_key,
           max_marks: a.max_marks,
@@ -196,15 +198,28 @@ export default function Home() {
                       {(a.ocr_confidence * 100).toFixed(0)}%{a.low_confidence && " ⚑"}
                     </td>
                     <td style={{ ...C.td, maxWidth: 340 }}>
-                      <textarea
-                        value={edits[a.question_no] ?? a.student_answer}
-                        onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
-                        rows={2}
-                        style={{ width: "100%", background: "#0f172a", color: "#e2e8f0",
-                                 border: "1px solid #334155", borderRadius: 6, padding: 6,
-                                 fontSize: 13, fontFamily: "inherit", resize: "vertical" }} />
+                      {a.type === "mcq" ? (
+                        <select
+                          value={edits[a.question_no] ?? a.student_answer}
+                          onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
+                          style={{ background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155",
+                                   borderRadius: 6, padding: "5px 8px", fontSize: 14 }}>
+                          <option value="">—</option>
+                          {["A", "B", "C", "D"].map((o) => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      ) : (
+                        <textarea
+                          value={edits[a.question_no] ?? a.student_answer}
+                          onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
+                          rows={2}
+                          style={{ width: "100%", background: "#0f172a", color: "#e2e8f0",
+                                   border: "1px solid #334155", borderRadius: 6, padding: 6,
+                                   fontSize: 13, fontFamily: "inherit", resize: "vertical" }} />
+                      )}
                     </td>
-                    <td style={{ ...C.td, color: "#86efac", maxWidth: 300 }}>{a.answer_key}</td>
+                    <td style={{ ...C.td, color: "#86efac", maxWidth: 300 }}>
+                      {a.type === "mcq" ? <b>{a.answer_key}</b> : a.answer_key}
+                    </td>
                   </tr>
                 ))}
               </tbody>
