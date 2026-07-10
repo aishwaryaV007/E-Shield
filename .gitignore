@@ -27,22 +27,32 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# ── Data & model artefacts (never commit student data) ────
+# ── Runtime data & model artefacts (never commit student data) ────
 data/raw/*
 data/processed/*
 data/results/*
-data/registers/*
+data/corpus/*
+data/answer_keys/*
+data/metrics/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/results/.gitkeep
-!data/registers/.gitkeep
-data/templates/*
-!data/templates/.gitkeep
+!data/corpus/.gitkeep
+!data/answer_keys/.gitkeep
+!data/metrics/.gitkeep
 models_cache/*
 !models_cache/.gitkeep
 *.sqlite3
 *.sqlite
 *.db
+
+# ── Dataset (ML training data — commit structure + sample only, never real student data) ────
+dataset/raw_scripts/*
+dataset/answer_keys/*
+dataset/training_csv/*
+!dataset/raw_scripts/.gitkeep
+!dataset/answer_keys/.gitkeep
+!dataset/training_csv/.gitkeep
 
 # ── Environment / secrets ─────────────────────────────────
 .env

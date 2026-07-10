@@ -108,8 +108,10 @@ E-Shield/
 │   ├── pipeline/        # orchestrator (train_pipeline + evaluate_pipeline)
 │   ├── services/ · storage/ · api/
 ├── frontend/            # Next.js dashboard (Overview, Training, Ingestion, Results)
-├── data/                # corpus/ (Phase 1), answer_keys/, raw/, results/, metrics/
-├── docs/                # architecture, planning, data-flow, engine-stage docs
+├── dataset/             # ML training data (Track 02): raw_scripts/, answer_keys/, training_csv/, sample/
+├── data/                # runtime I/O: corpus/, answer_keys/, raw/, results/, metrics/
+├── docs/                # architecture, planning, data-flow, pipeline-stage docs
+├── pitch/               # deliverables: validation PDF, pitch guide (md/html), deck (pptx), one-pager (docx)
 └── scripts/             # download_models.py, seed_demo_data.py
 ```
 
