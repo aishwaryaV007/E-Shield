@@ -137,6 +137,7 @@ select.inp { width: auto; min-width: 64px; }
 .inp-name:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
 .inp-roll { border: 1px solid var(--border); background: #fff; font-size: 13px; color: var(--muted);
   padding: 6px 8px; border-radius: 7px; width: 90px; }
+.file-chosen { font-size: 13px; color: var(--text); display: inline-flex; align-items: center; }
 .file-sm { font-size: 12px; color: var(--muted); }
 .file-sm::file-selector-button { margin-right: 8px; border: 1px solid var(--border); background: #fff;
   padding: 4px 10px; border-radius: 7px; font-weight: 600; color: var(--text); cursor: pointer; }

@@ -149,8 +149,16 @@ export default function Home() {
                         <td><input className="inp-roll" placeholder="—" value={s.roll}
                             onChange={(e) => patch(s.id, { roll: e.target.value })} /></td>
                         <td style={{ minWidth: 200 }}>
-                          <input className="file-sm" type="file" accept="application/pdf"
-                            onChange={(e) => patch(s.id, { file: e.target.files?.[0] || null, status: "idle", sheet: null })} />
+                          {s.file ? (
+                            <span className="file-chosen">
+                              📄 {s.file.name}
+                              <button className="link" style={{ marginLeft: 8 }}
+                                onClick={() => patch(s.id, { file: null, sheet: null, status: "idle" })}>change</button>
+                            </span>
+                          ) : (
+                            <input className="file-sm" type="file" accept="application/pdf"
+                              onChange={(e) => patch(s.id, { file: e.target.files?.[0] || null, status: "idle", sheet: null })} />
+                          )}
                         </td>
                         <td>
                           {s.status === "idle" && <span className="status st-idle">{s.file ? "ready" : "no file"}</span>}
