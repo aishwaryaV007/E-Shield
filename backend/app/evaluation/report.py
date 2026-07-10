@@ -22,6 +22,7 @@ def build_report(script_id: str, answers: dict[str, dict], answer_key: dict[str,
         rows.append({
             "question_no": qno,
             "student_answer": student,
+            "answer_key": key,
             "predicted_mark": sc["predicted_mark"],
             "max_marks": mm,
             "percent": sc["percent"],

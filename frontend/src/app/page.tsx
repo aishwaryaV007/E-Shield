@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 type Answer = {
   question_no: string;
   student_answer: string;
+  answer_key: string;
   predicted_mark: number;
   max_marks: number;
   percent: number;
@@ -149,7 +150,7 @@ export default function Home() {
               <thead>
                 <tr>
                   <th style={C.th}>Q</th><th style={C.th}>Mark</th><th style={C.th}>Match</th>
-                  <th style={C.th}>Extracted answer</th><th style={C.th}>Feedback</th>
+                  <th style={C.th}>Extracted answer (student)</th><th style={C.th}>Correct answer (key)</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,11 +159,11 @@ export default function Home() {
                     <td style={C.td}><b>Q{a.question_no}</b></td>
                     <td style={{ ...C.td, whiteSpace: "nowrap", fontWeight: 700 }}>{a.predicted_mark}/{a.max_marks}</td>
                     <td style={{ ...C.td, color: a.similarity < 0.2 ? "#f87171" : "#94a3b8" }}>{a.similarity.toFixed(2)}</td>
-                    <td style={{ ...C.td, color: "#cbd5e1", maxWidth: 340 }}>{a.student_answer.slice(0, 140)}</td>
-                    <td style={{ ...C.td, color: "#94a3b8" }}>
-                      {a.feedback}
+                    <td style={{ ...C.td, color: "#cbd5e1", maxWidth: 320 }}>
+                      {a.student_answer.slice(0, 140)}
                       {a.low_confidence && <span style={{ color: "#fbbf24" }}> ⚑</span>}
                     </td>
+                    <td style={{ ...C.td, color: "#86efac", maxWidth: 320 }}>{a.answer_key}</td>
                   </tr>
                 ))}
               </tbody>
