@@ -13,7 +13,10 @@ pypdfium2>=4.30.0
 # ── Handwriting OCR ──────────────────────────────────────
 paddleocr>=2.7.3
 paddlepaddle>=2.6.1
-transformers>=4.41.0          # TrOCR handwritten (optional)
+transformers>=4.41.0,<5.0.0          # TrOCR handwritten (optional)
+datasets>=2.19.0              # handwriting dataset pre-fetching
+torchvision                   # required by TrOCR image processor
+sentencepiece                 # required by TrOCR tokenizer
 
 # ── ML / NLP (Phase 1 training + Phase 2 scoring) ────────
 sentence-transformers>=3.0.0
