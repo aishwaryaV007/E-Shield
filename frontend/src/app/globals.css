@@ -1,9 +1,7 @@
-/*
- 1. FILE PURPOSE: Global stylesheet — Tailwind layer directives and base styles.
- 2. RESPONSIBILITIES:
-    - Include @tailwind base/components/utilities.
-    - Define CSS variables and base element styles for the dashboard.
- 3. PLANNED CONTENTS: @tailwind directives; :root design tokens; base resets.
- 4. INPUTS / OUTPUTS: Inputs: Tailwind. Outputs: app-wide CSS.
- 5. DEPENDS ON / USED BY: Imported by src/app/layout.tsx.
-*/
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}

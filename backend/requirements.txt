@@ -6,17 +6,16 @@ pydantic>=2.7.0
 pydantic-settings>=2.3.0
 
 # ── Image processing (Phase 2 input) ─────────────────────
-opencv-python>=4.9.0.80
+opencv-python==4.11.0.86     # pin: 5.x wheel is unstable (segfault / missing symbols)
 Pillow>=10.3.0
 pypdfium2>=4.30.0
 
-# ── Handwriting OCR ──────────────────────────────────────
-paddleocr>=2.7.3
-paddlepaddle>=2.6.1
-transformers>=4.41.0,<5.0.0          # TrOCR handwritten (optional)
-datasets>=2.19.0              # handwriting dataset pre-fetching
+# ── Handwriting OCR (TrOCR-large) ────────────────────────
+transformers==4.57.6         # pin: 5.x cannot load the TrOCR tokenizer
 torchvision                   # required by TrOCR image processor
 sentencepiece                 # required by TrOCR tokenizer
+# NOTE: paddleocr/paddlepaddle and surya-ocr were dropped — they force a transformers
+# upgrade that breaks TrOCR. Do not add them back alongside transformers 4.57.6.
 
 # ── ML / NLP (Phase 1 training + Phase 2 scoring) ────────
 sentence-transformers>=3.0.0

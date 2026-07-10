@@ -1,9 +1,10 @@
-/*
- 1. FILE PURPOSE: Ingestion page (Phase 2 input) — upload scanned scripts + the answer key, then start evaluation.
- 2. RESPONSIBILITIES:
-    - Upload PDFs/images for a batch and the question paper + answer key + rubric.
-    - Trigger the auto-grading run and show its progress.
- 3. PLANNED CONTENTS: IngestionPage() component using lib/api/ingestion + hooks/useEvaluation.
- 4. INPUTS / OUTPUTS: Inputs: file uploads. Outputs: ingest + evaluation-run status UI.
- 5. DEPENDS ON / USED BY: lib/api/ingestion.ts, hooks/useEvaluation.ts, ui/*.
-*/
+export default function IngestionPage() {
+  return (
+    <main style={{ maxWidth: 960, margin: "0 auto", padding: 40 }}>
+      <h2>Ingestion</h2>
+      <p style={{ color: "#94a3b8" }}>
+        Upload &amp; grading is on the <a href="/" style={{ color: "#3b82f6" }}>home page</a>.
+      </p>
+    </main>
+  );
+}

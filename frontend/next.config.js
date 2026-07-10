@@ -1,9 +1,12 @@
-/*
- 1. FILE PURPOSE: Next.js configuration, including API rewrites/proxy to the FastAPI backend.
- 2. RESPONSIBILITIES:
-    - Define rewrites so /api/* proxies to NEXT_PUBLIC_API_URL (avoids CORS in dev).
-    - Set React strict mode and build options.
- 3. PLANNED CONTENTS: module.exports nextConfig with async rewrites().
- 4. INPUTS / OUTPUTS: Inputs: env NEXT_PUBLIC_API_URL. Outputs: Next.js build/runtime config.
- 5. DEPENDS ON / USED BY: Next.js build; pairs with lib/api/client.ts base URL.
-*/
+/** Next.js config — proxies /api/* to the FastAPI backend so the browser calls same-origin. */
+const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  async rewrites() {
+    return [{ source: "/api/:path*", destination: `${BACKEND}/api/:path*` }];
+  },
+};
+
+module.exports = nextConfig;

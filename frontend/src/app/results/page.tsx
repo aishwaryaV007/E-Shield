@@ -1,10 +1,11 @@
-/*
- 1. FILE PURPOSE: Results page (Phase 2) — lists the auto-graded scripts in a batch with totals and percentages.
- 2. RESPONSIBILITIES:
-    - Fetch evaluated scripts for the selected batch.
-    - Show each script's total marks, percentage, and any low-confidence answers to verify.
-    - Link into the per-script evaluated sheet.
- 3. PLANNED CONTENTS: ResultsPage() using hooks/useResults; renders a table of ScriptEvaluation rows.
- 4. INPUTS / OUTPUTS: Inputs: batch id. Outputs: evaluated-scripts overview UI.
- 5. DEPENDS ON / USED BY: hooks/useResults, components/results/*, ui/*.
-*/
+export default function ResultsPage() {
+  return (
+    <main style={{ maxWidth: 960, margin: "0 auto", padding: 40 }}>
+      <h2>Results</h2>
+      <p style={{ color: "#94a3b8" }}>
+        Grade a script and see its evaluated sheet on the{" "}
+        <a href="/" style={{ color: "#3b82f6" }}>home page</a>.
+      </p>
+    </main>
+  );
+}

@@ -1,0 +1,38 @@
+{
+  "n_train": 1964,
+  "n_test": 478,
+  "unseen_questions": 17,
+  "model": {
+    "rmse": 0.1923,
+    "mae": 0.1324,
+    "r2": 0.1239,
+    "accuracy_within_1_mark": 0.7364
+  },
+  "baseline_mean": {
+    "rmse": 0.2087,
+    "mae": 0.1777,
+    "r2": -0.0321,
+    "accuracy_within_1_mark": 0.8347
+  },
+  "partial_credit_model": {
+    "rmse": 0.2373,
+    "mae": 0.1868,
+    "r2": -0.4141,
+    "accuracy_within_1_mark": 0.6387,
+    "corr": 0.371
+  },
+  "partial_credit_baseline_acc1": 0.5864,
+  "cv_rmse": 0.1878,
+  "params": {
+    "n_estimators": 200,
+    "max_depth": 3,
+    "learning_rate": 0.03
+  },
+  "feature_importance": {
+    "similarity": 0.131,
+    "keyword_recall": 0.45,
+    "word_overlap": 0.218,
+    "length_ratio": 0.083,
+    "negation_flag": 0.118
+  }
+}

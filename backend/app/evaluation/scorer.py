@@ -1,9 +1,22 @@
-# 1. FILE PURPOSE: Assigns marks to each answer by applying the trained mark-predictor to the answer's features — the automated grading step.
-# 2. RESPONSIBILITIES:
-#    - Build the feature vector (via training/features.py) for each (student_answer, key, rubric) unit.
-#    - Run the loaded trained model to predict a mark, scaled to the question's max marks.
-#    - Apply percentage-based marking bands (e.g. 90-100% -> full) and clamp to [0, max].
-#    - The mark comes ONLY from the trained model — never from an LLM prompt (Track 02 rule).
-# 3. PLANNED CONTENTS: score_answer(unit) -> {mark, max, percent, features}; score_script(units) -> list.
-# 4. INPUTS / OUTPUTS: Inputs: grading units + trained model. Outputs: predicted marks per question.
-# 5. DEPENDS ON / USED BY: models/mark_model.py, training/features.py, evaluation/similarity.py; used by report.py.
+# 1. FILE PURPOSE: Assign a mark to each answer by applying the trained mark-predictor to its
+#    features — the automated grading step. The mark comes ONLY from the model, never an LLM.
+# 2. RESPONSIBILITIES: build features (training/features.py), predict a PERCENTAGE (models/mark_model.py),
+#    scale to the question's max_marks, clamp to [0, max].
+# 3. DEPENDS ON / USED BY: models/mark_model.py, training/features.py; used by evaluation/report.py.
+from app.training.features import extract_features
+from app.models.mark_model import get_mark_model
+
+
+def score_answer(student_answer: str, answer_key: str, max_marks: float) -> dict:
+    """Grade one answer. Returns predicted mark + the features/percentage behind it."""
+    feats = extract_features(student_answer, answer_key)
+    pct = get_mark_model().predict_percentage(feats)      # trained model (or similarity baseline)
+    mark = round(min(max(pct * max_marks, 0.0), max_marks), 2)
+    return {
+        "predicted_mark": mark,
+        "max_marks": max_marks,
+        "percent": round(pct, 3),
+        "similarity": feats["similarity"],
+        "features": feats,
+        "model_trained": get_mark_model().is_trained(),
+    }
