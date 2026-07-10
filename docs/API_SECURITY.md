@@ -48,3 +48,16 @@ To protect the local database from injection attacks and ensure stable file proc
 *   [API Specifications Guide](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_CONTRACT.md)
 *   [Local Storage specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
 *   [Backend Security Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/BACKEND_SECURITY.md)
+
+## To-Do List
+
+- [ ] Implement JWT authentication
+- [ ] Add rate limiting and DDoS protection
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

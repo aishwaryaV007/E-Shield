@@ -56,3 +56,16 @@ Never commit database backup files (`.db`, `.sqlite`) or CSV roster records cont
 *   [Technology Stack Specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/TECH_STACK.md)
 *   [Local Storage specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
 *   [Secure Development Guidelines](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SECURE_DEVELOPMENT.md)
+
+## To-Do List
+
+- [ ] Setup .env templates
+- [ ] Configure local secrets manager integration
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

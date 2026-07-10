@@ -49,3 +49,16 @@ score. Recognition uses a **local handwriting OCR model** — never an LLM "read
 *   [OCR module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/ocr/README.md)
 *   [Ingestion & Segmentation Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/PIPELINE_PLAN.md)
 *   [System Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+
+## To-Do List
+
+- [x] Integrate local TrOCR model
+- [x] Implement confidence scoring module
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

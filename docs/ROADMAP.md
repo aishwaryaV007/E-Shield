@@ -46,3 +46,16 @@
 *   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [Future Implementation Tasks](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FUTURE_IMPLEMENTATION_TASKS.md)
 *   [Features](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FEATURES.md)
+
+## To-Do List
+
+- [x] Define initial milestones
+- [ ] Update roadmap based on current progress
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

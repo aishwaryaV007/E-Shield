@@ -59,3 +59,16 @@ Evaluated sheets (question-wise marks, total, percentage, feedback) exported; ba
 *   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [Architecture](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ARCHITECTURE.md)
 *   [Data Flow](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)
+
+## To-Do List
+
+- [ ] Implement exam creation workflow
+- [ ] Implement end-to-end exam grading workflow
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

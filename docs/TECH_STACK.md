@@ -81,3 +81,16 @@ Then train the mark-predictor on the historical corpus (Phase 1).
 - **NLI cross-encoder for coverage** — solves negation ("is not exothermic" → contradiction).
 - **SQLite/JSON over Postgres** — nothing to install at the venue, portable between laptops.
 - **Local OCR over cloud OCR** — student data never leaves the machine; no venue-Wi-Fi risk.
+
+## To-Do List
+
+- [x] Document Python backend stack
+- [ ] Document Next.js frontend stack
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

@@ -81,3 +81,16 @@ To restore the application to a previous backup state:
 *   [Local Storage specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
 *   [Database Design specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
 *   [Disaster Recovery Procedures](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DISASTER_RECOVERY.md)
+
+## To-Do List
+
+- [ ] Create automated SQLite backup scripts
+- [ ] Test database restore procedure
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

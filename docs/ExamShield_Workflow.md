@@ -100,3 +100,16 @@ similarity scoring + one evaluated sheet is a complete winning demo.** Never sac
 - [ ] H18: script → full evaluated sheet ← **end-to-end secured**
 - [ ] H21: Results + Training UI wired → **FEATURE FREEZE**
 - [ ] H24: fallback video + 2 rehearsals + pitch ready
+
+## To-Do List
+
+- [x] Document initial processing workflow
+- [ ] Complete end-to-end integration
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

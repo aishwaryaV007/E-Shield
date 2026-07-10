@@ -48,3 +48,16 @@ Before merging new code into the main branch:
 *   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [Backend Security Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/BACKEND_SECURITY.md)
 *   [DevOps Deployment Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DEVOPS_PLAN.md)
+
+## To-Do List
+
+- [ ] Add SAST scanning to pipeline
+- [ ] Review dependencies for known vulnerabilities
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

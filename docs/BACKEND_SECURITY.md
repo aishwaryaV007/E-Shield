@@ -46,3 +46,16 @@ Because ExamShield runs locally, its security model focuses on securing the **Lo
 *   [API Security Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/API_SECURITY.md)
 *   [Database Concepts Reference](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DBMS_CONCEPTS.md)
 *   [Secure Development Guidelines](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SECURE_DEVELOPMENT.md)
+
+## To-Do List
+
+- [ ] Setup secure environment variables
+- [ ] Implement input sanitization middleware
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

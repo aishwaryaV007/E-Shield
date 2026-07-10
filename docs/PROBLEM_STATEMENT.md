@@ -114,3 +114,16 @@ Phase 2:  Scanned scripts → preprocess → handwriting OCR → segment (questi
    with deduction reasons.
 4. Compare a few predicted marks against a teacher's marks to show agreement.
 5. Honesty beat: an unreadable answer flagged *"low confidence — verify"*, never guessed.
+
+## To-Do List
+
+- [x] Define problem scope clearly
+- [x] Identify target audience and use cases
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

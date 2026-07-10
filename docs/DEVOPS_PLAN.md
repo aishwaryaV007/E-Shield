@@ -87,3 +87,16 @@ wait
 *   [Database Specification](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
 *   [Monitoring and Run Logs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/MONITORING.md)
 ```
+
+## To-Do List
+
+- [ ] Setup GitHub Actions CI/CD pipeline
+- [ ] Create Dockerfiles for deployment
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

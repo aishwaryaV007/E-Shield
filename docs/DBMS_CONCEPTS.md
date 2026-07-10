@@ -76,3 +76,16 @@ PRAGMA foreign_keys = ON;
 *   [Database Schema Design spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
 *   [Performance & Scalability Spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SCALABILITY.md)
 *   [Local Storage Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
+
+## To-Do List
+
+- [x] Map relational concepts to SQLite schema
+- [x] Apply foreign key constraints
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

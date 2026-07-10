@@ -50,3 +50,16 @@ explainable marks** — not policing students.
 *   [Data Privacy](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_PRIVACY.md)
 *   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)
 *   [Problem Statement](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/PROBLEM_STATEMENT.md)
+
+## To-Do List
+
+- [ ] Implement anomaly detection in grading
+- [ ] Add audit logging for score changes
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

@@ -47,3 +47,16 @@ The app runs locally; access is managed via local profiles / dashboard sections.
 *   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
 *   [FAQ](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FAQ.md)
 *   [System Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+
+## To-Do List
+
+- [ ] Define RBAC (Role-Based Access Control) models
+- [ ] Implement Role-checking middleware
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

@@ -62,3 +62,16 @@ Because ExamShield runs entirely on local machines, operational failures are typ
 *   [Application Monitoring Reference](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/MONITORING.md)
 *   [Local Database Backup & Restore](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/BACKUP_RESTORE.md)
 *   [System Design Subsystems](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+
+## To-Do List
+
+- [ ] Define failover strategies
+- [ ] Test disaster recovery plan locally
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

@@ -54,3 +54,16 @@ def verify_demo(batch_id, model_metrics):
 *   [Implementation Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/implementation_plan.md)
 *   [Storage module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/storage/README.md)
 *   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)
+
+## To-Do List
+
+- [x] Write ingestion and storage unit tests
+- [ ] Write end-to-end integration tests
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.

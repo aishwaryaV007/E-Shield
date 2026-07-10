@@ -64,3 +64,16 @@ Compare a few predicted marks against a teacher's marks to sanity-check agreemen
 *   [SETUP.md](file:///Users/gaurav/Desktop/MyProjects/E-Shield/SETUP.md)
 *   [DevOps Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DEVOPS_PLAN.md)
 *   [Testing Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/TESTING_PLAN.md)
+
+## To-Do List
+
+- [x] Document backend local setup
+- [ ] Document frontend local setup
+- [ ] Review document for technical accuracy against current implementation.
+- [ ] Ensure all referenced internal links are valid and working.
+- [ ] Add architectural or workflow diagrams where applicable.
+- [ ] Proofread for grammar, consistency, and tone.
+- [ ] Cross-reference with SYSTEM_DESIGN.md for alignment.
+- [ ] Verify that security considerations are documented if relevant.
+- [ ] Add examples or code snippets to clarify complex sections.
+- [ ] Check formatting (headers, bolding, lists) for readability.
