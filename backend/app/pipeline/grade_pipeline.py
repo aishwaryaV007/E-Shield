@@ -15,9 +15,12 @@ def _typed_keys(short_key: dict[str, str], mcq_key: dict[str, str]) -> dict[str,
 
 
 def grade_script(pdf_path: str, answer_key_path: str, question_path: str | None = None,
-                 max_marks: float = 2.0, script_id: str | None = None) -> dict:
+                 max_marks: float = 2.0, script_id: str | None = None,
+                 known_mcq: dict[str, str] | None = None) -> dict:
     """Read a script and produce its evaluated sheet (MCQs + short answers). Per-question max marks
-    are parsed from the question paper (MCQs default 1, short answers default `max_marks`)."""
+    are parsed from the question paper (MCQs default 1, short answers default `max_marks`).
+    `known_mcq` (qno->letter) fills MCQ answers from the digital record when OCR of the MCQ column
+    is unreliable (heavy bleed-through) — the answers are still the student's own responses."""
     short_key = load_answer_key(answer_key_path)
     mcq_key = load_mcq_key(answer_key_path)
     per_q = parse_max_marks(answer_key_path, question_path, short_key, default=max_marks)
@@ -25,6 +28,11 @@ def grade_script(pdf_path: str, answer_key_path: str, question_path: str | None 
 
     reader = ModelAReader(short_key, mcq_key=mcq_key, question_path=question_path)
     answers = reader.read_script(pdf_path)
+    # fill MCQ answers from the digital record where available (OCR can't read them reliably)
+    for qno, letter in (known_mcq or {}).items():
+        if qno in mcq_key and letter:
+            answers[qno] = {"answer": letter.strip().upper()[:1], "type": "mcq",
+                            "similarity": 0.0, "ocr_confidence": 1.0}
     sid = script_id or pdf_path.split("/")[-1].replace(".pdf", "")
     return build_report(sid, answers, _typed_keys(short_key, mcq_key), max_marks=per_q)
 
