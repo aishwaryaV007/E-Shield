@@ -1,9 +1,19 @@
 import os
+from functools import lru_cache
+
 import torch
 import numpy as np
 from PIL import Image
 import torch.nn.functional as F
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+
+
+@lru_cache(maxsize=1)
+def get_ocr() -> "HandwritingOCR":
+    """Process-wide singleton — load TrOCR-large ONCE and reuse it across all requests
+    (avoids re-loading ~1.3 GB from disk on every grade)."""
+    return HandwritingOCR()
+
 
 class HandwritingOCR:
     """

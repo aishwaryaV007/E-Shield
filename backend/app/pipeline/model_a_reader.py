@@ -17,7 +17,7 @@ from rapidfuzz import process, fuzz
 
 from app.ingestion.pdf_loader import PDFLoader
 from app.segmentation.line_segmenter import segment_lines
-from app.ocr.handwriting_ocr import HandwritingOCR
+from app.ocr.handwriting_ocr import get_ocr
 from app.evaluation.similarity import similarity_matrix, answer_similarity
 
 _LEAD = re.compile(r"^\s*[^A-Za-z]*\s*(?:\d{1,2}\s*[.)])?\s*")
@@ -112,7 +112,7 @@ class ModelAReader:
         self.key = answer_key
         self.mcq_key = mcq_key or {}
         self.vocab = _vocab(answer_key, question_path)
-        self.ocr = HandwritingOCR()
+        self.ocr = get_ocr()
 
     def read_script(self, pdf_path: str) -> dict[str, dict]:
         pages = PDFLoader.rasterize_pdf(pdf_path, dpi=200)  # BGR arrays

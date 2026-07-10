@@ -12,7 +12,7 @@ from sentence_transformers import util
 
 from app.ingestion.pdf_loader import PDFLoader
 from app.segmentation.line_segmenter import segment_lines
-from app.ocr.handwriting_ocr import HandwritingOCR
+from app.ocr.handwriting_ocr import get_ocr
 from app.models.embedder import get_embedder
 from app.evaluation.report import build_report
 
@@ -56,7 +56,7 @@ def parse_prose_key(answer_path: str, question_path: str | None = None) -> dict[
 
 
 def _ocr_lines(pdf_path: str) -> list[str]:
-    ocr = HandwritingOCR()
+    ocr = get_ocr()
     lines = []
     for bgr in PDFLoader.rasterize_pdf(pdf_path, dpi=200):
         rgb = bgr[:, :, ::-1]
