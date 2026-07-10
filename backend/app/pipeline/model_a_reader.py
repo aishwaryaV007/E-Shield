@@ -40,9 +40,9 @@ def load_mcq_key(path: str) -> dict[str, str]:
 
 # an MCQ answer line looks like "1. D", "20 C" — a number then a single isolated letter A-D
 _MCQ_RE = re.compile(r"^(?:[Il|]\s+)?[^\dA-Za-z]*(\d{1,2})\s*[.)]?\s*([A-Da-d])\s*[.)]?\s*$")
-# the question number the student wrote at the start of an answer block ("24.", "29)"),
-# tolerating a stray leading OCR token like "I " from the left margin rule.
-_QNUM_RE = re.compile(r"^(?:[Il|(]\s*)?[^\dA-Za-z]{0,3}(\d{1,2})\s*[.)]")
+# the question number the student wrote at the start of an answer block ("24.", "29)", "Q1."),
+# tolerating a stray leading OCR token like "I " and an optional "Q" prefix.
+_QNUM_RE = re.compile(r"^(?:[Il|(]\s*)?[Qq]?\s*[^\dA-Za-z]{0,3}(\d{1,2})\s*[.)]")
 
 
 _SECTION_MARKS = re.compile(r"\((\d+(?:\.\d+)?)\s*marks?\s*(?:each)?\)", re.I)

@@ -166,12 +166,14 @@ export default function Home() {
               <div style={{ fontSize: 13, color: "#94a3b8" }}>Script</div>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.script_id}</div>
             </div>
+            {sheet.mcq_max > 0 && (
+              <div>
+                <div style={{ fontSize: 13, color: "#94a3b8" }}>MCQs</div>
+                <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.mcq_marks} / {sheet.mcq_max}</div>
+              </div>
+            )}
             <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>MCQs (Q1–20)</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.mcq_marks} / {sheet.mcq_max}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>Descriptive (Q21–35)</div>
+              <div style={{ fontSize: 13, color: "#94a3b8" }}>Descriptive</div>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.descriptive_marks} / {sheet.descriptive_max}</div>
             </div>
             <div>

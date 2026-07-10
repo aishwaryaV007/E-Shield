@@ -71,13 +71,23 @@ async def grade(
             qf.write(qb); question_path = qf.name; tmp_paths.append(question_path)
 
     sid = file.filename.replace(".pdf", "")
+    # Route: CSV answer key (has a Question_Number header) -> the tuned DS reader.
+    # Plain-text answer key (any exam format) -> the format-agnostic general grader.
+    key_head = open(key_path, encoding="utf-8", errors="ignore").read(200)
+    is_csv = "Question_Number" in key_head
     t0 = time.time()
     try:
-        sheet = grade_script(pdf_path, key_path,
-                             question_path=question_path,
-                             max_marks=max_marks,
-                             script_id=sid,
-                             known_mcq=known_mcq_for(sid))
+        if is_csv:
+            sheet = grade_script(pdf_path, key_path, question_path=question_path,
+                                 max_marks=max_marks, script_id=sid,
+                                 known_mcq=known_mcq_for(sid))
+        else:
+            from app.pipeline.general_grader import parse_prose_key, grade_general
+            keys = parse_prose_key(key_path, question_path)
+            if not keys:
+                raise HTTPException(400, "Could not parse the answer key. Use 'Q1. ... Marks: N' text "
+                                         "or the CSV format (Question_Number,Type,Correct_Answer).")
+            sheet = grade_general(pdf_path, keys, sid, default_max=max_marks)
     finally:
         for p in tmp_paths:
             os.unlink(p)
