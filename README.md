@@ -53,31 +53,60 @@ Open **http://localhost:3000**, then:
 3. See **MCQ + descriptive subtotals**, the total `/50`, per-question marks, the extracted answer,
    and the correct answer. **Edit** any mis-read answer and hit **Re-grade** for the fixed mark.
 
-### Windows (PowerShell / CMD)
+## 🪟 Running on Windows (step by step)
 
-Same steps, but the venv activation, environment variable, and paths differ:
+Follow these exactly. You'll need **two terminals** open at the same time (one for the backend, one for the frontend).
 
+### Windows prerequisites
+1. **Python 3.11+** — install from [python.org](https://www.python.org/downloads/windows/) and tick **"Add Python to PATH"** during install.
+2. **Node.js 20 LTS** — install from [nodejs.org](https://nodejs.org/).
+3. **Git** — install from [git-scm.com](https://git-scm.com/download/win).
+4. Verify (in a new terminal): `py --version`, `node --version`, `git --version`.
+
+### Step 1 — Get the code
 ```powershell
-# ── Backend (PowerShell) ──
+git clone https://github.com/aishwaryaV007/E-Shield.git
+cd E-Shield
+```
+
+### Step 2 — Backend (Terminal 1) — PowerShell
+```powershell
 cd backend
 py -3 -m venv .venv
-.venv\Scripts\Activate.ps1              # CMD: .venv\Scripts\activate.bat
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-$env:PYTHONPATH = "."                    # CMD: set PYTHONPATH=.
+$env:PYTHONPATH = "."
 python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+Leave this terminal running. The API is at **http://127.0.0.1:8000** (first run downloads ~1.5 GB of models; later runs are offline).
 
-# ── Frontend (second terminal) ──
-cd frontend
+> **Using Command Prompt (cmd.exe) instead of PowerShell?** Use these two lines in place of the PowerShell ones:
+> ```bat
+> .venv\Scripts\activate.bat
+> set PYTHONPATH=.
+> ```
+> **PowerShell blocks the activate script?** Run once, then re-activate:
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+> ```
+
+### Step 3 — Frontend (Terminal 2 — a **new** window)
+```powershell
+cd E-Shield\frontend
 npm install
 npm run dev
 ```
+Leave this running too. The dashboard is at **http://localhost:3000**.
 
-Notes for Windows:
-- Use **backslashes** in paths (`..\dataset\raw_scripts\Student_Pdf\Student_1.pdf`).
-- `PYTHONPATH` must be set **before** running python: PowerShell `$env:PYTHONPATH="."`, CMD `set PYTHONPATH=.`.
-- No GPU needed — it runs on CPU (Apple-Silicon MPS is auto-used on Mac only).
-- If PowerShell blocks the activate script, run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+### Step 4 — Open the app
+Open **http://localhost:3000** in your browser. Upload a student PDF (e.g. `dataset\Test Data\page-1.pdf`) with its `answer_key.txt` + `question_paper.txt`, then click **Grade**.
+
+### Windows notes
+- Paths use **backslashes**: `dataset\raw_scripts\Student_Pdf\Student_1.pdf`.
+- `PYTHONPATH` must be set **before** `python` runs (Step 2) — every new backend terminal needs it again.
+- **No GPU required** — it runs on CPU (a grade takes ~30–45 s).
+- If port 8000 or 3000 is busy, change the port (`--port 8001` / `npm run dev -- -p 3001`) and update `NEXT_PUBLIC_API_URL` accordingly.
+- If `pip install` fails on a wheel, ensure you're on **Python 3.11–3.13** (3.14 also works) 64-bit.
 
 ### Command-line / tests (optional)
 ```bash
