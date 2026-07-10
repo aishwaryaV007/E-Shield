@@ -18,7 +18,7 @@ from rapidfuzz import process, fuzz
 from app.ingestion.pdf_loader import PDFLoader
 from app.segmentation.line_segmenter import segment_lines
 from app.ocr.handwriting_ocr import HandwritingOCR
-from app.evaluation.similarity import similarity_matrix
+from app.evaluation.similarity import similarity_matrix, answer_similarity
 
 _LEAD = re.compile(r"^\s*[^A-Za-z]*\s*(?:\d{1,2}\s*[.)])?\s*")
 _MIN_WORDS = 4
@@ -40,6 +40,9 @@ def load_mcq_key(path: str) -> dict[str, str]:
 
 # an MCQ answer line looks like "1. D", "20 C" — a number then a single isolated letter A-D
 _MCQ_RE = re.compile(r"^(?:[Il|]\s+)?[^\dA-Za-z]*(\d{1,2})\s*[.)]?\s*([A-Da-d])\s*[.)]?\s*$")
+# the question number the student wrote at the start of an answer block ("24.", "29)"),
+# tolerating a stray leading OCR token like "I " from the left margin rule.
+_QNUM_RE = re.compile(r"^(?:[Il|(]\s*)?[^\dA-Za-z]{0,3}(\d{1,2})\s*[.)]")
 
 
 _SECTION_MARKS = re.compile(r"\((\d+(?:\.\d+)?)\s*marks?\s*(?:each)?\)", re.I)
@@ -130,7 +133,9 @@ class ModelAReader:
                     cur = None
                     continue
                 if ln["is_header"]:
-                    cur = {"t": [_LEAD.sub("", txt, 1)], "c": list(res["confidences"])}
+                    numm = _QNUM_RE.match(txt)            # the question number the student wrote
+                    cur = {"t": [_LEAD.sub("", txt, 1)], "c": list(res["confidences"]),
+                           "qnum": numm.group(1) if numm else None}
                     blocks.append(cur)
                 elif cur is not None:
                     cur["t"].append(txt); cur["c"].extend(res["confidences"])
@@ -147,18 +152,35 @@ class ModelAReader:
             else:
                 result[qno] = {"answer": "", "type": "mcq", "similarity": 0.0, "ocr_confidence": 0.0}
 
-        # --- short answers: (text, ocr_confidence) per block, matched to key by content ---
+        # --- short answers ---
+        # cand = (text, ocr_confidence, written_qnum) per block
         cand = [(_correct(" ".join(b["t"]).strip(), self.vocab),
-                 float(np.mean(b["c"])) if b["c"] else 1.0) for b in blocks]
+                 float(np.mean(b["c"])) if b["c"] else 1.0, b.get("qnum")) for b in blocks]
         cand = [c for c in cand if len(c[0].split()) >= _MIN_WORDS]
         if cand:
             qns = sorted(self.key, key=int)
-            S = similarity_matrix([c[0] for c in cand], [self.key[q] for q in qns])
-            keep = [i for i in range(len(cand)) if S[i].max() >= _KEEP_SIM] or list(range(len(cand)))
-            Sk = S[keep]
-            bi, ki = linear_sum_assignment(-Sk)
-            for b, k in zip(bi, ki):
-                result[qns[k]] = {"answer": cand[keep[b]][0], "type": "short",
-                                  "similarity": round(float(Sk[b, k]), 3),
-                                  "ocr_confidence": round(cand[keep[b]][1], 3)}
+
+            def emit(qno, idx):
+                result[qno] = {"answer": cand[idx][0], "type": "short",
+                               "similarity": round(answer_similarity(cand[idx][0], self.key[qno]), 3),
+                               "ocr_confidence": round(cand[idx][1], 3)}
+
+            # 1) HYBRID: trust the question number the student wrote, when valid + unique.
+            used, taken_q = set(), set()
+            by_num: dict[str, list[int]] = {}
+            for i, (_, _, qn) in enumerate(cand):
+                if qn in self.key:
+                    by_num.setdefault(qn, []).append(i)
+            for qn, idxs in by_num.items():
+                if len(idxs) == 1:                       # unambiguous written number
+                    emit(qn, idxs[0]); used.add(idxs[0]); taken_q.add(qn)
+
+            # 2) content-match the remaining blocks to the remaining questions (Hungarian)
+            rem_c = [i for i in range(len(cand)) if i not in used]
+            rem_q = [q for q in qns if q not in taken_q]
+            if rem_c and rem_q:
+                S = similarity_matrix([cand[i][0] for i in rem_c], [self.key[q] for q in rem_q])
+                bi, ki = linear_sum_assignment(-S)
+                for b, k in zip(bi, ki):
+                    emit(rem_q[k], rem_c[b])
         return result
