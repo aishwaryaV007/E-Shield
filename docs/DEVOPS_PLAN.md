@@ -91,7 +91,7 @@ wait
 ## To-Do List
 
 - [ ] Setup GitHub Actions CI/CD pipeline
-- [ ] Create Dockerfiles for deployment
+- [x] Create Dockerfiles for deployment
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

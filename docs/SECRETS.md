@@ -59,7 +59,7 @@ Never commit database backup files (`.db`, `.sqlite`) or CSV roster records cont
 
 ## To-Do List
 
-- [ ] Setup .env templates
+- [x] Setup .env templates
 - [ ] Configure local secrets manager integration
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.

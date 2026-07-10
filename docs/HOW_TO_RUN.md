@@ -68,7 +68,7 @@ Compare a few predicted marks against a teacher's marks to sanity-check agreemen
 ## To-Do List
 
 - [x] Document backend local setup
-- [ ] Document frontend local setup
+- [x] Document frontend local setup
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

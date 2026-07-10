@@ -85,7 +85,7 @@ Then train the mark-predictor on the historical corpus (Phase 1).
 ## To-Do List
 
 - [x] Document Python backend stack
-- [ ] Document Next.js frontend stack
+- [x] Document Next.js frontend stack
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.
