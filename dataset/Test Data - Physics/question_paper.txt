@@ -1,0 +1,17 @@
+SUBJECT: Physics
+TIME: 1 Hour                                        MAX MARKS: 25
+
+Q1. (MCQ, 2 marks) What is the SI unit of force?
+    a) Joule
+    b) Newton
+    c) Watt
+    d) Pascal
+
+Q2. (Short answer, 3 marks) State Newton's first law of motion.
+
+Q3. (Short answer, 5 marks) Differentiate between speed and velocity.
+
+Q4. (Long answer, 7 marks) Explain the law of conservation of energy with an example.
+
+Q5. (Long answer, 8 marks) Describe the working of a simple electric motor.
+

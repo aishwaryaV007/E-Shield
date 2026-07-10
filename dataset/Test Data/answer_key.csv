@@ -1,0 +1,6 @@
+Question_Number,Type,Correct_Answer,Max_Marks
+1,MCQ,b,2
+2,Short_Answer,"RAM Random Access Memory is a type of volatile computer memory used to store data and instructions that the CPU needs while running programs. It loses its content when power is switched off.",3
+3,Short_Answer,"An operating system manages computer hardware and software resources, provides common services for programs, handles memory management, process scheduling, file management, and provides a user interface.",5
+4,Short_Answer,"A compiler translates the entire source code into machine code before execution producing a standalone executable and errors are reported after full compilation. An interpreter translates and executes code line by line without producing a separate executable and stops at the first error.",7
+5,Short_Answer,"The OSI model is a 7-layer conceptual framework for network communication: Physical Data Link Network Transport Session Presentation Application layers.",8

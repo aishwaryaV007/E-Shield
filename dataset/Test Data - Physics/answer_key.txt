@@ -1,0 +1,17 @@
+ANSWER KEY
+
+Q1. Correct option: b) Newton
+    Marks: 2 (all or nothing)
+
+Q2. An object remains at rest or in uniform motion in a straight line unless acted upon by an external unbalanced force. This is also called the law of inertia.
+    Marks: 3
+
+Q3. Speed is the distance travelled per unit time and is a scalar quantity with only magnitude. Velocity is the displacement per unit time and is a vector quantity having both magnitude and direction.
+    Marks: 5
+
+Q4. The law of conservation of energy states that energy can neither be created nor destroyed, only transformed from one form to another. The total energy of an isolated system remains constant. For example, in a falling ball potential energy is converted into kinetic energy as it falls.
+    Marks: 7
+
+Q5. An electric motor converts electrical energy into mechanical energy. It has a coil placed between the poles of a magnet. When current flows through the coil it experiences a force due to the magnetic field, causing it to rotate. A split-ring commutator reverses the current direction every half turn so rotation continues in the same direction.
+    Marks: 8
+

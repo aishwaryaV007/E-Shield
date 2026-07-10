@@ -1,0 +1,16 @@
+SUBJECT: Basic Computer Science
+TIME: 1 Hour                                             MAX MARKS: 25
+
+Q1. (MCQ, 2 marks) What does CPU stand for?
+    a) Central Process Unit
+    b) Central Processing Unit
+    c) Computer Personal Unit
+    d) Central Processor Unit
+
+Q2. (Short answer, 3 marks) Define RAM.
+
+Q3. (Short answer, 5 marks) What is the function of an operating system?
+
+Q4. (Long answer, 7 marks) Explain the difference between a compiler and an interpreter.
+
+Q5. (Long answer, 8 marks) Describe the OSI model and briefly explain its layers.

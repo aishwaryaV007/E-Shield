@@ -1,0 +1,48 @@
+ANSWER KEY
+
+Q1. Correct option: b) Central Processing Unit
+    Marks: 2 (all or nothing)
+
+Q2. RAM (Random Access Memory) is a type of volatile computer memory used to
+    store data and instructions that the CPU needs while running programs.
+    It loses its content when power is switched off.
+    Rubric points:
+      - Mentions "volatile" / temporary storage
+      - Used by CPU / active programs
+      - Content lost on power off
+    Marks: 3 (1 per rubric point)
+
+Q3. An operating system manages computer hardware and software resources,
+    provides common services for programs, handles memory management,
+    process scheduling, file management, and provides a user interface.
+    Rubric points:
+      - Manages hardware/software resources
+      - Memory management
+      - Process/task scheduling
+      - File management
+      - Provides user interface
+    Marks: 5 (1 per rubric point)
+
+Q4. A compiler translates the entire source code into machine code before
+    execution, producing a standalone executable, and errors are reported
+    after full compilation. An interpreter translates and executes code
+    line by line, without producing a separate executable, and stops at
+    the first error encountered.
+    Rubric points:
+      - Compiler translates whole program at once
+      - Compiler produces executable file
+      - Interpreter translates/executes line by line
+      - Interpreter has no separate executable
+      - Difference in error reporting (compile-time vs runtime)
+    Marks: 7 (~1.4 per rubric point, round to nearest 0.5)
+
+Q5. The OSI model is a 7-layer conceptual framework for network communication:
+      1. Physical - transmission of raw bits over a medium
+      2. Data Link - node-to-node data transfer, error detection
+      3. Network - routing and logical addressing (IP)
+      4. Transport - end-to-end delivery, reliability (TCP/UDP)
+      5. Session - managing sessions/connections between applications
+      6. Presentation - data translation, encryption, compression
+      7. Application - interface for end-user applications (HTTP, FTP)
+    Rubric points: 1 per correctly named+described layer (max 7) + 1 for
+    correctly stating "7 layers" = 8 marks total.
