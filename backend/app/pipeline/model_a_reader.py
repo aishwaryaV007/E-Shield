@@ -105,26 +105,29 @@ class ModelAReader:
             rgb = bgr[:, :, ::-1]
             for ln in segment_lines(rgb):
                 crop = rgb[ln["y0"]:ln["y1"], ln["x0"]:ln["x1"]]
-                txt = self.ocr.recognize_text(crop)["text"].strip()
+                res = self.ocr.recognize_text(crop)
+                txt = res["text"].strip()
                 if not txt:
                     continue
                 if ln["is_header"]:
-                    cur = {"t": [_LEAD.sub("", txt, 1)]}; blocks.append(cur)
+                    cur = {"t": [_LEAD.sub("", txt, 1)], "c": list(res["confidences"])}
+                    blocks.append(cur)
                 elif cur is not None:
-                    cur["t"].append(txt)
+                    cur["t"].append(txt); cur["c"].extend(res["confidences"])
 
-        cand = [self._clean(b) for b in blocks]
-        cand = [c for c in cand if len(c.split()) >= _MIN_WORDS]
+        # (text, ocr_confidence) per block; confidence = mean token probability
+        cand = [(_correct(" ".join(b["t"]).strip(), self.vocab),
+                 float(np.mean(b["c"])) if b["c"] else 1.0) for b in blocks]
+        cand = [c for c in cand if len(c[0].split()) >= _MIN_WORDS]
         if not cand:
             return {}
 
         qns = sorted(self.key, key=int)
-        S = similarity_matrix(cand, [self.key[q] for q in qns])
+        S = similarity_matrix([c[0] for c in cand], [self.key[q] for q in qns])
         keep = [i for i in range(len(cand)) if S[i].max() >= _KEEP_SIM] or list(range(len(cand)))
         Sk = S[keep]
         bi, ki = linear_sum_assignment(-Sk)
-        return {qns[k]: {"answer": cand[keep[b]], "similarity": round(float(Sk[b, k]), 3)}
+        return {qns[k]: {"answer": cand[keep[b]][0],
+                         "similarity": round(float(Sk[b, k]), 3),
+                         "ocr_confidence": round(cand[keep[b]][1], 3)}
                 for b, k in zip(bi, ki)}
-
-    def _clean(self, block) -> str:
-        return _correct(" ".join(block["t"]).strip(), self.vocab)

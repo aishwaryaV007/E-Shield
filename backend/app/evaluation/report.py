@@ -17,6 +17,8 @@ def build_report(script_id: str, answers: dict[str, dict], answer_key: dict[str,
         mm = max_marks.get(qno, 2.0) if isinstance(max_marks, dict) else max_marks
         sc = score_answer(student, key, mm)
         fb = build_feedback(student, key, sc)
+        # OCR confidence drives the "verify" flag (default 1.0 for human-corrected answers)
+        ocr_conf = float(answers[qno].get("ocr_confidence", 1.0))
         total += sc["predicted_mark"]
         max_total += mm
         rows.append({
@@ -27,9 +29,10 @@ def build_report(script_id: str, answers: dict[str, dict], answer_key: dict[str,
             "max_marks": mm,
             "percent": sc["percent"],
             "similarity": sc["similarity"],
+            "ocr_confidence": round(ocr_conf, 3),
             "feedback": fb["summary"],
             "deduction_reasons": fb["deduction_reasons"],
-            "low_confidence": fb["low_confidence"],
+            "low_confidence": ocr_conf < 0.55,
         })
     return {
         "script_id": script_id,

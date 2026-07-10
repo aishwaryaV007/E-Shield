@@ -16,3 +16,12 @@ def grade_script(pdf_path: str, answer_key_path: str, question_path: str | None 
     answers = reader.read_script(pdf_path)
     sid = script_id or pdf_path.split("/")[-1].replace(".pdf", "")
     return build_report(sid, answers, key, max_marks=per_q)
+
+
+def rescore(corrections: list[dict], script_id: str = "corrected") -> dict:
+    """Re-grade human-corrected answers WITHOUT OCR (fast). Each item carries its own key + max marks:
+    {question_no, student_answer, answer_key, max_marks}."""
+    answers = {c["question_no"]: {"answer": c["student_answer"], "ocr_confidence": 1.0} for c in corrections}
+    key = {c["question_no"]: c.get("answer_key", "") for c in corrections}
+    mm = {c["question_no"]: float(c.get("max_marks", 2.0)) for c in corrections}
+    return build_report(script_id, answers, key, max_marks=mm)

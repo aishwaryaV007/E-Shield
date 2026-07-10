@@ -4,6 +4,7 @@ import tempfile
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ANSWER_KEY = os.path.join(REPO, "dataset/answer_keys/answerkey.txt")
@@ -68,3 +69,22 @@ async def grade(
             os.unlink(p)
     sheet["elapsed_seconds"] = round(time.time() - t0, 1)
     return sheet
+
+
+class Correction(BaseModel):
+    question_no: str
+    student_answer: str
+    answer_key: str = ""
+    max_marks: float = 2.0
+
+
+class RescoreReq(BaseModel):
+    answers: list[Correction]
+    script_id: str = "corrected"
+
+
+@app.post("/api/v1/rescore")
+def rescore_endpoint(req: RescoreReq):
+    """Re-grade after a human fixes the OCR text — fast, no OCR re-run."""
+    from app.pipeline.grade_pipeline import rescore
+    return rescore([a.model_dump() for a in req.answers], req.script_id)

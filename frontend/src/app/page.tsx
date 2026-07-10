@@ -9,6 +9,7 @@ type Answer = {
   max_marks: number;
   percent: number;
   similarity: number;
+  ocr_confidence: number;
   feedback: string;
   deduction_reasons: string[];
   low_confidence: boolean;
@@ -36,8 +37,41 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sheet, setSheet] = useState<Sheet | null>(null);
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  const [regrading, setRegrading] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const timer = useRef<any>(null);
+
+  function applySheet(s: Sheet) {
+    setSheet(s);
+    setEdits(Object.fromEntries(s.answers.map((a) => [a.question_no, a.student_answer])));
+  }
+
+  async function regrade() {
+    if (!sheet) return;
+    setRegrading(true); setError("");
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const body = {
+        script_id: sheet.script_id + " (corrected)",
+        answers: sheet.answers.map((a) => ({
+          question_no: a.question_no,
+          student_answer: edits[a.question_no] ?? a.student_answer,
+          answer_key: a.answer_key,
+          max_marks: a.max_marks,
+        })),
+      };
+      const res = await fetch(`${API}/api/v1/rescore`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      applySheet(await res.json());
+    } catch (e: any) {
+      setError(e.message || "Re-grade failed");
+    } finally {
+      setRegrading(false);
+    }
+  }
 
   // live seconds counter while grading
   useEffect(() => {
@@ -63,7 +97,7 @@ export default function Home() {
       const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const res = await fetch(`${API}/api/v1/grade`, { method: "POST", body: fd });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`);
-      setSheet(await res.json());
+      applySheet(await res.json());
     } catch (e: any) {
       setError(e.message || "Grading failed");
     } finally {
@@ -149,29 +183,48 @@ export default function Home() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
                 <tr>
-                  <th style={C.th}>Q</th><th style={C.th}>Mark</th><th style={C.th}>Match</th>
-                  <th style={C.th}>Extracted answer (student)</th><th style={C.th}>Correct answer (key)</th>
+                  <th style={C.th}>Q</th><th style={C.th}>Mark</th><th style={C.th}>OCR&nbsp;conf.</th>
+                  <th style={C.th}>Extracted answer — edit to correct</th><th style={C.th}>Correct answer (key)</th>
                 </tr>
               </thead>
               <tbody>
                 {sheet.answers.map((a) => (
-                  <tr key={a.question_no}>
+                  <tr key={a.question_no} style={a.low_confidence ? { background: "#2a2416" } : undefined}>
                     <td style={C.td}><b>Q{a.question_no}</b></td>
                     <td style={{ ...C.td, whiteSpace: "nowrap", fontWeight: 700 }}>{a.predicted_mark}/{a.max_marks}</td>
-                    <td style={{ ...C.td, color: a.similarity < 0.2 ? "#f87171" : "#94a3b8" }}>{a.similarity.toFixed(2)}</td>
-                    <td style={{ ...C.td, color: "#cbd5e1", maxWidth: 320 }}>
-                      {a.student_answer.slice(0, 140)}
-                      {a.low_confidence && <span style={{ color: "#fbbf24" }}> ⚑</span>}
+                    <td style={{ ...C.td, color: a.low_confidence ? "#fbbf24" : "#94a3b8", whiteSpace: "nowrap" }}>
+                      {(a.ocr_confidence * 100).toFixed(0)}%{a.low_confidence && " ⚑"}
                     </td>
-                    <td style={{ ...C.td, color: "#86efac", maxWidth: 320 }}>{a.answer_key}</td>
+                    <td style={{ ...C.td, maxWidth: 340 }}>
+                      <textarea
+                        value={edits[a.question_no] ?? a.student_answer}
+                        onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
+                        rows={2}
+                        style={{ width: "100%", background: "#0f172a", color: "#e2e8f0",
+                                 border: "1px solid #334155", borderRadius: 6, padding: 6,
+                                 fontSize: 13, fontFamily: "inherit", resize: "vertical" }} />
+                    </td>
+                    <td style={{ ...C.td, color: "#86efac", maxWidth: 300 }}>{a.answer_key}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14 }}>
+            <button onClick={regrade} disabled={regrading}
+                    style={{ padding: "9px 20px", borderRadius: 8, border: "none",
+                             background: regrading ? "#475569" : "#16a34a", color: "#fff",
+                             cursor: regrading ? "not-allowed" : "pointer", fontWeight: 600 }}>
+              {regrading ? "Re-grading…" : "✎ Re-grade with my corrections"}
+            </button>
+            <span style={{ color: "#64748b", fontSize: 12 }}>
+              Fix any mis-read answer above, then re-grade instantly (no OCR re-run).
+            </span>
+          </div>
           <p style={{ color: "#64748b", fontSize: 12, marginTop: 12 }}>
-            Marks are produced by the trained model (XGBoost), never by an LLM. Low-confidence
-            answers (⚑) are flagged for human verification.
+            Marks come from the trained model (XGBoost), never an LLM. Highlighted rows have low OCR
+            confidence (⚑) — verify and correct them before publishing.
           </p>
         </>
       )}
