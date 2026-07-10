@@ -29,11 +29,7 @@ type Sheet = {
   answers: Answer[];
 };
 
-const C = {
-  card: { background: "#1e293b", borderRadius: 12, padding: 20, border: "1px solid #334155" } as React.CSSProperties,
-  th: { textAlign: "left", padding: "8px 10px", color: "#94a3b8", fontSize: 13, borderBottom: "1px solid #334155" } as React.CSSProperties,
-  td: { padding: "8px 10px", borderBottom: "1px solid #24324a", verticalAlign: "top" } as React.CSSProperties,
-};
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -52,19 +48,43 @@ export default function Home() {
     setEdits(Object.fromEntries(s.answers.map((a) => [a.question_no, a.student_answer])));
   }
 
+  useEffect(() => {
+    if (loading) {
+      setElapsed(0);
+      timer.current = setInterval(() => setElapsed((s) => +(s + 0.1).toFixed(1)), 100);
+    } else if (timer.current) clearInterval(timer.current);
+    return () => timer.current && clearInterval(timer.current);
+  }, [loading]);
+
+  async function grade() {
+    if (!file) return;
+    setLoading(true); setError(""); setSheet(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("max_marks", "2");
+      if (keyFile) fd.append("answer_key", keyFile);
+      if (qpFile) fd.append("question_paper", qpFile);
+      const res = await fetch(`${API}/api/v1/grade`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`);
+      applySheet(await res.json());
+    } catch (e: any) {
+      setError(e.message || "Grading failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function regrade() {
     if (!sheet) return;
     setRegrading(true); setError("");
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const body = {
         script_id: sheet.script_id + " (corrected)",
         answers: sheet.answers.map((a) => ({
-          question_no: a.question_no,
-          type: a.type,
+          question_no: a.question_no, type: a.type,
           student_answer: edits[a.question_no] ?? a.student_answer,
-          answer_key: a.answer_key,
-          max_marks: a.max_marks,
+          answer_key: a.answer_key, max_marks: a.max_marks,
         })),
       };
       const res = await fetch(`${API}/api/v1/rescore`, {
@@ -79,184 +99,140 @@ export default function Home() {
     }
   }
 
-  // live seconds counter while grading
-  useEffect(() => {
-    if (loading) {
-      setElapsed(0);
-      timer.current = setInterval(() => setElapsed((s) => +(s + 0.1).toFixed(1)), 100);
-    } else if (timer.current) {
-      clearInterval(timer.current);
-    }
-    return () => timer.current && clearInterval(timer.current);
-  }, [loading]);
-
-  async function grade() {
-    if (!file) return;
-    setLoading(true); setError(""); setSheet(null);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("max_marks", "2");
-      if (keyFile) fd.append("answer_key", keyFile);
-      if (qpFile) fd.append("question_paper", qpFile);
-      // Call the backend directly (CORS-enabled); avoids the Next dev-proxy timeout on ~40s grading.
-      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${API}/api/v1/grade`, { method: "POST", body: fd });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `HTTP ${res.status}`);
-      applySheet(await res.json());
-    } catch (e: any) {
-      setError(e.message || "Grading failed");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const pctColor = (p: number) => (p >= 75 ? "var(--success)" : p >= 40 ? "var(--warn)" : "var(--danger)");
 
   return (
-    <main style={{ maxWidth: 960, margin: "0 auto", padding: "40px 20px" }}>
-      <h1 style={{ fontSize: 28, marginBottom: 4 }}>🛡️ ExamShield</h1>
-      <p style={{ color: "#94a3b8", marginTop: 0 }}>
-        Upload a handwritten answer script (PDF). The AI reads it, matches each answer to the key,
-        and the trained model assigns marks.
-      </p>
-
-      <div style={{ ...C.card, marginBottom: 24 }}>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
-            Student answer script (PDF) *
-          </label>
-          <input type="file" accept="application/pdf"
-                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                 style={{ color: "#e2e8f0" }} />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
-            Answer key (optional CSV: Question_Number,Type,Correct_Answer) — uses the default exam key if omitted
-          </label>
-          <input type="file" accept=".txt,.csv"
-                 onChange={(e) => setKeyFile(e.target.files?.[0] || null)}
-                 style={{ color: "#e2e8f0" }} />
-          {keyFile && <span style={{ marginLeft: 10, color: "#34d399", fontSize: 13 }}>✓ {keyFile.name}</span>}
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
-            Question paper (optional) — the model reads per-question marks from it (e.g. "(2 Marks Each)", "[8]")
-          </label>
-          <input type="file" accept=".txt,.csv"
-                 onChange={(e) => setQpFile(e.target.files?.[0] || null)}
-                 style={{ color: "#e2e8f0" }} />
-          {qpFile && <span style={{ marginLeft: 10, color: "#34d399", fontSize: 13 }}>✓ {qpFile.name}</span>}
-        </div>
-        <button onClick={grade} disabled={!file || loading}
-                style={{ padding: "9px 20px", borderRadius: 8, border: "none",
-                         background: loading ? "#475569" : "#3b82f6", color: "#fff",
-                         cursor: file && !loading ? "pointer" : "not-allowed", fontWeight: 600 }}>
-          {loading ? `⏱ Grading… ${elapsed.toFixed(1)}s` : "Grade script"}
-        </button>
-        {loading && <span style={{ marginLeft: 12, color: "#94a3b8", fontSize: 13 }}>
-          reading handwriting + scoring — usually 30–45s
-        </span>}
-      </div>
-
-      {error && <div style={{ ...C.card, borderColor: "#ef4444", color: "#fca5a5", marginBottom: 24 }}>⚠️ {error}</div>}
-
-      {sheet && (
-        <>
-          <div style={{ ...C.card, marginBottom: 20, display: "flex", gap: 32, alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>Script</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.script_id}</div>
-            </div>
-            {sheet.mcq_max > 0 && (
-              <div>
-                <div style={{ fontSize: 13, color: "#94a3b8" }}>MCQs</div>
-                <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.mcq_marks} / {sheet.mcq_max}</div>
-              </div>
-            )}
-            <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>Descriptive</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.descriptive_marks} / {sheet.descriptive_max}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>Total</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.total_marks} / {sheet.max_total}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 13, color: "#94a3b8" }}>Percentage</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: "#34d399" }}>{sheet.percentage}%</div>
-            </div>
-            {sheet.elapsed_seconds != null && (
-              <div>
-                <div style={{ fontSize: 13, color: "#94a3b8" }}>⏱ Time</div>
-                <div style={{ fontSize: 20, fontWeight: 700 }}>{sheet.elapsed_seconds}s</div>
-              </div>
-            )}
-            {sheet.low_confidence_count > 0 && (
-              <div style={{ color: "#fbbf24" }}>⚑ {sheet.low_confidence_count} low-confidence — verify</div>
-            )}
+    <>
+      <nav className="navbar">
+        <div className="navbar-inner">
+          <div className="brand">
+            <span className="brand-badge">🛡️</span>
+            ExamShield <span className="brand-sub">AI Answer-Sheet Evaluator</span>
           </div>
+          <span className="nav-pill">● Offline · No LLM grading</span>
+        </div>
+      </nav>
 
-          <div style={{ ...C.card, overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-              <thead>
-                <tr>
-                  <th style={C.th}>Q</th><th style={C.th}>Mark</th><th style={C.th}>OCR&nbsp;conf.</th>
-                  <th style={C.th}>Extracted answer — edit to correct</th><th style={C.th}>Correct answer (key)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sheet.answers.map((a) => (
-                  <tr key={a.question_no} style={a.low_confidence ? { background: "#2a2416" } : undefined}>
-                    <td style={C.td}><b>Q{a.question_no}</b></td>
-                    <td style={{ ...C.td, whiteSpace: "nowrap", fontWeight: 700 }}>{a.predicted_mark}/{a.max_marks}</td>
-                    <td style={{ ...C.td, color: a.low_confidence ? "#fbbf24" : "#94a3b8", whiteSpace: "nowrap" }}>
-                      {(a.ocr_confidence * 100).toFixed(0)}%{a.low_confidence && " ⚑"}
-                    </td>
-                    <td style={{ ...C.td, maxWidth: 340 }}>
-                      {a.type === "mcq" ? (
-                        <select
-                          value={edits[a.question_no] ?? a.student_answer}
-                          onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
-                          style={{ background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155",
-                                   borderRadius: 6, padding: "5px 8px", fontSize: 14 }}>
-                          <option value="">—</option>
-                          {["A", "B", "C", "D"].map((o) => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      ) : (
-                        <textarea
-                          value={edits[a.question_no] ?? a.student_answer}
-                          onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}
-                          rows={2}
-                          style={{ width: "100%", background: "#0f172a", color: "#e2e8f0",
-                                   border: "1px solid #334155", borderRadius: 6, padding: 6,
-                                   fontSize: 13, fontFamily: "inherit", resize: "vertical" }} />
-                      )}
-                    </td>
-                    <td style={{ ...C.td, color: "#86efac", maxWidth: 300 }}>
-                      {a.type === "mcq" ? <b>{a.answer_key}</b> : a.answer_key}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="container">
+        <p className="lead">
+          Upload a handwritten answer script and its question paper &amp; answer key. The AI reads the
+          handwriting, matches each answer to the key, and a trained model assigns the marks.
+        </p>
+
+        {/* Upload panel */}
+        <div className="card card-pad" style={{ marginBottom: 24 }}>
+          <h2 className="section-title">1 · Upload</h2>
+          <div className="field">
+            <label>Student answer script <span className="req">(PDF, required)</span></label>
+            <input className="file" type="file" accept="application/pdf"
+              onChange={(e) => setFile(e.target.files?.[0] || null)} />
+            {file && <span className="chip-ok">✓ {file.name}</span>}
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14 }}>
-            <button onClick={regrade} disabled={regrading}
-                    style={{ padding: "9px 20px", borderRadius: 8, border: "none",
-                             background: regrading ? "#475569" : "#16a34a", color: "#fff",
-                             cursor: regrading ? "not-allowed" : "pointer", fontWeight: 600 }}>
-              {regrading ? "Re-grading…" : "✎ Re-grade with my corrections"}
+          <div className="field">
+            <label>Answer key <span className="hint">— .txt or .csv (optional; uses default if omitted)</span></label>
+            <input className="file" type="file" accept=".txt,.csv"
+              onChange={(e) => setKeyFile(e.target.files?.[0] || null)} />
+            {keyFile && <span className="chip-ok">✓ {keyFile.name}</span>}
+          </div>
+          <div className="field">
+            <label>Question paper <span className="hint">— .txt (optional; sets per-question max marks)</span></label>
+            <input className="file" type="file" accept=".txt,.csv"
+              onChange={(e) => setQpFile(e.target.files?.[0] || null)} />
+            {qpFile && <span className="chip-ok">✓ {qpFile.name}</span>}
+          </div>
+          <div className="btn-row">
+            <button className="btn btn-primary" onClick={grade} disabled={!file || loading}>
+              {loading ? `⏱ Grading… ${elapsed.toFixed(1)}s` : "Grade script"}
             </button>
-            <span style={{ color: "#64748b", fontSize: 12 }}>
-              Fix any mis-read answer above, then re-grade instantly (no OCR re-run).
-            </span>
+            {loading && <span className="muted-note">reading handwriting + scoring — usually 30–45s</span>}
           </div>
-          <p style={{ color: "#64748b", fontSize: 12, marginTop: 12 }}>
-            Marks come from the trained model (XGBoost), never an LLM. Highlighted rows have low OCR
-            confidence (⚑) — verify and correct them before publishing.
-          </p>
-        </>
-      )}
-    </main>
+        </div>
+
+        {error && <div className="alert alert-error">⚠️ {error}</div>}
+
+        {sheet && (
+          <>
+            <h2 className="section-title">2 · Result — {sheet.script_id}</h2>
+            <div className="stats" style={{ marginBottom: 20 }}>
+              <div className="stat hi">
+                <div className="k">Percentage</div>
+                <div className="v" style={{ color: pctColor(sheet.percentage) }}>{sheet.percentage}%</div>
+              </div>
+              <div className="stat">
+                <div className="k">Total marks</div>
+                <div className="v">{sheet.total_marks}<span className="of" style={{ color: "var(--faint)", fontWeight: 500 }}> / {sheet.max_total}</span></div>
+              </div>
+              {sheet.mcq_max > 0 && (
+                <div className="stat"><div className="k">MCQs</div><div className="v small">{sheet.mcq_marks} / {sheet.mcq_max}</div></div>
+              )}
+              <div className="stat"><div className="k">Descriptive</div><div className="v small">{sheet.descriptive_marks} / {sheet.descriptive_max}</div></div>
+              {sheet.elapsed_seconds != null && (
+                <div className="stat"><div className="k">⏱ Time</div><div className="v small">{sheet.elapsed_seconds}s</div></div>
+              )}
+            </div>
+
+            {sheet.low_confidence_count > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <span className="alert-warn">⚑ {sheet.low_confidence_count} low-confidence answer(s) — verify &amp; correct below</span>
+              </div>
+            )}
+
+            <div className="card">
+              <div className="table-wrap">
+                <table className="grades">
+                  <thead>
+                    <tr>
+                      <th>Q</th><th>Mark</th><th>OCR conf.</th>
+                      <th>Extracted answer — edit to correct</th><th>Correct answer (key)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sheet.answers.map((a) => (
+                      <tr key={a.question_no} className={a.low_confidence ? "warn" : ""}>
+                        <td>
+                          <div className="qno">Q{a.question_no}</div>
+                          <span className={`qtype ${a.type}`}>{a.type === "mcq" ? "MCQ" : "Written"}</span>
+                        </td>
+                        <td>
+                          <div className="mark">{a.predicted_mark}<span className="of"> / {a.max_marks}</span></div>
+                          <div className="meter"><i style={{ width: `${Math.round((a.predicted_mark / a.max_marks) * 100)}%`, background: pctColor((a.predicted_mark / a.max_marks) * 100) }} /></div>
+                        </td>
+                        <td className={`conf ${a.low_confidence ? "low" : ""}`}>
+                          {(a.ocr_confidence * 100).toFixed(0)}%{a.low_confidence && " ⚑"}
+                        </td>
+                        <td style={{ minWidth: 280 }}>
+                          {a.type === "mcq" ? (
+                            <select className="inp" value={edits[a.question_no] ?? a.student_answer}
+                              onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))}>
+                              <option value="">—</option>
+                              {["A", "B", "C", "D"].map((o) => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                          ) : (
+                            <textarea className="inp" rows={3} value={edits[a.question_no] ?? a.student_answer}
+                              onChange={(e) => setEdits((p) => ({ ...p, [a.question_no]: e.target.value }))} />
+                          )}
+                        </td>
+                        <td className={`keytext ${a.type}`} style={{ minWidth: 240, maxWidth: 340 }}>{a.answer_key}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="btn-row">
+              <button className="btn btn-success" onClick={regrade} disabled={regrading}>
+                {regrading ? "Re-grading…" : "✎ Re-grade with my corrections"}
+              </button>
+              <span className="muted-note">Fix any mis-read answer above, then re-grade instantly (no OCR re-run).</span>
+            </div>
+            <p className="footnote">
+              Marks come from the trained model (XGBoost) — never an LLM. Amber rows have low OCR
+              confidence; verify and correct them before publishing.
+            </p>
+          </>
+        )}
+      </div>
+    </>
   );
 }
