@@ -10,7 +10,7 @@
 Although ExamShield runs locally, the FastAPI backend must be secured to prevent unauthorized access from other devices on the same local network (e.g., college Wi-Fi).
 
 ```
-[ Local Streamlit Dashboard UI ]
+[ Local Next.js Dashboard UI ]
         │
         ▼ (Restricted loopback connection: localhost / 127.0.0.1)
 [ Local FastAPI server (port 8000) ]

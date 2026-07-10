@@ -1,182 +1,128 @@
 # 🛡️ ExamShield: Judge Pitch & Project Documentation Guide
-> **Project Pitch:** *"Upload a batch of answer scripts. ExamShield finds the copying no human can catch, verifies every total, and highlights the evidence a grader needs—in minutes, not weeks."*
+> **Project Pitch:** *"Train ExamShield on a few previously corrected answer sheets, and it grades new handwritten scripts the way your teachers do — question-wise marks, feedback, and a percentage, in minutes."*
+
+**Track:** 02 — Predictive Analytics (ML / DL)
 
 ---
 
 ## 🎯 1. The 30-Second Elevator Pitch
-**Every semester, universities evaluate hundreds of thousands of handwritten answer booklets manually.** This process is slow, error-prone, and highly vulnerable to student collusion. 
+**Every semester, universities evaluate hundreds of thousands of handwritten answer booklets manually** — slow, inconsistent, and subjective. Different evaluators award different marks for the same answer; nothing captures *how teachers grade* so it can be reused.
 
-**ExamShield** is a fully local, CV-powered verification assistant for **Controllers of Examinations (CoE)** and exam-cell staff. Instead of replacing graders, it operates under a strict philosophy: **"Rank and flag evidence; never accuse, never finalize; the human decides."**
+**ExamShield** learns marking behaviour from previously corrected scripts and then **automatically evaluates** new handwritten scripts. It works in two phases:
 
-By processing scanned scripts offline, it:
-1. **Automates arithmetic audits** (checking page marks sum vs. written totals).
-2. **Constructs collusion networks** (mapping out student copying pairs via sentence similarity).
-3. **Validates roster compliance** (catching duplicates, unregistered IDs, and absentees).
-4. **Preemptively reviews borderline grades** (catching grade-dispute candidates before publication).
+1. **Phase 1 — Train:** on historical answers + teacher-awarded marks + answer keys + rubrics, we train a **mark-predictor** model.
+2. **Phase 2 — Evaluate:** OCR a new script → detect each question → measure semantic similarity to the answer key → the trained model assigns **percentage-based marks** → generate feedback and deduction reasons → a fully evaluated sheet.
 
-All of this runs **100% locally and offline** on standard college hardware, ensuring absolute data privacy and zero cloud hosting costs.
+All **100% local and offline**. **The mark is the trained model's prediction — never an LLM's** (Track 02 prohibits LLM-generated predictions).
 
 ---
 
 ## 🛑 2. The Problem Space (Legacy vs. ExamShield)
 
-| Legacy Manual Workflow | 🛡️ ExamShield Automated Audit | Impact Metric |
+| Legacy Manual Workflow | 🛡️ ExamShield Auto-Evaluator | Impact |
 | :--- | :--- | :--- |
-| **Collusion Checking: 0% Coverage**<br>Graders evaluate booklets sequentially. A grader checking script #12 cannot remember script #200. Cross-comparing 300 scripts requires **44,850 pairwise reviews**—impossible for humans. | **Collusion Checking: 100% Coverage**<br>The system automatically digitizes text and calculates pairwise cosine similarity of the entire batch in seconds. | **0% → 100%** detection capability of copying networks. |
-| **Summation Auditing: Manual & Slow**<br>Administrative staff manually re-verify math addition on every script cover page, causing arithmetic slips and grading fatigue errors. | **Summation Auditing: Instant & Absolute**<br>Digit OCR reads marks grid values, computes the math, and matches it with the overall written total, routing mismatches to review. | **Days → Seconds** of administrative verification overhead. |
-| **Disputed Grade Resolution: Post-Publication**<br>Students who score 39/100 (where 40 is pass) find out *after* grades are posted, filing expensive, slow retroactive revaluation disputes. | **Disputed Grade Resolution: Preemptive Triage**<br>The system flags borderline scripts near grade boundaries and queues them for an automated check *before* publication. | **~80% reduction** in post-publication grade disputes. |
-| **Roster Matches: Manual Input Errors**<br>Administrative data-entry typing mistakes result in grades being attributed to the wrong student IDs. | **Roster Matches: Automated Database Lookup**<br>Roll numbers are read via digit OCR and checked against register rosters to flag mismatches or duplicate papers instantly. | **Zero** grade assignment mix-ups. |
+| **Inconsistent marking** — different evaluators/fatigue give different marks for equivalent answers. | Every answer scored by the **same trained model** learned from real teacher marking. | One consistent standard; measurable ±1-mark agreement. |
+| **Slow** — a batch takes an office days. | OCR → segment → score → feedback in minutes. | **Days → minutes.** |
+| **Opaque marks** — a bare number breeds revaluation disputes. | Every mark ships with feedback + explicit deduction reasons. | Fewer disputes; transparent grading. |
+| **No institutional memory** — rubric knowledge lives in heads. | The trained model captures marking behaviour and reuses it. | Train once, grade every exam. |
 
 ---
 
-## 🏗️ 3. System Architecture & Ingestion Spine
-All engines hang off **one single sequential pipeline**. Graders scan scripts, calibrate layout grids once, and the backend handles the heavy lifting.
+## 🏗️ 3. System Architecture (two phases)
 
 ```mermaid
 graph TD
-    A["📄 Scanned Answer Scripts (PDF/Images)"] --> B["⚙️ Ingestion Spine: Deskew / Denoise / Binarize (OpenCV)"]
-    B --> C["📐 Layout Calibration Canvas: Define bounding boxes for marks/roll-no/prose"]
-    C --> D["👁️ Dual-Tier local OCR (PaddleOCR - CPU)"]
-    
-    D --> E1["🔢 Digit OCR Box: MarkSafe Engine"]
-    D --> E2["✍️ Prose OCR Box: CopyCatch Engine"]
-    D --> E3["👤 Digit Roll-No Box: ScriptID Engine"]
-    D --> E4["📐 Attempted/Blank CV: BlankCheck Engine"]
-    
-    E1 --> F["💾 SQLite Database / Local JSON Store"]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-    
-    F --> G["💻 Interactive Streamlit Dashboard (Review Queue, PyVis Copying Graphs, Bounding-Box Crops)"]
-    G --> H["👤 Human Auditor (Final Override/Approval)"]
+    subgraph P1["Phase 1 — Training"]
+      H["📚 Historical corrected scripts + teacher marks + keys + rubrics"] --> DB["dataset_builder"]
+      DB --> FE["features (similarity, coverage, …)"] --> TR["trainer (XGBoost, tuned)"]
+      TR --> EV["evaluate: RMSE / MAE / R² / ±1-mark accuracy"]
+      TR --> M[("mark_predictor.pkl")]
+    end
+    subgraph P2["Phase 2 — Evaluation"]
+      A["📄 Scanned scripts"] --> B["ingestion: deskew/binarize"]
+      B --> C["handwriting OCR (+confidence)"]
+      C --> D["segment questions + match answer key"]
+      D --> S["similarity + concept coverage"]
+      S --> Q["scorer: trained model → marks"]
+      M --> Q
+      Q --> FB["feedback + deduction reasons"]
+      FB --> R["evaluated sheet: marks, total, %"]
+    end
 ```
 
 ---
 
-## ⚙️ 4. The Six Core Verification Engines
+## ⚙️ 4. The Pipeline Stages
 
-### 1️⃣ MarkSafe (The Trust Layer)
-*   **Role:** Verifies numerical correctness of question-by-question marks and totals.
-*   **Core CV/AI Tech:** Target-zone digit OCR + ink-presence checking.
-*   **Logic:**
-    *   Uses Regex rules to match standard numbers (`^\d+$`), decimals (`^\d+\.\d+$`), fractions (`^\d+/10$`), and evaluable addition formats (`^\d+(\+\d+)+$` for sub-questions like `4+3.5`).
-    *   **The Strikeout/Ambiguity Heuristic:** If a grader crosses out a grade (e.g., changes `~~5~~` to `8`), OCR confidence drops. If PaddleOCR confidence falls below **`0.85`**, the token is flagged as `AMBIGUOUS_MARK`.
-    *   **Mismatch Flags:** If the sum of extracted question marks does not equal the written total, the script is flagged with `SUM_MISMATCH`.
-    *   **Evidence View:** Coordinates-based image crops of the cover sheet marks grid are displayed side-by-side with the parsed values. **A wrong guess is impossible; the engine raises a review flag instead of guessing.**
+### 1️⃣ Phase-1 Training (the core innovation)
+- **dataset_builder** pairs each historical answer with its key + the teacher's mark (label).
+- **features** engineers: semantic similarity (MiniLM cosine), concept coverage, keyword recall,
+  missing/extra points, length ratio, negation cues. *The same function runs at inference — no skew.*
+- **trainer** fits + tunes an **XGBoost regressor** (feature importance for the bonus tag).
+- **evaluate** reports **RMSE, MAE, R², and accuracy within ±1 mark** vs teacher marks on a held-out split.
 
-### 2️⃣ CopyCatch (The Headline Collusion Mapper)
-*   **Role:** Identifies student copying networks across the entire batch.
-*   **Core CV/AI Tech:** Fuzzy Prose OCR + `all-MiniLM-L6-v2` Sentence Embeddings (~80MB model) + PyVis Force-Directed Nodes.
-*   **The Mathematical Secret (Class-Baseline Anomaly Ranking):**
-    If students $A$ and $B$ write a similar answer, the raw cosine similarity might be high. However, if the *entire class* scored high similarity because they copied a textbook definition or a blackboard formula, that is normal.
-    To filter out class-wide noise and catch authentic collusion, CopyCatch calculates a pairwise z-score against the class mean:
-    
-    $$Z_{A,B} = \frac{\text{Similarity}(A,B) - \mu_{\text{class}}}{\sigma_{\text{class}}}$$
-    
-    *   $\mu_{\text{class}}$: Mean similarity of all student pairs.
-    *   $\sigma_{\text{class}}$: Standard deviation of similarity across the cohort.
-    *   An edge is created in the collusion graph only if the z-score $Z_{A,B} \geq 3.0$ (deviating significantly from the class baseline).
-*   **Seating Chart Weighting:** If seating coordinate maps are provided, weights are scaled to prioritize physically adjacent students:
-    
-    $$\text{Weight}_{\text{final}} = Z_{A,B} \times (1.0 + \text{Seating\_Proximity}(A, B))$$
+### 2️⃣ Handwriting OCR + Segmentation
+- Local handwriting OCR (TrOCR/PaddleOCR) reads answers + confidence; unreadable answers are flagged.
+- The script is split into questions; each answer is matched to its answer key + rubric + max marks.
 
-*   **Interactive Render:** Displayed as a NetworkX cluster mapped onto an interactive PyVis canvas. Clicking a linked edge shows physical answer-sheet image crops side-by-side.
+### 3️⃣ Semantic Similarity & Concept Coverage
+- Embed answer vs key (all-MiniLM-L6-v2) → similarity + covered/missing key-points.
+- Optional NLI cross-encoder catches **negation** ("is not exothermic" → contradiction, not coverage).
 
-### 3️⃣ ScriptID (Roster Registry Validator)
-*   **Role:** Verifies student identity boxes to prevent roster mix-ups.
-*   **Core CV/AI Tech:** Digit OCR + pandas registration validation.
-*   **Logic:**
-    *   Scans the student Roll Number/ID box.
-    *   Checks against the official class registration CSV.
-    *   **DUPLICATE_ID:** Flags if two different scanned booklets claim the same roll number.
-    *   **UNREGISTERED_ID:** Flags if the roll number doesn't exist on the official roster (allowing auditors to look at the handwriting crop and see if `0` was read as `D` or `O`).
-    *   **ABSENTEE_WITH_SCRIPT:** Flags if the registration CSV lists the student as absent but a script was scanned.
+### 4️⃣ Scorer (assigns the marks)
+- Builds the feature vector, runs the **trained model**, applies percentage bands (90–100%→full, …),
+  clamps to `[0, max]`. **The mark comes from the model, never an LLM.**
 
-### 4️⃣ ReEval Guard (Borderline Queue Optimizer)
-*   **Role:** Selects and prioritizes scripts sitting on the cusp of grade boundaries.
-*   **Core CV/AI Tech:** Pure python logic overlay.
-*   **Logic:**
-    *   Matches final totals against boundary definitions (e.g., passing score = `40.0`, grade A boundary = `80.0`).
-    *   If a total score is within a configurable margin (e.g., `-1.0` or `-1.5` marks from a boundary, like `39.0` or `78.5`), the script is flagged as `BORDERLINE`.
-    *   Renders a specialized "Borderline Review Tab" sorting scripts by their proximity to the boundary (highest priority first), helping moderators double-check calculation pages before grades are published.
-
-### 5️⃣ BlankCheck (Page Integrity Check)
-*   **Role:** Pre-grading page count and workload triage.
-*   **Core CV/AI Tech:** OpenCV pixel profile density analysis.
-*   **Logic:**
-    *   Scans page backgrounds to verify the physical page count against standard templates.
-    *   Evaluates ink strokes on answer boxes: if a page contains no pen ink above a noise threshold, it is automatically marked as `BLANK_PAGE`, verifying attempted vs. unattempted questions to eliminate "lost supplement sheets" student complaints.
-
-### 6️⃣ RubricLens (Semantic Grading Assistant - Stretch Feature)
-*   **Role:** Assists evaluators by highlighting where specific rubric keys are addressed in an answer.
-*   **Core CV/AI Tech:** Local sentence retrieval + `cross-encoder/nli-deberta-v3-xsmall` classification.
-*   **Logic:**
-    *   Evaluates extracted student paragraphs against the official grading rubric guidelines.
-    *   Outputs Natural Language Inference labels:
-        *   **Entailment (Green Highlight):** Student text semantically aligns with the grading guideline.
-        *   **Contradiction (Red Highlight):** Student text contradicts the guideline (e.g., student writes *"releases energy"* when the rubric requires *"absorbs energy"*).
-    *   **Strict Boundary:** **The engine never assigns marks.** It only highlights evidence to support the evaluator's speed.
+### 5️⃣ Feedback & Report
+- Feedback + deduction reasons from the coverage breakdown; assembles question-wise marks, total,
+  percentage. Low-confidence answers flagged for human verification before publishing.
 
 ---
 
-## 🛠️ 5. Technical Stack & Local-Execution Justifications
-To operate in secure, restricted university exam cells, ExamShield is built with **zero external cloud API calls, zero commercial software, and zero high-end GPU needs**.
+## 🛠️ 5. Technical Stack (offline, CPU, no LLM in the grading path)
 
-*   **Language:** Python 3.11
-*   **Computer Vision Spine:** OpenCV (`opencv-python`) + `pypdfium2` (PDF rasterization).
-*   **OCR Engine:** **PaddleOCR** (local CNN-based text detector and recognizer). It is fully offline, runs extremely fast on basic CPUs, and provides confidence scores per bounding box.
-*   **NLP Models:** `sentence-transformers` (`all-MiniLM-L6-v2` - ~80MB, for fast cosine similarity matrices) and `cross-encoder/nli-deberta-v3-xsmall` (NLI cross-encoder for RubricLens).
-*   **Graph Mathematics:** NetworkX for structural graph grouping and PyVis (`vis.js` script) for rendering interactive HTML canvas nodes directly inside the dashboard.
-*   **Backend & frontend UI:** FastAPI (async REST endpoints) connected to a Streamlit Dashboard interface.
-*   **Database:** Local thread-safe SQLite file + JSON templates.
+- **Language:** Python 3.11 · **Backend:** FastAPI + Uvicorn.
+- **Image prep:** OpenCV + pypdfium2. **Handwriting OCR:** TrOCR handwritten / PaddleOCR (local).
+- **Semantic similarity:** `sentence-transformers` `all-MiniLM-L6-v2` (~80 MB, CPU).
+- **Mark-predictor (trained):** **XGBoost** regressor (fallback RandomForest / sklearn MLP) + joblib.
+- **Data/features:** NumPy, pandas, scikit-learn, rapidfuzz.
+- **Storage:** local SQLite + JSON. **Frontend:** Next.js 14 + React + TypeScript + Recharts.
 
 ---
 
-## 🎬 6. Interactive Live Demo Scenario (Hooking the Judges)
-To win the track, the demo must be interactive, personal, and bulletproof.
+## 🎬 6. Live Demo Scenario
 
-1. **THE HOOK (30s):**
-   *"Judges, an evaluator grading 300 booklets sequentially will never remember on script #200 what was written on script #12. We let our CV pipeline do the checking."*
-2. **THE LIVE SCENARIO (Judges are the data!):**
-   * Four judges write a short answer on physical sheets.
-   * Two judges are secretly instructed to copy each other's prose.
-   * The team takes photos of the sheets, uploading them live.
-3. **THE GRAPH CLUSTER:**
-   * CopyCatch runs live pre-processing, OCR, and vector embeddings.
-   * The collusion graph updates on-screen.
-   * The nodes representing the two copying judges light up, linked by a red edge. Clicking the edge shows their handwriting side-by-side.
-4. **THE TRUST VERIFICATION (MarkSafe Showcase):**
-   * The team loads the pre-configured 35-script demo corpus.
-   * MarkSafe instantly highlights three planted cover-sheet totaling errors and a low-confidence scribble marked "AMBIGUOUS — Human Review Required."
-   * Show the judges: *"No guessing. The human checks the crop and overrides."*
-5. **RAPID FIRE UTILITY:**
-   * ReEval Guard shows the 39/100 borderline sheets pre-checked.
-   * ScriptID flags the student who was marked absent on the CSV list but mysteriously had a booklet scanned in.
+1. **THE HOOK (30s):** *"Two evaluators grade the same answer and give different marks. We trained a model on how your teachers actually grade — and it applies that standard to every script, consistently."*
+2. **TRAINING PROOF:** show the **Training** dashboard — a model trained on the historical corpus with **RMSE and ±1-mark accuracy** vs teacher marks, plus feature importance.
+3. **LIVE GRADING (judges are the data):** a judge handwrites an answer; photograph + upload with the answer key; run Phase 2 live.
+4. **THE EVALUATED SHEET:** question-wise marks, total, percentage, and per-answer feedback + deduction reasons appear on screen.
+5. **AGREEMENT + HONESTY:** compare a couple of predicted marks to a teacher's; show an unreadable answer flagged *"low confidence — verify"*. *"The mark is our trained model's prediction — never an LLM's."*
 
 ---
 
-## 🛡️ 7. Q&A Defense Playbook (Beating Tough Judge Questions)
+## 🛡️ 7. Q&A Defense Playbook
 
-#### 💬 Q1: "OCR on handwriting is famously noisy. How do you trust the grades you output?"
-> **Answer:** *"We don't. We have built a two-tier verification process: the machine only ranks anomalies, and the human auditor confirms. More importantly, we do not guess on ambiguous fields. If a grader's handwriting is scribbled or crossed out, or if the OCR confidence score falls below 85%, MarkSafe flags the region as `AMBIGUOUS` and pulls up the direct cover sheet crop for the auditor. We do not make automated grading decisions; we eliminate clerical errors."*
+#### 💬 Q1: "Isn't this just prompting GPT to grade? That's banned in Track 02."
+> *"No. The mark is produced by an **XGBoost regressor** we train on historical teacher marks. We can show you its RMSE and ±1-mark accuracy on held-out data. No LLM is in the grading path — at most an LLM phrases feedback text, never the mark."*
 
-#### 💬 Q2: "Pairwise text comparison is $O(N^2)$. How does this scale for 10,000 students?"
-> **Answer:** *"While matching words takes a long time, comparing dense vectors is incredibly fast. We run prose OCR once per script and save the 384-dimensional vector embeddings. Computing the pairwise cosine similarities for 1,000 scripts ($1000 \times 1000 = 1,000,000$ operations) on a standard CPU takes less than 1.5 seconds. For larger counts, we use NumPy vector matrix multiplications, keeping it well within standard processing limits."*
+#### 💬 Q2: "Handwriting OCR is noisy — how do you trust the marks?"
+> *"Scoring uses **semantic similarity**, which tolerates OCR wobble because it compares meaning, not exact characters. And if an answer's OCR confidence is too low, we flag it `low_confidence` for human verification before publishing — we never silently guess."*
 
-#### 💬 Q3: "What if two students write similar answers because they are answering the same question or memorized the same slide?"
-> **Answer:** *"This is why we created **Class-Baseline Anomaly Ranking**. If everyone writes a similar paragraph because it's a standard textbook definition, the class-wide similarity average ($\mu_{\text{class}}$) goes up. CopyCatch normalizes the similarity score into a z-score against this class baseline. An edge is only created in the collusion graph if two students match *significantly more* than the rest of the class, effectively auto-discounting standard lecture formulas."*
+#### 💬 Q3: "Two students phrase a correct answer differently — do they get the same mark?"
+> *"Yes — we use sentence embeddings, not keyword matching, so differently-worded correct answers score similarly. Concept coverage checks rubric points, and NLI catches negation so a contradiction isn't counted as coverage."*
 
-#### 💬 Q4: "Why not use cloud LLMs like GPT-4o for handwriting recognition and evaluation?"
-> **Answer:** *"Three reasons: Privacy, Cost, and Track Rules. First, university examinations contain sensitive student data that cannot be sent to third-party cloud APIs. Second, calling cloud models for thousands of multi-page scripts is financially unsustainable. Third, our local CV model (PaddleOCR) runs entirely offline on standard CPUs and gives us precise bounding box coordinates and token confidence scores, which black-box cloud APIs do not provide."*
+#### 💬 Q4: "What if you don't have historical teacher-marked data to train on?"
+> *"Phase 2 runs on an **unsupervised similarity-to-key baseline** (map similarity % → marks). The trained model is the upgrade once labeled data exists — and it's what makes the grading match *your* teachers' standard."*
+
+#### 💬 Q5: "How is this measurable (the Track-02 evaluation requirement)?"
+> *"We report RMSE, MAE, R², and accuracy within ±1 mark of the teachers' marks on a held-out split — a real, numeric performance metric, not a vibe."*
 
 ---
 
-### 📝 Project File Map (For Quick Lookup during Demo)
-*   **Ingestion Pipeline Spine:** [`backend/app/pipeline/`](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/backend/app/pipeline/)
-*   **Calibration UI:** [`backend/app/calibration/`](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/backend/app/calibration/)
-*   **Evaluation Engines:** [`backend/app/engines/`](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/backend/app/engines/)
-*   **FastAPI Routes:** [`backend/app/api/routes/`](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/backend/app/api/routes/)
-*   **Streamlit Review Dashboard:** [`backend/app/services/`](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/backend/app/services/)
-*   **Comprehensive Project Setup:** [SETUP.md](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/SETUP.md)
-*   **Full Technical Specs:** [docs/](file:///c:/Users/aishw/OneDrive/Desktop/E-Shield/docs/)
+### 📝 Project File Map (for the demo)
+*   **Phase-1 Training:** [`backend/app/training/`](backend/app/training/)
+*   **Evaluation (scorer/feedback/report):** [`backend/app/evaluation/`](backend/app/evaluation/)
+*   **OCR + Segmentation:** [`backend/app/ocr/`](backend/app/ocr/), [`backend/app/segmentation/`](backend/app/segmentation/)
+*   **FastAPI Routes:** [`backend/app/api/routes/`](backend/app/api/routes/)
+*   **Dashboard:** [`frontend/src/app/`](frontend/src/app/)
+*   **Setup:** [SETUP.md](SETUP.md) · **Full specs:** [docs/](docs/)

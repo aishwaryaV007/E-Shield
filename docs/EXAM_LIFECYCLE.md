@@ -1,56 +1,61 @@
 # Exam Processing Lifecycle
-> Step-by-step workflow tracking physical answer booklet transitions, pipeline events, and state changes.
+> How a script moves from scan to evaluated sheet, plus the one-time training lifecycle.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Step-by-Step Lifecycle Workflow
-
-The processing lifecycle coordinates physical exam booklets and digital database records through six sequential stages:
+## 1. Training lifecycle (once per exam/subject, reused after)
 
 ```
-[ Step 1: Scan Booklets ] ──► [ Step 2: Binarize & Deskew ] ──► [ Step 3: Calibrate Zones ]
-                                                                        │
-                                                                        ▼
-[ Step 6: Export Grades ] ◄── [ Step 5: Human Resolution ] ◄── [ Step 4: Run OCR Engines ]
+[ Collect historical corrected scripts + teacher marks ] ──► [ Build labeled dataset ]
+        │                                                             │
+        ▼                                                             ▼
+[ Trained mark-predictor + metrics ] ◄── [ Train + evaluate ] ◄── [ Engineer features ]
+```
+
+## 2. Per-batch evaluation lifecycle
+
+```
+[ Step 1: Scan scripts + attach answer key ] ──► [ Step 2: Preprocess (deskew/binarize) ]
+                                                          │
+                                                          ▼
+[ Step 6: Publish results ] ◄── [ Step 5: Verify low-confidence ] ◄── [ Step 4: Score + feedback ]
+                                                          ▲
+                                                          │
+                                          [ Step 3: OCR + segment (question+key) ]
 ```
 
 ---
 
-## 2. Lifecycle Stages
+## 3. Stages
 
-### Step 1: Scanning & Ingestion
-*   **Physical Action:** The student booklet is collected and scanned by exam-cell staff.
-*   **System Action:** The system rasterizes the scanned PDF into page images at **300 DPI**, saves files to local storage, and initializes a batch run in SQLite.
+### Step 1 — Scan & attach key
+Scripts scanned to PDF/images; the question paper + answer key + rubric registered for the batch;
+a batch row created in SQLite.
 
-### Step 2: Pre-processing & Alignment
-*   **Physical Action:** None.
-*   **System Action:** OpenCV deskews text layout lines, filters paper grain noise, and binarizes the images using adaptive Gaussian thresholding. BlankCheck counts pages to flag missing inserts.
+### Step 2 — Preprocess
+OpenCV deskew/denoise/binarize; pages saved locally.
 
-### Step 3: Zone Calibration
-*   **Physical Action:** The administrator selects or creates a bounding-box template for the booklet format.
-*   **System Action:** The system crops the images into separate digit grids, roll number boxes, and answer prose zones.
+### Step 3 — OCR & segmentation
+Handwriting OCR (+confidence) reads answers; the script is split into questions and each answer is
+matched to its answer key + rubric + max marks.
 
-### Step 4: OCR & Engine Analysis
-*   **Physical Action:** None.
-*   **System Action:**
-    *   **Tier-1 OCR** reads the roll number and marks table digits, saving scores to SQLite.
-    *   **Tier-2 OCR** extracts answer text, vectorizes it, and calculates collusion graph connections.
-    *   **Engine checks** run and raise pending audit flags for mismatches or duplicate IDs.
+### Step 4 — Scoring & feedback
+Semantic similarity + concept coverage → feature vector → **trained model** predicts a mark
+(percentage bands); feedback + deduction reasons generated. *(Mark from the model, not an LLM.)*
 
-### Step 5: Manual Flag Resolution
-*   **Physical Action:** Graders and auditors review flagged scripts in the dashboard.
-*   **System Action:** Graders update values next to visual crops. User confirmations update flag statuses to `RESOLVED` and write finalized scores to SQLite.
+### Step 5 — Verification
+Low-confidence OCR answers are flagged for human verification before publishing.
 
-### Step 6: Grade Export & Archiving
-*   **Physical Action:** The CoE finalizes results.
-*   **System Action:** The system updates the batch status to `completed`, generates finalized grade lists, exports results to a CSV file, and archives the batch.
+### Step 6 — Publish & archive
+Evaluated sheets (question-wise marks, total, percentage, feedback) exported; batch marked
+`evaluated`; results released by the exam cell.
 
 ---
 
-## 3. Related Documents
+## 4. Related Documents
 
-*   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
-*   [In-Depth Architecture Spec](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ARCHITECTURE.md)
-*   [Product Features List](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/FEATURES.md)
+*   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
+*   [Architecture](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ARCHITECTURE.md)
+*   [Data Flow](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_FLOW.md)

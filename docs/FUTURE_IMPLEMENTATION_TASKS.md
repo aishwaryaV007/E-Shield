@@ -1,43 +1,45 @@
 # Future Implementation Backlog
-> Developer guide, task queue, and upcoming optimizations.
+> Task queue and upcoming optimizations for the auto-grader.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Developer Onboarding Guidelines
+## 1. Developer Guidelines
 
-This document tracks upcoming feature implementations, optimizations, and bug fixes for ExamShield. 
-
-When working on a new backlog task, please follow these guidelines:
-1.  **Isolate in Branches:** Create a descriptive branch (e.g., `backlog/export-pdf-report`).
-2.  **Maintain Offline Compatibility:** Ensure new features do not import cloud dependencies or require GPU resources.
-3.  **Preserve Fallback Rules:** Ensure that any OCR parser adjustments preserve the `AMBIGUOUS` flag fallback pattern. Grader grades must never be auto-corrected or overwritten without explicit human authorization.
+1. **Isolate in branches** (e.g., `backlog/csv-export`).
+2. **Stay offline & CPU-only** — no cloud deps, no GPU requirement.
+3. **Never let an LLM decide a mark** — the trained model in `evaluation/scorer.py` owns the mark;
+   preserve low-confidence flagging (never auto-trust unreadable answers).
+4. **Keep feature parity** — any change to `training/features.py` applies to both train and inference.
 
 ---
 
-## 2. Active Backlog Queue
+## 2. Backlog Queue
 
-### 1. Ingestion Subsystem Optimization
-- [ ] **Adaptive Binarization Tweak:** Improve binarization parameters to handle scans from phone cameras under varied lighting.
-- [ ] **Multi-format Importer:** Support raw image files (HEIC, JPEG, PNG) directly alongside PDFs in the ingestion folder.
+### Model & features
+- [ ] Per-question / per-subject models instead of one global regressor.
+- [ ] Add features: answer structure, numeric-answer exact match, ordered-steps coverage.
+- [ ] Hyperparameter search + published feature-importance report.
+- [ ] Active learning: teachers correct a few predictions → periodic retrain.
 
-### 2. OCR Subsystem Enhancements
-- [ ] **TrOCR Handwritten Model Integration:** Add an optional pipeline fallback to use the TrOCR handwritten model for low-confidence prose fields.
-- [ ] **Interactive Bounding Box Refinement:** Allow users to adjust bounding box alignments directly in the calibration tab if a scan is misaligned.
+### OCR & segmentation
+- [ ] Swap-in TrOCR handwritten for hard scripts; phone-camera-friendly preprocessing.
+- [ ] Robust question detection for varied answer-sheet layouts (no per-institution templates).
 
-### 3. Core Engine Tweaks
-- [ ] **Seating Proximity Weighted Similarity:** Enhance the CopyCatch algorithm by adjusting similarity scores based on physical seating coordinates in the exam room.
-- [ ] **Custom Grading Rubric Importer:** Build a parser in RubricLens to import rubrics directly from Excel sheets or PDF documents.
+### Feedback & explainability
+- [ ] NLI-based, negation-aware concept coverage for sharper deduction reasons.
+- [ ] Confidence calibration so ±1-mark reliability is shown per answer.
 
-### 4. User Interface Improvements
-- [ ] **Export Final Grades Report:** Support exporting finalized, audited scores directly to university grading systems via standardized XLS/CSV file formats.
-- [ ] **Visual Audit History Logs:** Build a dashboard view showing changes made by auditors to resolve mismatch flags.
+### UI & ops
+- [ ] CSV/XLS export of evaluated sheets to the exam-cell result system.
+- [ ] Model-registry + drift monitoring (predicted vs teacher marks over time).
+- [ ] Reviewer queue for low-confidence answers before publication.
 
 ---
 
 ## 3. Related Documents
 
-*   [Overall README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
-*   [Product Roadmap](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ROADMAP.md)
-*   [System Design Subsystems](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+*   [README](file:///Users/gaurav/Desktop/MyProjects/E-Shield/README.md)
+*   [Roadmap](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ROADMAP.md)
+*   [System Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)

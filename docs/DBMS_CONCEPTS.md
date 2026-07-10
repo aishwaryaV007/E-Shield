@@ -18,9 +18,9 @@ ExamShield implements **ACID-compliant transactions** locally via SQLite to ensu
                 │ BEGIN EXCLUSIVE TRANSACTION         │
                 ├─────────────────────────────────────┤
                 │ • Insert script row                 │
-                │ • Insert parsed marks fields        │
-                │ • Insert similarity scores          │
-                │ • Raise validation audit flags      │
+                │ • Insert per-question evaluations   │
+                │ • Store predicted marks + feedback  │
+                │ • Update script total + percentage  │
                 └──────────────────┬──────────────────┘
                                    │
                        ┌───────────┴───────────┐
@@ -33,8 +33,8 @@ ExamShield implements **ACID-compliant transactions** locally via SQLite to ensu
 ```
 
 ### ACID Rules
-*   **Atomicity:** If a single sheet binarization or OCR extraction fails, the database rolls back all marks records for that sheet.
-*   **Consistency:** Foreign key constraints prevent orphans (e.g., deleting a batch automatically deletes all related script and similarity matrix records).
+*   **Atomicity:** If OCR or scoring fails mid-script, the database rolls back all evaluation records for that script.
+*   **Consistency:** Foreign key constraints prevent orphans (e.g., deleting a batch removes its scripts and their evaluation rows).
 *   **Isolation:** Exclusive locks prevent concurrent write operations during batch processing, while allowing read access for dashboard views.
 *   **Durability:** Data commits directly to the local storage drive (`db.sqlite3`).
 
@@ -42,7 +42,7 @@ ExamShield implements **ACID-compliant transactions** locally via SQLite to ensu
 
 ## 2. Concurrency & Performance Optimization
 
-To prevent backend write processes from blocking Streamlit dashboard read queries, the engine configures SQLite with optimized database modes:
+To prevent backend write processes from blocking dashboard read queries, the app configures SQLite with optimized database modes:
 
 ```sql
 -- Planned database performance configurations
@@ -66,8 +66,8 @@ PRAGMA foreign_keys = ON;
 
 ## 3. Data Normalization Boundaries
 
-*   **Structured Tables:** Marks extraction tables (`parsed_marks`) and similarity matrices are stored as normalized relational columns to support SQL aggregations and fast index lookups.
-*   **JSON Serialization (Document Store Model):** Coordinates-based coordinates, page-specific layout boxes, and audit evidence payloads are stored as serialized JSON text strings. This approach avoids schema complexity and simplifies JSON exports for the dashboard UI.
+*   **Structured Tables:** Per-question `evaluations` (predicted mark, similarity, max marks, percentage) and `questions` are stored as normalized relational columns for SQL aggregations and fast lookups.
+*   **JSON Serialization (Document Store Model):** Rubric key-points, feedback, deduction reasons, and training metrics are stored as serialized JSON text strings — avoiding schema churn and simplifying exports to the dashboard UI.
 
 ---
 

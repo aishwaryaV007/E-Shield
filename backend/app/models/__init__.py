@@ -1,6 +1,6 @@
-# 1. FILE PURPOSE: Package for local ML model loaders (MiniLM embedder, NLI cross-encoder).
+# 1. FILE PURPOSE: Package for local model loaders (MiniLM embedder + trained mark-predictor).
 # 2. RESPONSIBILITIES:
-#    - Group cached, CPU-only model loaders used by the engines.
+#    - Group cached, CPU-only model loaders used by training + evaluation.
 # 3. PLANNED CONTENTS: Package docstring.
 # 4. INPUTS / OUTPUTS: Inputs: none. Outputs: none.
-# 5. DEPENDS ON / USED BY: embedder.py, nli.py; used by CopyCatch and RubricLens.
+# 5. DEPENDS ON / USED BY: embedder.py, mark_model.py; used by evaluation/scorer.py + training.

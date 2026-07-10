@@ -1,5 +1,5 @@
 # ExamShield Testing Specification
-> Test architecture, mock registry configurations, integration validations, and demo runner setups.
+> Test architecture for the training + evaluation pipelines.
 
 *Design / Planned — Not yet implemented*
 
@@ -7,57 +7,50 @@
 
 ## 1. Test Architecture
 
-The testing framework uses `pytest` to run automated unit checks on pre-processing pipelines, math summation parsers, and registry matching functions:
+`pytest` on the backend; type-check on the frontend.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│ PyTest Test Runner                                     │
-└───────────────────────┬────────────────────────────────┘
-                        │
-         ┌──────────────┼────────────────────────┐
-         ▼              ▼                        ▼
-   [ Unit Tests ] [ Integration Tests ]    [ Demo Validation ]
-   • preprocess   • Ingestion -> SQLite    • Run on 35 scripts
-   • regex sum    • End-to-end flow        • Check planted flags
-   • CSV roster   • Thread pool locks      • Render local HTML
+┌────────────────────────────────────────────────────────────┐
+│ PyTest Test Runner                                         │
+└──────────────────────┬─────────────────────────────────────┘
+         ┌─────────────┼──────────────┬────────────────┐
+         ▼             ▼              ▼                ▼
+   [ Unit ]      [ Training ]    [ Evaluation ]   [ End-to-end ]
+   preprocess    features +      similarity +     script → sheet
+   OCR conf.     trainer +       scorer +         on demo corpus
+                 metrics         feedback
 ```
 
 ---
 
-## 2. Test Suites Breakdown
+## 2. Test Suites
 
-### 1. Subsystem Unit Tests (`tests/unit/`)
-*   `test_preprocess.py`: Verifies OpenCV binarization and deskewing functions on synthetic skewed images.
-*   `test_marksafe_math.py`: Checks regex parsing of digits, fractions, addition formulas, and strikeouts.
-*   `test_roster_matcher.py`: Validates ScriptID enrollment matching and duplicate flag generation.
+### Unit (`backend/tests/`)
+- `test_ingestion.py` — PDF→image, deskew/binarize, question segmentation + answer matching.
+- `test_ocr.py` — handwriting OCR + low-confidence flagging.
+- `test_storage.py` — SQLite schema + evaluation persistence; JSON round-trips.
 
-### 2. Integration Pipelines Verification (`tests/integration/`)
-*   `test_pipeline_flow.py`: Verifies the end-to-end processing pipeline, checking data flow from raw scanned PDFs to SQLite DB records.
-*   `test_concurrent_writes.py`: Checks SQLite WAL settings and lock timeout behaviors under concurrent write loads from multiple threads.
+### Training & evaluation (`backend/tests/test_evaluation.py`)
+- **Feature parity:** `features.py` returns the same vector at train and inference time.
+- **Trainer/metrics:** model trains and reports RMSE / MAE / R² / ±1-mark accuracy on a held-out split.
+- **Scorer:** the mark comes from the trained model and is clamped to `[0, max]`.
+- **Feedback:** deduction reasons reference the missing rubric points.
 
-### 3. Demo Validation Runner (`app/test_runner.py`)
-Runs automated integration checks on a mock dataset before live demonstrations:
-*   **Verification Dataset:** A test batch of **35 scanned scripts** containing planted errors (2 copying student pairs, 3 arithmetic summation discrepancies, 1 registration error).
-*   **Success Verification Rules:**
-    ```python
-    # Planned implementation pattern
-    def verify_mock_batch_results(batch_id: str):
-        # Query results from local SQLite DB
-        mismatches = query_db("SELECT count(*) FROM audit_flags WHERE flag_type='SUM_MISMATCH'")
-        duplicates = query_db("SELECT count(*) FROM audit_flags WHERE flag_type='DUPLICATE_ID'")
-        collusions = query_db("SELECT count(*) FROM similarity_matrix WHERE similarity_score > 0.85")
-        
-        # Verify that all planted errors are detected
-        assert mismatches == 3, f"Expected 3 arithmetic errors, found {mismatches}"
-        assert duplicates == 1, f"Expected 1 duplicate ID error, found {duplicates}"
-        assert collusions >= 2, f"Expected at least 2 collusion pairs, found {collusions}"
-        print("Integration test passed: all planted errors successfully detected!")
-    ```
+### End-to-end (demo runner)
+Run Phase 1 on the demo corpus, then Phase 2 on the demo batch; assert:
+```python
+def verify_demo(batch_id, model_metrics):
+    assert model_metrics["accuracy_within_1_mark"] >= 0.85   # model tracks teacher marks
+    sheets = get_results(batch_id)
+    assert all(0 <= a["predicted_mark"] <= a["max_marks"] for s in sheets for a in s["answers"])
+    assert all(s["total_marks"] == sum(a["predicted_mark"] for a in s["answers"]) for s in sheets)
+    print("Demo verified: model trained + scripts fully evaluated.")
+```
 
 ---
 
 ## 3. Related Documents
 
-*   [Overall Implementation Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/implementation_plan.md)
-*   [Local Storage specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/app/storage/README.md)
-*   [Database Concepts Reference](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DBMS_CONCEPTS.md)
+*   [Implementation Plan](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/implementation_plan.md)
+*   [Storage module](file:///Users/gaurav/Desktop/MyProjects/E-Shield/backend/app/storage/README.md)
+*   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)

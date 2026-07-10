@@ -3,4 +3,4 @@
 #    - Group db.py, json_store.py, and schema.sql.
 # 3. PLANNED CONTENTS: Package docstring.
 # 4. INPUTS / OUTPUTS: Inputs: none. Outputs: none.
-# 5. DEPENDS ON / USED BY: Used by services and engines to persist marks/flags/templates.
+# 5. DEPENDS ON / USED BY: Used by services + evaluation to persist evaluations, answer keys, models.

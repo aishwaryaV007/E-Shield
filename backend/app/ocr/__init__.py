@@ -1,6 +1,6 @@
-# 1. FILE PURPOSE: Package for dual-tier OCR (digit grids + prose) with an ambiguity fallback.
+# 1. FILE PURPOSE: Package for handwriting OCR (answer-text recognition + confidence) — Phase 2.
 # 2. RESPONSIBILITIES:
-#    - Group digit_ocr, prose_ocr, and the ambiguity guard.
+#    - Group handwriting_ocr and confidence handling.
 # 3. PLANNED CONTENTS: Package docstring.
 # 4. INPUTS / OUTPUTS: Inputs: none. Outputs: none.
-# 5. DEPENDS ON / USED BY: Used by the engines after ingestion.
+# 5. DEPENDS ON / USED BY: Used by segmentation + evaluation after ingestion.

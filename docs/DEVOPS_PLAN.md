@@ -44,8 +44,8 @@ echo "Installing required Python dependencies..."
 # Installs dependencies using local wheel packages in offline environments
 pip install -r requirements.txt --no-index --find-links=./wheels/
 
-echo "Caching ML model weights..."
-python3 scripts/cache_models.py
+echo "Caching ML model weights (OCR + embedder; no LLM)..."
+python3 scripts/download_models.py
 
 echo "Installation complete! Run './start.sh' to launch ExamShield."
 ```
@@ -60,23 +60,23 @@ pip download -r requirements.txt -d ./wheels/
 
 ## 3. Execution Coordinator Script (`start.sh`)
 
-A single startup script launches the FastAPI server in the background and starts the Streamlit dashboard:
+A single startup script launches the FastAPI backend and the Next.js dashboard:
 
 ```bash
 #!/bin/bash
 # start.sh - Launch the application stack
 
-source .venv/bin/activate
-
-echo "Starting FastAPI server on port 8000..."
-uvicorn app.api:app --host 127.0.0.1 --port 8000 &
+echo "Starting FastAPI backend on port 8000..."
+(cd backend && source .venv/bin/activate && uvicorn main:app --host 127.0.0.1 --port 8000) &
 API_PID=$!
 
-echo "Starting Streamlit Dashboard..."
-streamlit run app/dashboard/main.py --server.port 8501 --server.address 127.0.0.1
+echo "Starting Next.js dashboard on port 3000..."
+(cd frontend && npm run start) &
+UI_PID=$!
 
-# Clean up FastAPI on exit
-trap "kill $API_PID" EXIT
+# Clean up on exit
+trap "kill $API_PID $UI_PID" EXIT
+wait
 ```
 
 ---

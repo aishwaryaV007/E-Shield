@@ -1,78 +1,71 @@
 # ExamShield Scalability Specification
-> Local CPU performance optimizations, memory profiles, processing run times, and $O(N^2)$ scaling limits.
+> Local CPU performance for training + evaluation on standard laptops.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Local Resource Scale Model
+## 1. Resource Model
 
-ExamShield runs entirely on the host machine. Scale optimizations focus on managing CPU execution and memory usage on standard laptops rather than scaling across multi-node cloud clusters.
+Everything runs on the host machine. Phase 1 (training) is a one-time batch job; Phase 2
+(evaluation) is what runs per exam batch.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│ Scanned Input Batch (N answer scripts)                 │
-└───────────────────────┬────────────────────────────────┘
-                        │
-                        ▼
-┌────────────────────────────────────────────────────────┐
-│ CPU Ingestion Spine (OpenCV thread pool execution)     │
-└───────────────────────┬────────────────────────────────┘
-                        │
-                        ▼
-┌────────────────────────────────────────────────────────┐
-│ Local OCR Pipeline (Sequential CPU Inference)          │
-└───────────────────────┬────────────────────────────────┘
-                        │
-                        ▼
-┌────────────────────────────────────────────────────────┐
-│ Pairwise Similarity Math (O(N^2) NumPy Tensor Calc)    │
-└────────────────────────────────────────────────────────┘
+[ Scanned batch (N scripts) ]
+        │  (ingestion: OpenCV thread pool)
+[ Clean pages ]
+        │  (handwriting OCR — sequential CPU inference; the main cost)
+[ Per-answer text ]
+        │  (embedding similarity + trained-model prediction — fast on CPU)
+[ Evaluated sheets ]
 ```
 
 ---
 
-## 2. Execution Run Times & Resource Targets
+## 2. Run-time & Resource Targets (4-core CPU, 8 GB RAM)
 
-The system is optimized for a target batch size of **$N=300$ scripts** (averaging 5 pages per booklet) running on a standard 4-core CPU with 8 GB of RAM:
+### Phase 1 — Training (one-time)
+| Stage | Complexity | Est. time (a few thousand answers) | Notes |
+|-------|-----------|-------------------------------------|-------|
+| Feature extraction | $O(A)$ over answers | ~seconds–minutes | Embeddings dominate; batch them. |
+| XGBoost training + tuning | small | ~seconds | Tabular features → fast. |
+| Evaluation (metrics) | $O(A)$ | ~seconds | RMSE/MAE/R²/±1-acc. |
 
-| Pipeline Stage | Algorithmic Complexity | Bottleneck Factor | Est. Time ($N=35$) | Est. Time ($N=300$) | Optimization Strategy |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Ingestion** | $O(N \cdot P)$ | Disk I/O & PDF Rasterization. | ~15 seconds | ~2.5 minutes | OpenCV multithreading; low-overhead binarization. |
-| **Digit OCR** | $O(N)$ | Neural Network CPU Inference. | ~45 seconds | ~6.5 minutes | Crop and scan only calibrated zones; ignore background text. |
-| **Prose OCR** | $O(N \cdot P_{text})$ | Neural Network CPU Inference. | ~90 seconds | ~13 minutes | Scale down input resolution and filter out blank answer fields. |
-| **CopyCatch Math** | $O(N^2)$ | Tensor dot products. | < 0.1 seconds | ~1.5 seconds | Vectorize matrix calculations using NumPy; bypass Python loops. |
+### Phase 2 — Evaluation (per batch of N scripts)
+| Stage | Complexity | Est. ($N=35$) | Est. ($N=300$) | Optimization |
+|-------|-----------|---------------|----------------|--------------|
+| Ingestion | $O(N \cdot P)$ | ~15 s | ~2.5 min | OpenCV multithreading. |
+| Handwriting OCR | $O(N \cdot A)$ | ~2 min | ~15 min | The bottleneck; crop to answer regions, skip blanks. |
+| Embedding similarity | $O(N \cdot A)$ | ~seconds | ~1 min | Batch-encode all answers once. |
+| Trained-model scoring | $O(N \cdot A)$ | < 1 s | ~seconds | Vectorized feature matrix → one `predict`. |
+
+*(A = answers per script.)* **Scoring is cheap; OCR dominates** — the opposite of a per-pair
+collusion search, so there is no $O(N^2)$ term.
 
 ---
 
-## 3. Algorithmic Optimization & Bottleneck Remediation
+## 3. Optimizations
 
-### 1. Managing $O(N^2)$ Pairwise Comparisons
-For a batch of $N=300$ scripts, the engine performs $\frac{300 \times 299}{2} = 44,850$ similarity checks. 
-*   **Bypassing Python Loops:** Running these checks in standard Python loops causes noticeable UI lag. Instead, ExamShield stacks all MiniLM text embedding vectors into a single NumPy array of shape `(300, 384)` and calculates the cosine similarity matrix in one step using optimized tensor operations:
-    ```python
-    # Planned implementation pattern
-    import numpy as np
+### 1. Batch the embeddings
+Encode all answers in one MiniLM call — stack into a `(num_answers, 384)` array — instead of one
+call per answer.
+```python
+import numpy as np
+def score_batch(feature_matrix, model):     # (num_answers, num_features)
+    return np.clip(model.predict(feature_matrix), 0, None)   # one vectorized prediction
+```
 
-    def calculate_similarity_matrix(embeddings: np.ndarray) -> np.ndarray:
-        # Normalize vectors to unit length
-        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        normalized = embeddings / norms
-        # Compute dot product matrix in one step
-        return np.dot(normalized, normalized.T)
-    ```
+### 2. Trim OCR surface
+OCR only detected answer regions, skip blank areas — cuts scanned surface and time substantially.
 
-### 2. Reducing OCR Compute Loads
-Running OCR scans across whole pages is slow. The calibration engine limits OCR processing to specific coordinate bounding boxes (e.g., marks boxes, roll number grids, and answer blocks), reducing the scanned surface area by up to **80%**.
-
-### 3. Memory Profile & Footprint Management
-*   **Image Discarding:** High-resolution page matrices are discarded from memory immediately after pre-processing and coordinate cropping.
-*   **Model Lifecycles:** OCR and embedding pipelines share model weights in memory instead of spinning up independent instances, keeping the overall RAM footprint under **600 MB**.
+### 3. Memory footprint
+Discard high-res page matrices after OCR; share model weights (embedder + mark-predictor) as
+single cached instances. Target RAM footprint under **~600 MB**.
 
 ---
 
 ## 4. Related Documents
 
-*   [System Design Subsystems](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
-*   [CopyCatch Algorithmic Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/engines/COPYCATCH.md)
-*   [Database Optimization Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)
+*   [System Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/SYSTEM_DESIGN.md)
+*   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)
+*   [Database Design](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATABASE_DESIGN.md)

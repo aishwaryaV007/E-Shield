@@ -60,7 +60,7 @@ zip -r /data/backups/scripts_backup_$(date +%Y%m%d).zip /data/corpus/
 
 ### 3. Database Restoration Steps
 To restore the application to a previous backup state:
-1.  Stop the FastAPI and Streamlit dashboard processes.
+1.  Stop the FastAPI backend and the Next.js dashboard processes.
 2.  Rename the active database file (`db.sqlite3` to `db_corrupted.sqlite3`).
 3.  Copy the target backup database file to the workspace directory, renaming it to `db.sqlite3`.
 4.  Extract the corresponding script images ZIP archive back to `/data/corpus/`.

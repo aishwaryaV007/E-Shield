@@ -1,58 +1,52 @@
-# Exam Integrity Verification
-> Core value proposition, collusion network maps, sum check layers, and validation rules.
+# Grading Integrity & Fairness
+> How ExamShield keeps automated grading fair, consistent, transparent, and compliant.
 
 *Design / Planned — Not yet implemented*
 
 ---
 
-## 1. Exam Integrity Protection Framework
+## 1. Integrity Framework
 
-ExamShield is designed to protect **Exam Integrity** in offline written examinations. It provides exam-cell staff with a multi-layered verification framework to detect errors and discrepancies before grades are published.
+ExamShield auto-grades answer sheets. Its integrity guarantees are about **fair, consistent, and
+explainable marks** — not policing students.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│ Scanned Paper Batch                                    │
-└───────────────────────┬────────────────────────────────┘
-                        │
-         ┌──────────────┼──────────────┐
-         ▼              ▼              ▼
-   [ Integrity 1 ][ Integrity 2 ][ Integrity 3 ]
-   MarkSafe       CopyCatch      ScriptID
-   Verify sums    Find collusion Roster validate
-   & strikeouts   networks       & duplicates
-         │              │              │
-         └──────────────┼──────────────┘
-                        │
-                        ▼
-┌────────────────────────────────────────────────────────┐
-│ Verified & Audited Grade Cards                         │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│ Student answer + answer key + rubric                       │
+└──────────────────────┬─────────────────────────────────────┘
+         ┌─────────────┼──────────────┬────────────────┐
+         ▼             ▼              ▼                ▼
+   [ Consistency ][ Transparency ][ Compliance ]  [ Verification ]
+   same trained   feedback +      trained model,   low-confidence
+   model for all  deduction       never an LLM      answers flagged
 ```
 
 ---
 
-## 2. Integrity Verification Layers
+## 2. Integrity Layers
 
-### 1. Arithmetic Grade Auditing (MarkSafe)
-Prevents totaled-marks disputes and grading transcription errors.
-*   **Verification Rule:** The sum of question scores on a script must equal the written total.
-*   **Safety Trigger:** If the OCR-extracted sum does not match the written total, the script is flagged as `SUM_MISMATCH` and queued for manual verification.
-*   **Strikeout Handling:** Ambiguous marks and crossed-out numbers are flagged as `AMBIGUOUS_MARK`, requiring human intervention to prevent false corrections.
+### 1. Consistency
+- Every answer is scored by the **same trained mark-predictor**, so equivalent answers get
+  equivalent marks regardless of when or by whom they were scanned.
+- Measured by agreement with teacher marks: **accuracy within ±1 mark** on a held-out split.
 
-### 2. Collusion & Copying Detection (CopyCatch)
-Maps student copying networks across handwritten scripts.
-*   **Verification Rule:** Answer prose similarities must not exceed class-wide baselines.
-*   **Safety Trigger:** If two scripts share similarity scores that deviate from the class average, the system creates a node connection in the collusion graph. Graders can review both scripts side-by-side to confirm copying.
+### 2. Transparency
+- Each mark ships with **feedback** and explicit **deduction reasons** (which rubric points were
+  missing/wrong), so a student or moderator can see *why*.
 
-### 3. Student Identity Validation (ScriptID)
-Prevents student identity mix-ups and registry errors.
-*   **Verification Rule:** Every roll number must match an active student registered in the enrollment CSV database.
-*   **Safety Trigger:** The system flags duplicates, absent students with scripts, or unregistered IDs, prompting the user to check the original booklets.
+### 3. Compliance (Track 02)
+- The mark is always the **trained model's prediction** — prompting an LLM to grade is prohibited
+  and never done. An LLM may only phrase feedback text.
+- No train/serve skew: the identical feature function runs at training and inference.
+
+### 4. Verification before publication
+- Answers the OCR cannot read confidently are flagged **low-confidence** for human verification —
+  never silently guessed. The exam cell reviews these before releasing results.
 
 ---
 
 ## 3. Related Documents
 
-*   [Anti-Cheating Mechanisms Specs](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/ANTI_CHEATING.md)
-*   [Data Privacy & Local Constraints](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_PRIVACY.md)
-*   [MarkSafe Technical Specifications](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/engines/MARKSAFE.md)
+*   [Data Privacy](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/DATA_PRIVACY.md)
+*   [Scorer stage](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/stages/SCORER.md)
+*   [Problem Statement](file:///Users/gaurav/Desktop/MyProjects/E-Shield/docs/PROBLEM_STATEMENT.md)
