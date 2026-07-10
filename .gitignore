@@ -66,6 +66,7 @@ dataset/processed/student_scripts_*.csv
 # ── Node / Next.js ────────────────────────────────────────
 node_modules/
 .next/
+next-env.d.ts
 out/
 .pnp
 .pnp.js
@@ -88,3 +89,6 @@ Thumbs.db
 *.tar
 
 **/.DS_Store
+
+# Per-student OCR training files (real student text + marks) — keep local, never commit.
+dataset/ocr_files/

@@ -53,9 +53,35 @@ Open **http://localhost:3000**, then:
 3. See **MCQ + descriptive subtotals**, the total `/50`, per-question marks, the extracted answer,
    and the correct answer. **Edit** any mis-read answer and hit **Re-grade** for the fixed mark.
 
+### Windows (PowerShell / CMD)
+
+Same steps, but the venv activation, environment variable, and paths differ:
+
+```powershell
+# ── Backend (PowerShell) ──
+cd backend
+py -3 -m venv .venv
+.venv\Scripts\Activate.ps1              # CMD: .venv\Scripts\activate.bat
+pip install -r requirements.txt
+
+$env:PYTHONPATH = "."                    # CMD: set PYTHONPATH=.
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+
+# ── Frontend (second terminal) ──
+cd frontend
+npm install
+npm run dev
+```
+
+Notes for Windows:
+- Use **backslashes** in paths (`..\dataset\raw_scripts\Student_Pdf\Student_1.pdf`).
+- `PYTHONPATH` must be set **before** running python: PowerShell `$env:PYTHONPATH="."`, CMD `set PYTHONPATH=.`.
+- No GPU needed — it runs on CPU (Apple-Silicon MPS is auto-used on Mac only).
+- If PowerShell blocks the activate script, run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
 ### Command-line / tests (optional)
 ```bash
-cd backend && source .venv/bin/activate
+cd backend && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
 # Grade one script from the CLI:
 PYTHONPATH=. python -c "
