@@ -25,16 +25,17 @@ const newStudent = (): Student =>
   ({ id: `s${SEQ}`, name: `Student ${SEQ++}`, roll: "", file: null, sheet: null,
      status: "idle", error: "", elapsed: 0, edits: {} });
 
-const pctColor = (p: number) => (p >= 75 ? "var(--success)" : p >= 40 ? "var(--warn)" : "var(--danger)");
+const pctColor = (_p: number) => "#111111";               // monochrome
 const half = (n: number) => (Math.round(n * 2) / 2).toString();  // 12 / 12.5 / 13
 function gradeBand(p: number): { g: string; c: string } {
-  if (p >= 90) return { g: "A+", c: "#059669" };
-  if (p >= 80) return { g: "A", c: "#16a34a" };
-  if (p >= 70) return { g: "B", c: "#2563eb" };
-  if (p >= 60) return { g: "C", c: "#7c3aed" };
-  if (p >= 50) return { g: "D", c: "#d97706" };
-  if (p >= 40) return { g: "E", c: "#ea580c" };
-  return { g: "F", c: "#dc2626" };
+  const c = "#111111";
+  if (p >= 90) return { g: "A+", c };
+  if (p >= 80) return { g: "A", c };
+  if (p >= 70) return { g: "B", c };
+  if (p >= 60) return { g: "C", c };
+  if (p >= 50) return { g: "D", c };
+  if (p >= 40) return { g: "E", c };
+  return { g: "F", c };
 }
 
 export default function Home() {
