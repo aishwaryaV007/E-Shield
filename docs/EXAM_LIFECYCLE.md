@@ -62,8 +62,8 @@ Evaluated sheets (question-wise marks, total, percentage, feedback) exported; ba
 
 ## To-Do List
 
-- [ ] Implement exam creation workflow
-- [ ] Implement end-to-end exam grading workflow
+- [x] Implement exam creation workflow
+- [x] Implement end-to-end exam grading workflow
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

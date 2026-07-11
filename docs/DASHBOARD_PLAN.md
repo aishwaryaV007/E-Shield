@@ -56,7 +56,7 @@ auto-graded evaluated sheets.
 ## To-Do List
 
 - [x] Scaffold Next.js dashboard UI
-- [ ] Implement reporting and analytics views
+- [x] Implement reporting and analytics views
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

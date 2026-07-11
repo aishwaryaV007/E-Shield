@@ -112,8 +112,8 @@ Build the dataset from the historical corpus and train the mark-predictor (async
 
 ## To-Do List
 
-- [ ] Implement FastAPI endpoints for submission
-- [ ] Implement FastAPI endpoints for retrieval
+- [x] Implement FastAPI endpoints for submission
+- [x] Implement FastAPI endpoints for retrieval
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

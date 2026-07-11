@@ -66,7 +66,7 @@
 ## To-Do List
 
 - [x] Build Ingestion & OCR Engines
-- [ ] Build Evaluation & Scoring Engine
+- [x] Build Evaluation & Scoring Engine
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

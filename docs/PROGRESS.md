@@ -41,7 +41,7 @@
 ## To-Do List
 
 - [x] Update phase 1 ingestion progress
-- [ ] Track phase 2 evaluation progress
+- [x] Track phase 2 evaluation progress
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

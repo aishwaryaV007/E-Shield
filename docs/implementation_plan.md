@@ -55,7 +55,7 @@
 ## To-Do List
 
 - [x] Execute database implementation plan
-- [ ] Draft evaluation engine implementation plan
+- [x] Draft evaluation engine implementation plan
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.
