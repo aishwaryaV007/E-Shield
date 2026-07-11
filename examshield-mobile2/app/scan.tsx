@@ -33,16 +33,15 @@ export default function ScanScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.actionButton} onPress={pickDocument}>
-            <Text style={styles.text}>Upload PDF</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.text}>Snap Photo</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
+      <CameraView style={styles.camera} facing={facing} />
+      <View style={[styles.buttonContainer, { position: 'absolute', bottom: 0, left: 0, right: 0 }]}>
+        <TouchableOpacity style={styles.actionButton} onPress={pickDocument}>
+          <Text style={styles.text}>Upload PDF</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.text}>Snap Photo</Text>
+        </TouchableOpacity>
+      </View>
       {scannedFile && (
         <View style={styles.previewContainer}>
           <Text style={styles.previewText}>Selected: {scannedFile.name}</Text>
