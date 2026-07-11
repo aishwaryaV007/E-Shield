@@ -4,21 +4,11 @@ import { StatusBar } from 'expo-status-bar';
 export default function Layout() {
   return (
     <>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#ffffff',
-          },
-          headerTintColor: '#4F46E5', // Indigo-600
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: 'ExamShield' }} />
-        <Stack.Screen name="scan" options={{ title: 'Scan Script' }} />
+      {/* The screen renders its own ExamShield masthead, so hide the native header. */}
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#ffffff' } }}>
+        <Stack.Screen name="index" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </>
   );
 }
