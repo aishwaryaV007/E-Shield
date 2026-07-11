@@ -1,8 +1,6 @@
 # Ingestion & Segmentation Plan (Phase 2 input)
 > Development steps for turning a scanned script into gradable (question, answer) units.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Development Focus

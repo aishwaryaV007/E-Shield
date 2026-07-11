@@ -1,8 +1,6 @@
 # ExamShield API Contracts
 > REST API for the FastAPI backend — training, evaluation, and results.
 
-*Design / Planned — Not yet implemented*
-
 Backend runs locally at `http://localhost:8000`. The Next.js dashboard uses these endpoints.
 
 ---

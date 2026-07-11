@@ -1,8 +1,6 @@
 # ExamShield Database Design Spec
 > SQLite schema, entity relationships, and indexing for the auto-grader.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Database Paradigm

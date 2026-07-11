@@ -1,8 +1,6 @@
 # Local DevOps & Packaging Plan
 > Offline deployment setups, local python environments, model weights caching, and application execution scripts.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Local Deployment Target

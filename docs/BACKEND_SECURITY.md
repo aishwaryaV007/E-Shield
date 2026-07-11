@@ -1,8 +1,6 @@
 # Backend Process Security
 > Local sandbox guidelines, process isolation, third-party dependency rules, and database file protection.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Backend Security Framework

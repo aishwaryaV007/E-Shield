@@ -1,8 +1,6 @@
 # Data Privacy & Offline Processing
 > Local data storage, privacy controls, offline sandboxing constraints, and local library guidelines.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Privacy Strategy

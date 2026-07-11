@@ -1,8 +1,6 @@
 # ExamShield High-Level Build Plan
 > Sequential milestones (M0–M6) from design to a working local auto-grader.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Milestone Roadmap

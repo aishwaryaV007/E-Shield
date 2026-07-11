@@ -3,8 +3,6 @@
 > Learns teacher marking behaviour from historical corrected answer sheets. Produces the trained
 > mark-predictor used in Phase 2. **The mark is a model prediction — never an LLM output.**
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Objective

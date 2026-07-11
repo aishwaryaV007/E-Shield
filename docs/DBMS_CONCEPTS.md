@@ -1,8 +1,6 @@
 # ExamShield DBMS Concepts
 > Details on local database transactions, write-ahead logging (WAL), Python thread-safety models, and normalization boundaries.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Local Transactional Design & ACID Compliance

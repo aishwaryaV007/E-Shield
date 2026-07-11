@@ -1,8 +1,6 @@
 # API Security & Loopback Bounds
 > API security guidelines, local loopback bindings, input validation, and parameter sanitization rules.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Local Network Isolation

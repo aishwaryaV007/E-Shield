@@ -1,8 +1,6 @@
 # ExamShield Data Flow & State Transitions
 > How data moves through both phases, and the states an evaluation passes through.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Phase 1 — Training data flow

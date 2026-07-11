@@ -3,8 +3,6 @@
 > Explains each mark and assembles the fully evaluated answer sheet — question-wise marks, total,
 > percentage, per-answer feedback, and mark-deduction reasons.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Objective

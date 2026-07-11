@@ -1,8 +1,6 @@
 # Local Database Backup & Restore
 > Database backing up procedures, script zip archiving, recovery steps, and retention guidelines.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Local Backup Strategy

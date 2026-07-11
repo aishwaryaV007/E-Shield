@@ -1,8 +1,6 @@
 # Pipeline Development Plan
 > Development steps, tasks, and configurations for the two-phase auto-grader (training + evaluation).
 
-*Design / Planned — Not yet implemented*
-
 > Note: this replaces the earlier "five verification engines" plan. ExamShield now **assigns marks**
 > via a trained model; the old audit engines (MarkSafe/CopyCatch/ScriptID/ReEval/RubricLens) are gone.
 

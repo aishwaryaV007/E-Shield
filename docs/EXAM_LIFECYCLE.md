@@ -1,8 +1,6 @@
 # Exam Processing Lifecycle
 > How a script moves from scan to evaluated sheet, plus the one-time training lifecycle.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Training lifecycle (once per exam/subject, reused after)

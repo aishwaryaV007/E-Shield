@@ -1,8 +1,6 @@
 # Product Features Specifications
 > User-facing features of the AI answer-sheet evaluator (Track 02).
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Feature Architecture

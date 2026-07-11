@@ -3,8 +3,6 @@
 > Applies the trained mark-predictor to each answer's features and assigns percentage-based marks.
 > **This is the only place a mark is decided, and it is decided by the trained model — never an LLM.**
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Objective

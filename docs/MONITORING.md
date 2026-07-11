@@ -1,8 +1,6 @@
 # Application Logging & Monitoring
 > Run logs, execution tracking, and dashboard monitoring for training + evaluation.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Runtime Monitoring

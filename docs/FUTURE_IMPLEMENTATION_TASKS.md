@@ -1,8 +1,6 @@
 # Future Implementation Backlog
 > Task queue and upcoming optimizations for the auto-grader.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Developer Guidelines

@@ -2,8 +2,6 @@
 > Problem-space analysis, productivity impact, and technical design justifications for the
 > AI answer-sheet evaluator (Track 02).
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Problem Space Analysis
@@ -61,7 +59,7 @@ Manual grading scales poorly and grades inconsistently:
 ## To-Do List
 
 - [x] Complete initial feasibility analysis
-- [ ] Review system requirements
+- [x] Review system requirements
 - [ ] Review document for technical accuracy against current implementation.
 - [ ] Ensure all referenced internal links are valid and working.
 - [ ] Add architectural or workflow diagrams where applicable.

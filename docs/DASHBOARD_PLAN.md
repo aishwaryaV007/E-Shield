@@ -1,8 +1,6 @@
 # Dashboard Interface Development Plan
 > Development steps for the Next.js dashboard: training metrics + evaluated sheets.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Development Focus

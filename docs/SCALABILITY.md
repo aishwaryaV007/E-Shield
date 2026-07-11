@@ -1,8 +1,6 @@
 # ExamShield Scalability Specification
 > Local CPU performance for training + evaluation on standard laptops.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Resource Model

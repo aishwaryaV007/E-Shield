@@ -37,6 +37,17 @@ def build_report(script_id: str, answers: dict[str, dict], keys: dict[str, dict]
             sc = score_answer(student, correct, mm)
             fb = build_feedback(student, correct, sc)
         ocr_conf = float(a.get("ocr_confidence", 1.0))
+        
+        # Anomaly detection: flag if similarity and predicted marks severely conflict (e.g. high sim but low score)
+        is_anomaly = False
+        if qtype != "mcq":
+            similarity = sc.get("similarity", 0.0)
+            percent = sc.get("percent", 0.0)
+            if (similarity > 0.80 and percent < 0.30) or (similarity < 0.30 and percent > 0.70):
+                is_anomaly = True
+                if "deduction_reasons" in fb:
+                    fb["deduction_reasons"].append("Grading anomaly: Severe mismatch between semantic similarity and predicted score.")
+
         total += sc["predicted_mark"]
         max_total += mm
         rows.append({
@@ -51,7 +62,7 @@ def build_report(script_id: str, answers: dict[str, dict], keys: dict[str, dict]
             "ocr_confidence": round(ocr_conf, 3),
             "feedback": fb["summary"],
             "deduction_reasons": fb["deduction_reasons"],
-            "low_confidence": ocr_conf < 0.55,
+            "low_confidence": (ocr_conf < 0.40) or is_anomaly,
         })
     mcq_rows = [r for r in rows if r["type"] == "mcq"]
     short_rows = [r for r in rows if r["type"] != "mcq"]

@@ -1,8 +1,6 @@
 # Secrets Management & Local Credentials
 > Local database credentials, database security guidelines, and rules to prevent credential exposure in public repositories.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Local Credentials Model

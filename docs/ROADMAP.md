@@ -1,8 +1,6 @@
 # Product Roadmap
 > Release timeline for the AI answer-sheet evaluator (Track 02).
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Release Timeline

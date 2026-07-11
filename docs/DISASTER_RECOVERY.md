@@ -1,8 +1,6 @@
 # Local Disaster Recovery Procedures
 > Procedures for database corruption recovery, OCR pipeline crash resolution, and layout template restoration.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. System Failure Vectors

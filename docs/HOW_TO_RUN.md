@@ -1,8 +1,6 @@
 # Application Execution Guide
 > Setup, training, and running the auto-grader.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Installation

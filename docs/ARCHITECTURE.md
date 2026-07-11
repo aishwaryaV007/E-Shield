@@ -1,8 +1,6 @@
 # ExamShield Architecture Specification
 > High-level architecture, the two-phase lifecycle, and component separation.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Architectural Strategy

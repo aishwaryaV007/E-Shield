@@ -1,8 +1,6 @@
 # OCR Subsystem Development Plan (Phase 2)
 > Development steps for reading handwritten answers with confidence.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Development Focus

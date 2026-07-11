@@ -1,8 +1,6 @@
 # ExamShield Detailed Implementation Plan
 > Granular tasks, target files, and verification checks per milestone.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. M0 — Storage & Schema

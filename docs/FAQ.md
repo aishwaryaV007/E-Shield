@@ -1,8 +1,6 @@
 # Product FAQ Reference
 > Common questions about the AI answer-sheet evaluator.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. General

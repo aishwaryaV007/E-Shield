@@ -1,8 +1,6 @@
 # ExamShield Context & Scope
 > Problem, product goals, boundaries, glossary, and status for the AI answer-sheet evaluator.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Problem Statement

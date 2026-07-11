@@ -1,8 +1,6 @@
 # Secure Development Guidelines
 > Codebase audit practices, input validation standards, static analysis, and comments preservation.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Development Principles

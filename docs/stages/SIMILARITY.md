@@ -3,8 +3,6 @@
 > Measures how close a student's answer is to the official answer key — by **meaning**, not keyword
 > overlap — and which rubric concepts are covered. This is the primary signal the scorer uses.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Objective

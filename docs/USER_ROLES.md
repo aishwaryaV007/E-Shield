@@ -1,8 +1,6 @@
 # User Roles & Access Controls
 > Roles and dashboard access boundaries for the AI answer-sheet evaluator.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Roles Matrix

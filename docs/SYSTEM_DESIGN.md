@@ -1,8 +1,6 @@
 # ExamShield System Design
 > Subsystem interaction, execution model, and caching for the two-phase auto-grader.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Subsystem Interaction (Phase 2 evaluation)

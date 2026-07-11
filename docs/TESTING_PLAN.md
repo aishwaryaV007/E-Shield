@@ -1,8 +1,6 @@
 # ExamShield Testing Specification
 > Test architecture for the training + evaluation pipelines.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Test Architecture

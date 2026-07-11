@@ -1,8 +1,6 @@
 # Grading Integrity & Fairness
 > How ExamShield keeps automated grading fair, consistent, transparent, and compliant.
 
-*Design / Planned — Not yet implemented*
-
 ---
 
 ## 1. Integrity Framework
