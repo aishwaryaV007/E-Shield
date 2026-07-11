@@ -132,9 +132,14 @@ export default function Home() {
     <>
       <nav className="navbar">
         <div className="navbar-inner">
-          <div className="brand"><span className="brand-badge">🛡️</span>
-            ExamShield <span className="brand-sub">AI Answer-Sheet Evaluator</span></div>
-          <span className="nav-pill">● Offline · No LLM grading</span>
+          <div className="brand">
+            <span className="brand-badge">E</span>
+            <span>
+              <span className="brand-name">ExamShield</span>
+              <span className="brand-sub">AI Answer-Sheet Evaluator</span>
+            </span>
+          </div>
+          <span className="nav-pill">Offline · No LLM grading</span>
         </div>
       </nav>
 
