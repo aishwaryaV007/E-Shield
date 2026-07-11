@@ -45,6 +45,14 @@ npm run dev
 # Dashboard is now at http://localhost:3000
 ```
 
+### 3b. Mobile App (Expo Go) — in a third terminal
+```bash
+cd examshield-mobile2
+npm install                                            # first time only
+npx expo start
+```
+Ensure your mobile device and computer are on the **same Wi-Fi network**. Install **Expo Go** on your phone (from Google Play Store / App Store) and scan the QR code printed in the terminal.
+
 ### 4. Use it
 Open **http://localhost:3000**, then:
 1. **Upload** a student answer-script PDF (e.g. `dataset/raw_scripts/Student_Pdf/Student_1.pdf`).
@@ -97,6 +105,20 @@ npm install
 npm run dev
 ```
 Leave this running too. The dashboard is at **http://localhost:3000**.
+
+### Step 3b — Mobile App (Terminal 3 — a **new** window)
+Runs the companion mobile app using **Expo Go**.
+```powershell
+cd E-Shield\examshield-mobile2
+npm install
+npx expo start
+```
+This starts the Expo bundler and displays a QR code in the terminal.
+1. Download the **Expo Go** app from the Google Play Store (Android) or App Store (iOS) on your physical phone.
+2. Ensure both your computer and phone are connected to the **same Wi-Fi network**.
+3. Scan the QR code shown in the terminal:
+   - On Android: Scan it directly from the scan button inside the **Expo Go** app.
+   - On iOS: Scan it using the built-in Camera app.
 
 ### Step 4 — Open the app
 Open **http://localhost:3000** in your browser. Upload a student PDF (e.g. `dataset\Test Data\page-1.pdf`) with its `answer_key.txt` + `question_paper.txt`, then click **Grade**.
