@@ -92,3 +92,7 @@ Thumbs.db
 
 # Per-student OCR training files (real student text + marks) — keep local, never commit.
 dataset/ocr_files/
+
+# runtime logs
+backend/app.log
+*.log

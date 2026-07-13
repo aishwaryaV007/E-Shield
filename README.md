@@ -270,3 +270,36 @@ E-Shield/
 
 See [SETUP.md](SETUP.md) to run it, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design,
 and [docs/PROBLEM_STATEMENT.md](docs/PROBLEM_STATEMENT.md) for the hackathon brief.
+
+---
+
+## 7. Next steps & development process
+
+### Current state
+Working end-to-end and committed to `main`: Model A (TrOCR reader) + Model B (XGBoost marker),
+FastAPI backend (`/api/v1/grade`, `/api/v1/rescore`), Next.js web dashboard, and the
+**`examshield-mobile2`** Expo app (class-roster UI wired to the backend). Backend security utils,
+a GitHub Actions CI, and an end-to-end test are in place.
+
+> **Canonical mobile app is `examshield-mobile2/`.** An earlier `examshield-mobile/` folder is
+> deprecated — do not add to it.
+
+### Immediate cleanup (do this first)
+- [ ] Delete the legacy `examshield-mobile/` folder (its UI was ported into `examshield-mobile2/`).
+- [ ] Remove macOS duplicate artifacts (files ending in `" 2"`, e.g. `App 2.js`, `index 2.tsx`).
+- [ ] Stop tracking runtime logs: add `backend/app.log` to `.gitignore`.
+
+### Roadmap
+- [ ] **Throughput** — pipeline is single-process (~4–5 scripts/min). Add batching / a worker queue.
+- [ ] **Prediction caching** — skip re-OCR/re-scoring for identical scripts.
+- [ ] **More exam formats** — tune line segmentation for varied layouts; assign marks to the
+      synthetic booklets so they become trainable.
+- [ ] **Real MCQ OCR** — currently MCQ answers fall back to the digital record (scan bleed-through
+      defeats OCR). Improve preprocessing for double-sided scans.
+- [ ] **Monitoring & DR** — logging is in; add metrics/alerting and a backup/restore runbook.
+
+### Team workflow
+1. `git pull --rebase origin main` before you start (team pushes directly to `main`).
+2. Make focused commits; run `PYTHONPATH=. pytest -q` (backend) and `npx tsc --noEmit`
+   (in `examshield-mobile2/`) before pushing.
+3. `git pull --rebase origin main` again, then `git push`.
