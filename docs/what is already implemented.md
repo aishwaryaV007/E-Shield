@@ -42,4 +42,4 @@
 A real test script graded **23.5 / 25 = 94% (Grade A+)** across 5 questions in ~30 s (first grade includes the one-time OCR model load).
 
 ---
-*See also: [02_TO_BE_IMPLEMENTED](02_TO_BE_IMPLEMENTED.md) · [04_WORKING_PROCESS](04_WORKING_PROCESS.md)*
+*See also: [what should be implemented](what%20should%20be%20implemented.md) · [working process](working%20process.md)*

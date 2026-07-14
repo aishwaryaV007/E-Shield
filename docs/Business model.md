@@ -31,4 +31,4 @@ marking, and slow turnaround are persistent, well-funded pain points. The global
 assessment market is growing rapidly, with strong demand for privacy-first, self-reliant tools.
 
 ---
-*See also: [01_ALREADY_IMPLEMENTED](01_ALREADY_IMPLEMENTED.md)*
+*See also: [what is already implemented](what%20is%20already%20implemented.md)*

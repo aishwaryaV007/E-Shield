@@ -1,7 +1,7 @@
 # 2. What Should Be Implemented
 
 > Production-hardening and reach items. None are demo blockers — the system already grades
-> exams end-to-end. See [01_ALREADY_IMPLEMENTED](01_ALREADY_IMPLEMENTED.md).
+> exams end-to-end. See [what is already implemented](what%20is%20already%20implemented.md).
 
 ---
 
@@ -28,4 +28,4 @@
 - Class/cohort trends, question-difficulty analysis, examiner-consistency reports.
 
 ---
-*See also: [05_FEATURE_ENHANCEMENTS](05_FEATURE_ENHANCEMENTS.md)*
+*See also: [feature enhancements](feature%20enhancements.md)*

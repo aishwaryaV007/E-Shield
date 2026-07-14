@@ -1,7 +1,7 @@
 # 5. Feature Enhancements
 
 > Candidate improvements to raise accuracy, usability, and reach. Complements the
-> production-hardening list in [02_TO_BE_IMPLEMENTED](02_TO_BE_IMPLEMENTED.md).
+> production-hardening list in [what should be implemented](what%20should%20be%20implemented.md).
 
 ---
 
@@ -31,4 +31,4 @@
 - **Throughput** — single-process, CPU/MPS-bound (~4–5 scripts/min); no parallelism yet.
 
 ---
-*See also: [02_TO_BE_IMPLEMENTED](02_TO_BE_IMPLEMENTED.md)*
+*See also: [what should be implemented](what%20should%20be%20implemented.md)*
